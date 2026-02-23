@@ -25,5 +25,18 @@ export function useFavorites() {
 
   const isFavorite = (animalId: string) => favorites.includes(animalId)
 
-  return { favorites, toggleFavorite, isFavorite }
+  const removeFavorite = (animalId: string) => {
+    setFavorites(prev => {
+      const newFavorites = prev.filter(id => id !== animalId)
+      localStorage.setItem('maya_favorites', JSON.stringify(newFavorites))
+      return newFavorites
+    })
+  }
+
+  const clearFavorites = () => {
+    setFavorites([])
+    localStorage.removeItem('maya_favorites')
+  }
+
+  return { favorites, toggleFavorite, isFavorite, removeFavorite, clearFavorites }
 }
