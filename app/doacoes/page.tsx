@@ -1,0 +1,320 @@
+'use client'
+
+import { useState } from 'react'
+import Link from 'next/link'
+import { Heart, DollarSign, CreditCard, Check, Shield, Lock, TrendingUp } from 'lucide-react'
+import { loadStripe } from '@stripe/stripe-js'
+
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || '')
+
+type DonationType = 'single' | 'monthly'
+
+const presetAmounts = [25, 50, 100, 250]
+
+export default function DoacoesPage() {
+  const [donationType, setDonationType] = useState<DonationType>('single')
+  const [selectedAmount, setSelectedAmount] = useState<number>(50)
+  const [customAmount, setCustomAmount] = useState<string>('')
+  const [isLoading, setIsLoading] = useState(false)
+
+  const handleDonation = async () => {
+    setIsLoading(true)
+
+    try {
+      const amount = customAmount ? parseFloat(customAmount) : selectedAmount
+
+      if (isNaN(amount) || amount < 5) {
+        alert('Por favor, insira um valor válido (mínimo R$ 5)')
+        setIsLoading(false)
+        return
+      }
+
+      // Call API to create Stripe checkout session
+      const response = await fetch('/api/create-checkout-session', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          amount: amount,
+          donationType: donationType,
+        }),
+      })
+
+      const { sessionId, error } = await response.json()
+
+      if (error) {
+        alert(error)
+        setIsLoading(false)
+        return
+      }
+
+      // Redirect to Stripe Checkout
+      const stripe = await stripePromise
+      if (stripe) {
+        const { error } = await stripe.redirectToCheckout({ sessionId })
+        if (error) {
+          alert(error.message)
+        }
+      }
+    } catch (error) {
+      console.error('Error:', error)
+      alert('Erro ao processar doação. Tente novamente.')
+    }
+
+    setIsLoading(false)
+  }
+
+  return (
+    <div className="min-h-screen bg-maya-beige dark:bg-gray-900 py-12">
+      <div className="container mx-auto px-4">
+        {/* Header */}
+        <div className="text-center mb-12">
+          <Heart className="w-16 h-16 text-maya-olive mx-auto mb-4" />
+          <h1 className="text-5xl md:text-6xl font-display font-bold text-maya-brown dark:text-white mb-4">
+            Faça uma Doação
+          </h1>
+          <p className="text-xl text-maya-brown/70 dark:text-gray-300 max-w-2xl mx-auto">
+            Sua contribuição transforma vidas. Cada doação nos ajuda a resgatar, 
+            cuidar e encontrar lares para animais abandonados.
+          </p>
+        </div>
+
+        {/* Donation Form */}
+        <div className="max-w-3xl mx-auto">
+          <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl p-8 md:p-12">
+            {/* Donation Type Toggle */}
+            <div className="mb-8">
+              <h2 className="font-display font-bold text-2xl text-maya-brown dark:text-white mb-4 text-center">
+                Tipo de Doação
+              </h2>
+              <div className="grid grid-cols-2 gap-4">
+                <button
+                  onClick={() => setDonationType('single')}
+                  className={`relative p-6 rounded-2xl border-2 transition-all ${
+                    donationType === 'single'
+                      ? 'border-maya-olive bg-maya-olive/5 dark:bg-maya-olive/10'
+                      : 'border-gray-200 dark:border-gray-600 hover:border-maya-olive/30 dark:hover:border-maya-olive/50'
+                  }`}
+                >
+                  {donationType === 'single' && (
+                    <div className="absolute top-3 right-3 w-6 h-6 bg-maya-olive rounded-full flex items-center justify-center">
+                      <Check className="w-4 h-4 text-white" />
+                    </div>
+                  )}
+                  <Heart className="w-8 h-8 text-maya-olive mx-auto mb-3" />
+                  <div className="font-bold text-maya-brown dark:text-white mb-1">Doação Única</div>
+                  <div className="text-sm text-maya-brown/60 dark:text-gray-300">Contribua uma vez</div>
+                </button>
+
+                <button
+                  onClick={() => setDonationType('monthly')}
+                  className={`relative p-6 rounded-2xl border-2 transition-all ${
+                    donationType === 'monthly'
+                      ? 'border-maya-blue bg-maya-blue/5 dark:bg-maya-blue/10'
+                      : 'border-gray-200 dark:border-gray-600 hover:border-maya-blue/30 dark:hover:border-maya-blue/50'
+                  }`}
+                >
+                  {donationType === 'monthly' && (
+                    <div className="absolute top-3 right-3 w-6 h-6 bg-maya-blue rounded-full flex items-center justify-center">
+                      <Check className="w-4 h-4 text-white" />
+                    </div>
+                  )}
+                  <DollarSign className="w-8 h-8 text-maya-blue mx-auto mb-3" />
+                  <div className="font-bold text-maya-brown dark:text-white mb-1">Doação Mensal</div>
+                  <div className="text-sm text-maya-brown/60 dark:text-gray-300">Seja um apoiador</div>
+                  <div className="absolute top-2 left-2 bg-maya-blue text-white text-xs px-2 py-1 rounded-lg font-semibold">
+                    Recomendado
+                  </div>
+                </button>
+              </div>
+            </div>
+
+            {/* Amount Selection */}
+            <div className="mb-8">
+              <h2 className="font-display font-bold text-2xl text-maya-brown dark:text-white mb-4 text-center">
+                Valor da Doação
+              </h2>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+                {presetAmounts.map((amount) => (
+                  <button
+                    key={amount}
+                    onClick={() => {
+                      setSelectedAmount(amount)
+                      setCustomAmount('')
+                    }}
+                    className={`p-4 rounded-xl border-2 font-bold transition-all ${
+                      selectedAmount === amount && !customAmount
+                        ? 'border-maya-olive bg-maya-olive text-white'
+                        : 'border-gray-200 dark:border-gray-600 text-maya-brown dark:text-white hover:border-maya-olive/50 dark:hover:border-maya-olive'
+                    }`}
+                  >
+                    R$ {amount}
+                  </button>
+                ))}
+              </div>
+
+              {/* Custom Amount */}
+              <div className="relative">
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-maya-brown dark:text-white font-bold text-lg">
+                  R$
+                </span>
+                <input
+                  type="number"
+                  min="5"
+                  step="0.01"
+                  placeholder="Outro valor"
+                  value={customAmount}
+                  onChange={(e) => {
+                    setCustomAmount(e.target.value)
+                    setSelectedAmount(0)
+                  }}
+                  className="w-full pl-12 pr-4 py-4 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:border-maya-olive dark:focus:border-maya-olive focus:outline-none text-lg font-semibold bg-white dark:bg-gray-700 text-maya-brown dark:text-white"
+                />
+              </div>
+
+              <p className="text-sm text-maya-brown/60 dark:text-gray-400 mt-3 text-center">
+                Valor mínimo: R$ 5,00
+              </p>
+            </div>
+
+            {/* Impact Message */}
+            <div className="bg-maya-beige dark:bg-gray-700 rounded-2xl p-6 mb-8">
+              <h3 className="font-bold text-maya-brown dark:text-white mb-3 text-center">
+                Seu impacto:
+              </h3>
+              <div className="space-y-2 text-sm text-maya-brown/80 dark:text-gray-300">
+                {(customAmount ? parseFloat(customAmount) : selectedAmount) >= 25 && (
+                  <div className="flex items-center gap-2">
+                    <Check className="w-5 h-5 text-maya-olive flex-shrink-0" />
+                    <span>Alimentação para 1 animal por 1 semana</span>
+                  </div>
+                )}
+                {(customAmount ? parseFloat(customAmount) : selectedAmount) >= 50 && (
+                  <div className="flex items-center gap-2">
+                    <Check className="w-5 h-5 text-maya-olive flex-shrink-0" />
+                    <span>Vacinas e vermífugos</span>
+                  </div>
+                )}
+                {(customAmount ? parseFloat(customAmount) : selectedAmount) >= 100 && (
+                  <div className="flex items-center gap-2">
+                    <Check className="w-5 h-5 text-maya-olive flex-shrink-0" />
+                    <span>Consulta veterinária completa</span>
+                  </div>
+                )}
+                {(customAmount ? parseFloat(customAmount) : selectedAmount) >= 250 && (
+                  <div className="flex items-center gap-2">
+                    <Check className="w-5 h-5 text-maya-olive flex-shrink-0" />
+                    <span>Cirurgia de castração</span>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Monthly Donation Benefits */}
+            {donationType === 'monthly' && (
+              <div className="bg-maya-blue/10 dark:bg-maya-blue/20 border-l-4 border-maya-blue rounded-lg p-4 mb-8">
+                <h3 className="font-bold text-maya-brown dark:text-white mb-2 flex items-center gap-2">
+                  <Heart className="w-5 h-5 text-maya-olive fill-maya-olive" />
+                  Vantagens de ser um doador mensal:
+                </h3>
+                <ul className="text-sm text-maya-brown/80 dark:text-gray-300 space-y-1">
+                  <li>✓ Sustentabilidade para nossos projetos</li>
+                  <li>✓ Cancele quando quiser</li>
+                  <li>✓ Acompanhe o impacto das suas doações</li>
+                  <li>✓ Receba atualizações exclusivas</li>
+                </ul>
+              </div>
+            )}
+
+            {/* Donate Button */}
+            <button
+              onClick={handleDonation}
+              disabled={isLoading}
+              className="btn-primary w-full text-center inline-flex items-center justify-center gap-2 text-lg py-4 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isLoading ? (
+                <>Processando...</>
+              ) : (
+                <>
+                  <CreditCard size={24} />
+                  Doar {donationType === 'monthly' && 'Mensalmente'} R${' '}
+                  {customAmount || selectedAmount}
+                </>
+              )}
+            </button>
+
+            <p className="text-xs text-maya-brown/60 dark:text-gray-400 text-center mt-4 flex items-center justify-center gap-1">
+              <Lock className="w-3 h-3" />
+              Pagamento seguro processado pelo Stripe
+            </p>
+
+            {/* Doador CTA */}
+            <div className="mt-8 bg-maya-olive/10 dark:bg-maya-olive/20 rounded-2xl p-6 border-2 border-maya-olive/30 dark:border-maya-olive/40">
+              <div className="text-center">
+                <h3 className="font-bold text-maya-brown dark:text-white mb-2 flex items-center justify-center gap-2">
+                  <Heart size={20} className="text-maya-olive fill-maya-olive" />
+                  Já é um doador?
+                </h3>
+                <p className="text-sm text-maya-brown/70 dark:text-gray-300 mb-4">
+                  Acesse sua conta para ver seu histórico de doações, baixar recibos e acompanhar seu impacto
+                </p>
+                <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                  <Link
+                    href="/doador/login"
+                    className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-maya-olive text-white rounded-xl hover:bg-maya-olive-light transition-colors font-semibold"
+                  >
+                    Acessar Área do Doador
+                  </Link>
+                  <Link
+                    href="/doador/registro"
+                    className="inline-flex items-center justify-center gap-2 px-6 py-3 border-2 border-maya-olive text-maya-olive dark:text-maya-olive-light rounded-xl hover:bg-maya-olive/10 dark:hover:bg-maya-olive/20 transition-colors font-semibold"
+                  >
+                    Criar Conta
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Additional Info */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
+            <div className="text-center">
+              <div className="flex justify-center mb-3">
+                <div className="w-16 h-16 bg-maya-olive/10 dark:bg-maya-olive/20 rounded-2xl flex items-center justify-center">
+                  <Shield className="w-8 h-8 text-maya-olive" />
+                </div>
+              </div>
+              <h3 className="font-bold text-maya-brown dark:text-white mb-1">Seguro</h3>
+              <p className="text-sm text-maya-brown/70 dark:text-gray-300">
+                Pagamentos criptografados
+              </p>
+            </div>
+            <div className="text-center">
+              <div className="flex justify-center mb-3">
+                <div className="w-16 h-16 bg-maya-blue/10 dark:bg-maya-blue/20 rounded-2xl flex items-center justify-center">
+                  <TrendingUp className="w-8 h-8 text-maya-blue" />
+                </div>
+              </div>
+              <h3 className="font-bold text-maya-brown dark:text-white mb-1">Transparente</h3>
+              <p className="text-sm text-maya-brown/70 dark:text-gray-300">
+                100% para os animais
+              </p>
+            </div>
+            <div className="text-center">
+              <div className="flex justify-center mb-3">
+                <div className="w-16 h-16 bg-maya-olive/10 dark:bg-maya-olive/20 rounded-2xl flex items-center justify-center">
+                  <CreditCard className="w-8 h-8 text-maya-olive" />
+                </div>
+              </div>
+              <h3 className="font-bold text-maya-brown dark:text-white mb-1">Flexível</h3>
+              <p className="text-sm text-maya-brown/70 dark:text-gray-300">
+                Cancele a qualquer momento
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
