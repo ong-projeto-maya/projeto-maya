@@ -37,8 +37,8 @@ export default function BlogPage() {
       <div className="container mx-auto px-4">
         {/* Header */}
         <div className="text-center mb-12">
-          <BookOpen className="w-16 h-16 text-maya-olive mx-auto mb-4" />
-          <h1 className="text-5xl md:text-6xl font-display font-bold text-maya-brown dark:text-white mb-4">
+          <BookOpen className="w-16 h-16 text-maya-green mx-auto mb-4" />
+          <h1 className="text-5xl md:text-6xl font-display text-maya-brown dark:text-white mb-4">
             Blog Projeto Maya
           </h1>
           <p className="text-xl text-maya-brown/70 dark:text-gray-300 max-w-2xl mx-auto">
@@ -48,16 +48,16 @@ export default function BlogPage() {
 
         {/* Categories */}
         <div className="flex flex-wrap gap-3 justify-center mb-12">
-          <button className="px-6 py-2 bg-maya-olive text-white rounded-full font-semibold">
+          <button className="px-6 py-2 bg-maya-green text-white rounded-full font-semibold">
             Todos
           </button>
-          <button className="px-6 py-2 bg-white dark:bg-gray-800 text-maya-brown dark:text-white rounded-full font-semibold hover:bg-maya-olive/20 dark:hover:bg-maya-olive/30 transition-colors">
+          <button className="px-6 py-2 bg-white dark:bg-gray-800 text-maya-brown dark:text-white rounded-full font-semibold hover:bg-maya-green/20 dark:hover:bg-maya-green/30 transition-colors">
             Resgates
           </button>
-          <button className="px-6 py-2 bg-white dark:bg-gray-800 text-maya-brown dark:text-white rounded-full font-semibold hover:bg-maya-olive/20 dark:hover:bg-maya-olive/30 transition-colors">
+          <button className="px-6 py-2 bg-white dark:bg-gray-800 text-maya-brown dark:text-white rounded-full font-semibold hover:bg-maya-green/20 dark:hover:bg-maya-green/30 transition-colors">
             Dicas
           </button>
-          <button className="px-6 py-2 bg-white dark:bg-gray-800 text-maya-brown dark:text-white rounded-full font-semibold hover:bg-maya-olive/20 dark:hover:bg-maya-olive/30 transition-colors">
+          <button className="px-6 py-2 bg-white dark:bg-gray-800 text-maya-brown dark:text-white rounded-full font-semibold hover:bg-maya-green/20 dark:hover:bg-maya-green/30 transition-colors">
             Histórias de Sucesso
           </button>
         </div>
@@ -77,7 +77,7 @@ export default function BlogPage() {
                   alt={post.title}
                   className="w-full h-full object-cover"
                 />
-                <span className="absolute top-4 left-4 bg-maya-olive text-white px-3 py-1 rounded-full text-xs font-semibold">
+                <span className="absolute top-4 left-4 bg-maya-green text-white px-3 py-1 rounded-full text-xs font-semibold">
                   {post.category}
                 </span>
               </div>
@@ -94,7 +94,7 @@ export default function BlogPage() {
                 </div>
               </div>
 
-              <h2 className="font-display font-bold text-2xl text-maya-brown dark:text-white mb-3 line-clamp-2 group-hover:text-maya-olive transition-colors">
+              <h2 className="font-display text-2xl text-maya-brown dark:text-white mb-3 line-clamp-2 group-hover:text-maya-green transition-colors">
                 {post.title}
               </h2>
 
@@ -102,7 +102,7 @@ export default function BlogPage() {
                 {post.excerpt}
               </p>
 
-              <div className="flex items-center text-maya-olive font-semibold group-hover:gap-2 transition-all">
+              <div className="flex items-center text-maya-green font-semibold group-hover:gap-2 transition-all">
                 Ler mais
                 <ArrowRight size={18} className="ml-1" />
               </div>
@@ -112,7 +112,7 @@ export default function BlogPage() {
 
         {/* Coming Soon */}
         <div className="mt-16 text-center bg-white dark:bg-gray-800 rounded-3xl p-12 max-w-2xl mx-auto shadow-lg">
-          <h2 className="font-display font-bold text-3xl text-maya-brown dark:text-white mb-4">
+          <h2 className="font-display text-3xl text-maya-brown dark:text-white mb-4">
             Mais Histórias em Breve!
           </h2>
           <p className="text-maya-brown/70 dark:text-gray-300 mb-6">

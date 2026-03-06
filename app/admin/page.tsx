@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { PawPrint, Heart, Users, DollarSign, TrendingUp, Plus, Edit, Trash2, AlertTriangle, Dog, Cat, LogOut } from 'lucide-react'
+import { PawPrint, Heart, Users, DollarSign, TrendingUp, Plus, Edit, Trash2, AlertTriangle, Dog, Cat, LogOut, Target } from 'lucide-react'
 import { animals, stats } from '@/data/animals'
 import { useAuth } from '@/hooks/useAuth'
 import Link from 'next/link'
@@ -31,7 +31,7 @@ export default function AdminDashboard() {
     return (
       <div className="min-h-screen bg-gradient-to-b from-gray-100 to-white dark:from-gray-900 dark:to-gray-800 flex items-center justify-center">
         <div className="text-center">
-          <PawPrint className="w-12 h-12 text-maya-olive mx-auto mb-4 animate-pulse" />
+          <PawPrint className="w-12 h-12 text-maya-green mx-auto mb-4 animate-pulse" />
           <p className="text-maya-brown dark:text-white">Carregando...</p>
         </div>
       </div>
@@ -55,7 +55,7 @@ export default function AdminDashboard() {
               className="h-16 w-auto hidden sm:block"
             />
             <div>
-              <h1 className="text-4xl font-display font-bold text-maya-brown dark:text-white mb-2">
+              <h1 className="text-4xl font-display text-maya-brown dark:text-white mb-2">
                 Dashboard Administrativo
               </h1>
               <p className="text-maya-brown/60 dark:text-gray-400">
@@ -104,8 +104,8 @@ export default function AdminDashboard() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg">
             <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 bg-maya-olive/10 rounded-xl flex items-center justify-center">
-                <PawPrint className="w-6 h-6 text-maya-olive" />
+              <div className="w-12 h-12 bg-maya-green/10 rounded-xl flex items-center justify-center">
+                <PawPrint className="w-6 h-6 text-maya-green" />
               </div>
               <TrendingUp className="w-5 h-5 text-green-500" />
             </div>
@@ -146,7 +146,7 @@ export default function AdminDashboard() {
               <div className="w-12 h-12 bg-maya-blue/10 rounded-xl flex items-center justify-center">
                 <DollarSign className="w-6 h-6 text-maya-blue" />
               </div>
-              <span className="text-xs font-semibold text-maya-olive bg-maya-olive/10 px-2 py-1 rounded-full">
+              <span className="text-xs font-semibold text-maya-green bg-maya-green/10 px-2 py-1 rounded-full">
                 {Math.round((stats.currentDonations / stats.monthlyGoal) * 100)}%
               </span>
             </div>
@@ -166,8 +166,8 @@ export default function AdminDashboard() {
               onClick={() => setActiveTab('overview')}
               className={`flex-1 px-6 py-4 font-semibold transition-colors ${
                 activeTab === 'overview'
-                  ? 'text-maya-olive border-b-2 border-maya-olive'
-                  : 'text-maya-brown/60 dark:text-gray-400 hover:text-maya-olive'
+                  ? 'text-maya-green border-b-2 border-maya-green'
+                  : 'text-maya-brown/60 dark:text-gray-400 hover:text-maya-green'
               }`}
             >
               Visão Geral
@@ -176,8 +176,8 @@ export default function AdminDashboard() {
               onClick={() => setActiveTab('animals')}
               className={`flex-1 px-6 py-4 font-semibold transition-colors ${
                 activeTab === 'animals'
-                  ? 'text-maya-olive border-b-2 border-maya-olive'
-                  : 'text-maya-brown/60 dark:text-gray-400 hover:text-maya-olive'
+                  ? 'text-maya-green border-b-2 border-maya-green'
+                  : 'text-maya-brown/60 dark:text-gray-400 hover:text-maya-green'
               }`}
             >
               Animais
@@ -186,8 +186,8 @@ export default function AdminDashboard() {
               onClick={() => setActiveTab('donations')}
               className={`flex-1 px-6 py-4 font-semibold transition-colors ${
                 activeTab === 'donations'
-                  ? 'text-maya-olive border-b-2 border-maya-olive'
-                  : 'text-maya-brown/60 dark:text-gray-400 hover:text-maya-olive'
+                  ? 'text-maya-green border-b-2 border-maya-green'
+                  : 'text-maya-brown/60 dark:text-gray-400 hover:text-maya-green'
               }`}
             >
               Doações
@@ -200,7 +200,7 @@ export default function AdminDashboard() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Recent Activity */}
             <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg">
-              <h2 className="font-display font-bold text-2xl text-maya-brown dark:text-white mb-4">
+              <h2 className="font-display text-2xl text-maya-brown dark:text-white mb-4">
                 Atividades Recentes
               </h2>
               <div className="space-y-4">
@@ -227,7 +227,7 @@ export default function AdminDashboard() {
                   </div>
                 </div>
                 <div className="flex items-start gap-3 p-3 bg-maya-beige dark:bg-gray-700 rounded-lg">
-                  <PawPrint className="w-5 h-5 text-maya-olive mt-0.5" />
+                  <PawPrint className="w-5 h-5 text-maya-green mt-0.5" />
                   <div>
                     <p className="text-sm font-semibold text-maya-brown dark:text-white">
                       Novo resgate realizado
@@ -242,17 +242,26 @@ export default function AdminDashboard() {
 
             {/* Quick Actions */}
             <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg">
-              <h2 className="font-display font-bold text-2xl text-maya-brown dark:text-white mb-4">
+              <h2 className="font-display text-2xl text-maya-brown dark:text-white mb-4">
                 Ações Rápidas
               </h2>
               <div className="grid grid-cols-2 gap-4">
                 <Link
                   href="/admin/animais"
-                  className="p-4 bg-maya-olive/10 hover:bg-maya-olive/20 rounded-xl transition-colors text-left"
+                  className="p-4 bg-maya-green/10 hover:bg-maya-green/20 rounded-xl transition-colors text-left"
                 >
-                  <Plus className="w-6 h-6 text-maya-olive mb-2" />
+                  <Plus className="w-6 h-6 text-maya-green mb-2" />
                   <p className="font-semibold text-maya-brown dark:text-white text-sm">
                     Gerenciar Animais
+                  </p>
+                </Link>
+                <Link
+                  href="/admin/campanhas"
+                  className="p-4 bg-maya-orange/10 hover:bg-maya-orange/20 rounded-xl transition-colors text-left"
+                >
+                  <Target className="w-6 h-6 text-maya-orange mb-2" />
+                  <p className="font-semibold text-maya-brown dark:text-white text-sm">
+                    Gerenciar Campanhas
                   </p>
                 </Link>
                 <Link
@@ -290,7 +299,7 @@ export default function AdminDashboard() {
         {activeTab === 'animals' && (
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg">
             <div className="p-6 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
-              <h2 className="font-display font-bold text-2xl text-maya-brown dark:text-white">
+              <h2 className="font-display text-2xl text-maya-brown dark:text-white">
                 Gerenciar Animais
               </h2>
               <Link
@@ -342,7 +351,7 @@ export default function AdminDashboard() {
                           <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
                             animal.isAdopted
                               ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
-                              : 'bg-maya-olive/10 text-maya-olive'
+                              : 'bg-maya-green/10 text-maya-green'
                           }`}>
                             {animal.isAdopted ? 'Adotado' : 'Disponível'}
                           </span>
@@ -368,7 +377,7 @@ export default function AdminDashboard() {
 
         {activeTab === 'donations' && (
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6">
-            <h2 className="font-display font-bold text-2xl text-maya-brown dark:text-white mb-6">
+            <h2 className="font-display text-2xl text-maya-brown dark:text-white mb-6">
               Relatório de Doações
             </h2>
             
@@ -376,13 +385,13 @@ export default function AdminDashboard() {
             <div className="mb-8">
               <div className="flex justify-between text-sm mb-2">
                 <span className="font-semibold text-maya-brown dark:text-white">Meta Mensal</span>
-                <span className="text-maya-olive font-bold">
+                <span className="text-maya-green font-bold">
                   {Math.round((stats.currentDonations / stats.monthlyGoal) * 100)}%
                 </span>
               </div>
               <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 overflow-hidden">
                 <div
-                  className="bg-gradient-to-r from-maya-olive to-maya-olive-light h-full transition-all duration-500"
+                  className="bg-gradient-to-r from-maya-green to-maya-green h-full transition-all duration-500"
                   style={{ width: `${(stats.currentDonations / stats.monthlyGoal) * 100}%` }}
                 />
               </div>
@@ -394,7 +403,7 @@ export default function AdminDashboard() {
 
             {/* Mock Donations Table */}
             <div className="bg-maya-beige dark:bg-gray-700 rounded-xl p-6 text-center">
-              <DollarSign className="w-12 h-12 text-maya-olive mx-auto mb-3" />
+              <DollarSign className="w-12 h-12 text-maya-green mx-auto mb-3" />
               <p className="text-maya-brown/70 dark:text-gray-300 mb-4">
                 Conecte um banco de dados para ver o histórico completo de doações
               </p>

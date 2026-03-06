@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Caprasimo&family=Nunito:wght@300;400;500;600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -40,14 +40,14 @@
     }
     
     .btn-outline {
-      @apply border-maya-olive-light text-maya-olive-light hover:bg-maya-olive-light hover:text-gray-900;
+      @apply border-maya-green text-maya-green hover:bg-maya-green hover:text-gray-900;
     }
   }
 }
 
 @layer components {
   .btn-primary {
-    @apply bg-maya-olive hover:bg-maya-olive-light text-white font-semibold py-3 px-8 rounded-2xl transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-0.5;
+    @apply bg-maya-green hover:bg-maya-green text-white font-semibold py-3 px-8 rounded-2xl transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-0.5;
   }
 
   .btn-secondary {
@@ -55,7 +55,7 @@
   }
 
   .btn-outline {
-    @apply border-2 border-maya-olive text-maya-olive hover:bg-maya-olive hover:text-white font-semibold py-3 px-8 rounded-2xl transition-all duration-300;
+    @apply border-2 border-maya-green text-maya-green hover:bg-maya-green hover:text-white font-semibold py-3 px-8 rounded-2xl transition-all duration-300;
   }
 
   .card {

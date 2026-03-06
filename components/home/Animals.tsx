@@ -32,17 +32,65 @@ export default function Animals() {
                   className="object-cover"
                   priority={false}
                 />
-                {animal.isPuppy && (
-                  <span className="absolute top-4 left-4 bg-maya-blue text-white px-3 py-1 rounded-full text-sm font-semibold">
-                    Filhote
-                  </span>
-                )}
+                {/* Badges do Brandbook */}
+                <div className="absolute top-4 left-4 flex flex-col gap-2">
+                  {animal.isAdopted && (
+                    <div className="relative w-24 h-24">
+                      <Image
+                        src="/images/badge-adotado.png"
+                        alt="Adotado"
+                        fill
+                        className="object-contain drop-shadow-lg"
+                      />
+                    </div>
+                  )}
+                  {animal.isRescued && !animal.isAdopted && (
+                    <div className="relative w-24 h-24">
+                      <Image
+                        src="/images/badge-novo-resgatado.png"
+                        alt="Resgatado"
+                        fill
+                        className="object-contain drop-shadow-lg"
+                      />
+                    </div>
+                  )}
+                  {animal.isPuppy && !animal.isAdopted && !animal.isRescued && (
+                    <div className="relative w-24 h-24">
+                      <Image
+                        src="/images/badge-novo-resgatado.png"
+                        alt="Novo/Filhote"
+                        fill
+                        className="object-contain drop-shadow-lg"
+                      />
+                    </div>
+                  )}
+                  {animal.isMixed && !animal.isAdopted && (
+                    <div className="relative w-24 h-24">
+                      <Image
+                        src="/images/badge-sem-raca.png"
+                        alt="Sem Raça Definida"
+                        fill
+                        className="object-contain drop-shadow-lg"
+                      />
+                    </div>
+                  )}
+                  {!animal.isAdopted && !animal.isRescued && !animal.isPuppy && !animal.isMixed && (
+                    <div className="relative w-24 h-24">
+                      <Image
+                        src="/images/badge-quer-mea-adotar.png"
+                        alt="Quer me adotar?"
+                        fill
+                        className="object-contain drop-shadow-lg"
+                      />
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* Info */}
               <div className="flex justify-between items-start mb-3">
                 <div>
-                  <h3 className="font-display font-bold text-2xl text-maya-brown mb-1">
+                  <h3 className="font-display text-2xl text-maya-brown mb-1">
                     {animal.name}
                   </h3>
                   <p className="text-maya-brown/60 text-sm flex items-center gap-1">
@@ -50,7 +98,7 @@ export default function Animals() {
                     {animal.age} • {animal.gender === 'male' ? 'Macho' : 'Fêmea'}
                   </p>
                 </div>
-                <Heart className="w-6 h-6 text-maya-olive" />
+                <Heart className="w-6 h-6 text-maya-green" />
               </div>
 
               {/* Temperament */}
@@ -58,7 +106,7 @@ export default function Animals() {
                 {animal.temperament.slice(0, 3).map((trait) => (
                   <span
                     key={trait}
-                    className="text-xs bg-maya-olive/10 text-maya-olive px-3 py-1 rounded-full"
+                    className="text-xs bg-maya-green/10 text-maya-green px-3 py-1 rounded-full"
                   >
                     {trait}
                   </span>
@@ -73,7 +121,7 @@ export default function Animals() {
               {/* CTA Button */}
               <Link
                 href={`/adocao/${animal.id}`}
-                className="inline-flex items-center gap-2 text-maya-olive hover:text-maya-olive-light font-semibold transition-colors"
+                className="inline-flex items-center gap-2 text-maya-green hover:text-maya-blue font-semibold transition-colors"
               >
                 Conhecer {animal.name}
                 <ArrowRight size={18} />

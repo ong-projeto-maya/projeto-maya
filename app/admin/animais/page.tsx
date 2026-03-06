@@ -42,6 +42,8 @@ export default function AdminAnimaisPage() {
     image: '',
     isAdopted: false,
     isPuppy: false,
+    isRescued: false,
+    isMixed: false,
   })
 
   useEffect(() => {
@@ -78,6 +80,8 @@ export default function AdminAnimaisPage() {
         image: animal.image,
         isAdopted: animal.isAdopted,
         isPuppy: animal.isPuppy,
+        isRescued: animal.isRescued || false,
+        isMixed: animal.isMixed || false,
       })
     } else {
       setEditingAnimal(null)
@@ -92,6 +96,8 @@ export default function AdminAnimaisPage() {
         image: 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=800&q=80',
         isAdopted: false,
         isPuppy: false,
+        isRescued: false,
+        isMixed: false,
       })
     }
     setShowModal(true)
@@ -144,14 +150,14 @@ export default function AdminAnimaisPage() {
         <div className="mb-8">
           <Link
             href="/admin"
-            className="inline-flex items-center gap-2 text-maya-olive hover:text-maya-olive-light mb-4"
+            className="inline-flex items-center gap-2 text-maya-green hover:text-maya-green mb-4"
           >
             <ArrowLeft size={20} />
             Voltar ao Dashboard
           </Link>
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-4xl font-display font-bold text-maya-brown dark:text-white mb-2">
+              <h1 className="text-4xl font-display text-maya-brown dark:text-white mb-2">
                 Gerenciar Animais
               </h1>
               <p className="text-maya-brown/70 dark:text-gray-300">
@@ -188,7 +194,7 @@ export default function AdminAnimaisPage() {
                   placeholder="Buscar por nome..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:border-maya-olive focus:outline-none bg-white dark:bg-gray-700 text-maya-brown dark:text-white"
+                  className="w-full pl-10 pr-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:border-maya-green focus:outline-none bg-white dark:bg-gray-700 text-maya-brown dark:text-white"
                 />
               </div>
             </div>
@@ -199,7 +205,7 @@ export default function AdminAnimaisPage() {
                 onClick={() => setFilterType('all')}
                 className={`px-4 py-2 rounded-xl font-semibold transition-all ${
                   filterType === 'all'
-                    ? 'bg-maya-olive text-white'
+                    ? 'bg-maya-green text-white'
                     : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
                 }`}
               >
@@ -209,7 +215,7 @@ export default function AdminAnimaisPage() {
                 onClick={() => setFilterType('dog')}
                 className={`px-4 py-2 rounded-xl font-semibold transition-all inline-flex items-center gap-2 ${
                   filterType === 'dog'
-                    ? 'bg-maya-olive text-white'
+                    ? 'bg-maya-green text-white'
                     : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
                 }`}
               >
@@ -219,7 +225,7 @@ export default function AdminAnimaisPage() {
                 onClick={() => setFilterType('cat')}
                 className={`px-4 py-2 rounded-xl font-semibold transition-all inline-flex items-center gap-2 ${
                   filterType === 'cat'
-                    ? 'bg-maya-olive text-white'
+                    ? 'bg-maya-green text-white'
                     : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
                 }`}
               >
@@ -300,7 +306,7 @@ export default function AdminAnimaisPage() {
                         className={`px-3 py-1 rounded-full text-xs font-semibold cursor-pointer hover:opacity-80 transition-opacity ${
                           animal.isAdopted
                             ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
-                            : 'bg-maya-olive/10 text-maya-olive dark:bg-maya-olive/20'
+                            : 'bg-maya-green/10 text-maya-green dark:bg-maya-green/20'
                         }`}
                       >
                         {animal.isAdopted ? 'Adotado' : 'Disponível'}
@@ -313,7 +319,7 @@ export default function AdminAnimaisPage() {
                           className="p-2 hover:bg-maya-beige dark:hover:bg-gray-600 rounded-lg transition-colors"
                           title="Editar"
                         >
-                          <Edit size={18} className="text-maya-olive" />
+                          <Edit size={18} className="text-maya-green" />
                         </button>
                         <button
                           onClick={() => handleDelete(animal)}
@@ -343,7 +349,7 @@ export default function AdminAnimaisPage() {
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 overflow-y-auto">
           <div className="bg-white dark:bg-gray-800 rounded-3xl max-w-2xl w-full my-8">
             <div className="p-6 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
-              <h2 className="text-2xl font-display font-bold text-maya-brown dark:text-white">
+              <h2 className="text-2xl font-display text-maya-brown dark:text-white">
                 {editingAnimal ? 'Editar Animal' : 'Adicionar Animal'}
               </h2>
               <button
@@ -364,7 +370,7 @@ export default function AdminAnimaisPage() {
                   type="text"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:border-maya-olive focus:outline-none bg-white dark:bg-gray-700 text-maya-brown dark:text-white"
+                  className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:border-maya-green focus:outline-none bg-white dark:bg-gray-700 text-maya-brown dark:text-white"
                   required
                 />
               </div>
@@ -378,7 +384,7 @@ export default function AdminAnimaisPage() {
                   <select
                     value={formData.type}
                     onChange={(e) => setFormData({ ...formData, type: e.target.value as 'dog' | 'cat' })}
-                    className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:border-maya-olive focus:outline-none bg-white dark:bg-gray-700 text-maya-brown dark:text-white"
+                    className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:border-maya-green focus:outline-none bg-white dark:bg-gray-700 text-maya-brown dark:text-white"
                   >
                     <option value="dog">Cão</option>
                     <option value="cat">Gato</option>
@@ -392,7 +398,7 @@ export default function AdminAnimaisPage() {
                   <select
                     value={formData.gender}
                     onChange={(e) => setFormData({ ...formData, gender: e.target.value as 'male' | 'female' })}
-                    className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:border-maya-olive focus:outline-none bg-white dark:bg-gray-700 text-maya-brown dark:text-white"
+                    className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:border-maya-green focus:outline-none bg-white dark:bg-gray-700 text-maya-brown dark:text-white"
                   >
                     <option value="male">Macho</option>
                     <option value="female">Fêmea</option>
@@ -411,7 +417,7 @@ export default function AdminAnimaisPage() {
                     value={formData.age}
                     onChange={(e) => setFormData({ ...formData, age: e.target.value })}
                     placeholder="Ex: 2 anos"
-                    className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:border-maya-olive focus:outline-none bg-white dark:bg-gray-700 text-maya-brown dark:text-white"
+                    className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:border-maya-green focus:outline-none bg-white dark:bg-gray-700 text-maya-brown dark:text-white"
                     required
                   />
                 </div>
@@ -423,7 +429,7 @@ export default function AdminAnimaisPage() {
                   <select
                     value={formData.size}
                     onChange={(e) => setFormData({ ...formData, size: e.target.value as 'small' | 'medium' | 'large' })}
-                    className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:border-maya-olive focus:outline-none bg-white dark:bg-gray-700 text-maya-brown dark:text-white"
+                    className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:border-maya-green focus:outline-none bg-white dark:bg-gray-700 text-maya-brown dark:text-white"
                   >
                     <option value="small">Pequeno</option>
                     <option value="medium">Médio</option>
@@ -442,7 +448,7 @@ export default function AdminAnimaisPage() {
                   value={formData.temperament}
                   onChange={(e) => setFormData({ ...formData, temperament: e.target.value })}
                   placeholder="Ex: Dócil, Carinhoso, Brincalhão"
-                  className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:border-maya-olive focus:outline-none bg-white dark:bg-gray-700 text-maya-brown dark:text-white"
+                  className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:border-maya-green focus:outline-none bg-white dark:bg-gray-700 text-maya-brown dark:text-white"
                   required
                 />
               </div>
@@ -456,7 +462,7 @@ export default function AdminAnimaisPage() {
                   value={formData.story}
                   onChange={(e) => setFormData({ ...formData, story: e.target.value })}
                   rows={4}
-                  className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:border-maya-olive focus:outline-none bg-white dark:bg-gray-700 text-maya-brown dark:text-white resize-none"
+                  className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:border-maya-green focus:outline-none bg-white dark:bg-gray-700 text-maya-brown dark:text-white resize-none"
                   required
                 />
               </div>
@@ -471,32 +477,131 @@ export default function AdminAnimaisPage() {
                   value={formData.image}
                   onChange={(e) => setFormData({ ...formData, image: e.target.value })}
                   placeholder="https://..."
-                  className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:border-maya-olive focus:outline-none bg-white dark:bg-gray-700 text-maya-brown dark:text-white"
+                  className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:border-maya-green focus:outline-none bg-white dark:bg-gray-700 text-maya-brown dark:text-white"
                   required
                 />
               </div>
 
-              {/* Checkboxes */}
-              <div className="flex gap-6">
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={formData.isAdopted}
-                    onChange={(e) => setFormData({ ...formData, isAdopted: e.target.checked })}
-                    className="w-5 h-5 text-maya-olive rounded focus:ring-maya-olive"
-                  />
-                  <span className="text-sm font-medium text-maya-brown dark:text-white">Adotado</span>
+              {/* Badges Section */}
+              <div>
+                <label className="block text-sm font-semibold text-maya-brown dark:text-white mb-3">
+                  Badges (Selos) do Animal
                 </label>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
+                  Selecione as badges que serão exibidas no card do animal
+                </p>
+                
+                {/* Badge Preview */}
+                {(formData.isAdopted || formData.isRescued || formData.isPuppy || formData.isMixed) && (
+                  <div className="mb-4 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl">
+                    <p className="text-xs font-semibold text-maya-brown dark:text-white mb-2">Prévia da Badge:</p>
+                    <div className="flex gap-2">
+                      {formData.isAdopted && (
+                        <div className="relative w-20 h-20">
+                          <Image
+                            src="/images/badge-adotado.png"
+                            alt="Adotado"
+                            fill
+                            className="object-contain"
+                          />
+                        </div>
+                      )}
+                      {(formData.isRescued || formData.isPuppy) && !formData.isAdopted && (
+                        <div className="relative w-20 h-20">
+                          <Image
+                            src="/images/badge-novo-resgatado.png"
+                            alt="Resgatado"
+                            fill
+                            className="object-contain"
+                          />
+                        </div>
+                      )}
+                      {formData.isMixed && !formData.isAdopted && (
+                        <div className="relative w-20 h-20">
+                          <Image
+                            src="/images/badge-sem-raca.png"
+                            alt="SRD"
+                            fill
+                            className="object-contain"
+                          />
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <label className={`flex items-start gap-3 p-3 border-2 rounded-xl cursor-pointer transition-colors ${
+                    formData.isAdopted 
+                      ? 'border-maya-green bg-maya-green/5' 
+                      : 'border-gray-200 dark:border-gray-600 hover:border-maya-green'
+                  }`}>
+                    <input
+                      type="checkbox"
+                      checked={formData.isAdopted}
+                      onChange={(e) => setFormData({ ...formData, isAdopted: e.target.checked })}
+                      className="w-5 h-5 text-maya-green rounded focus:ring-maya-green mt-0.5"
+                    />
+                    <div>
+                      <span className="text-sm font-medium text-maya-brown dark:text-white block">🎉 Adotado</span>
+                      <span className="text-xs text-gray-500 dark:text-gray-400">Badge verde "ADOTADO"</span>
+                    </div>
+                  </label>
 
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={formData.isPuppy}
-                    onChange={(e) => setFormData({ ...formData, isPuppy: e.target.checked })}
-                    className="w-5 h-5 text-maya-olive rounded focus:ring-maya-olive"
-                  />
-                  <span className="text-sm font-medium text-maya-brown dark:text-white">Filhote</span>
-                </label>
+                  <label className={`flex items-start gap-3 p-3 border-2 rounded-xl cursor-pointer transition-colors ${
+                    formData.isRescued 
+                      ? 'border-maya-green bg-maya-green/5' 
+                      : 'border-gray-200 dark:border-gray-600 hover:border-maya-green'
+                  }`}>
+                    <input
+                      type="checkbox"
+                      checked={formData.isRescued}
+                      onChange={(e) => setFormData({ ...formData, isRescued: e.target.checked })}
+                      className="w-5 h-5 text-maya-green rounded focus:ring-maya-green mt-0.5"
+                    />
+                    <div>
+                      <span className="text-sm font-medium text-maya-brown dark:text-white block">🆘 Resgatado</span>
+                      <span className="text-xs text-gray-500 dark:text-gray-400">Badge "NOVO / RESGATADO"</span>
+                    </div>
+                  </label>
+
+                  <label className={`flex items-start gap-3 p-3 border-2 rounded-xl cursor-pointer transition-colors ${
+                    formData.isPuppy 
+                      ? 'border-maya-green bg-maya-green/5' 
+                      : 'border-gray-200 dark:border-gray-600 hover:border-maya-green'
+                  }`}>
+                    <input
+                      type="checkbox"
+                      checked={formData.isPuppy}
+                      onChange={(e) => setFormData({ ...formData, isPuppy: e.target.checked })}
+                      className="w-5 h-5 text-maya-green rounded focus:ring-maya-green mt-0.5"
+                    />
+                    <div>
+                      <span className="text-sm font-medium text-maya-brown dark:text-white block">🐾 Filhote/Novo</span>
+                      <span className="text-xs text-gray-500 dark:text-gray-400">Badge "NOVO / RESGATADO"</span>
+                    </div>
+                  </label>
+
+                  <label className={`flex items-start gap-3 p-3 border-2 rounded-xl cursor-pointer transition-colors ${
+                    formData.isMixed 
+                      ? 'border-maya-green bg-maya-green/5' 
+                      : 'border-gray-200 dark:border-gray-600 hover:border-maya-green'
+                  }`}>
+                    <input
+                      type="checkbox"
+                      checked={formData.isMixed}
+                      onChange={(e) => setFormData({ ...formData, isMixed: e.target.checked })}
+                      className="w-5 h-5 text-maya-green rounded focus:ring-maya-green mt-0.5"
+                    />
+                    <div>
+                      <span className="text-sm font-medium text-maya-brown dark:text-white block">🌈 SRD</span>
+                      <span className="text-xs text-gray-500 dark:text-gray-400">Badge "SEM RAÇA DEFINIDA"</span>
+                    </div>
+                  </label>
+                </div>
+                <p className="text-xs text-maya-brown/60 dark:text-gray-400 mt-3 italic">
+                  💡 Se nenhuma badge for selecionada, será exibida a badge padrão "QUER ME ADOTAR?"
+                </p>
               </div>
 
               {/* Buttons */}

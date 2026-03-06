@@ -10,8 +10,8 @@ export default function LocalizacaoPage() {
       <div className="container mx-auto px-4">
         {/* Header */}
         <div className="text-center mb-12">
-          <MapPin className="w-16 h-16 text-maya-olive mx-auto mb-4" />
-          <h1 className="text-5xl md:text-6xl font-display font-bold text-maya-brown dark:text-white mb-4">
+          <MapPin className="w-16 h-16 text-maya-green mx-auto mb-4" />
+          <h1 className="text-5xl md:text-6xl font-display text-maya-brown dark:text-white mb-4">
             Nossa Localização
           </h1>
           <p className="text-xl text-maya-brown/70 dark:text-gray-300 max-w-2xl mx-auto">
@@ -41,11 +41,11 @@ export default function LocalizacaoPage() {
             {/* Address Card */}
             <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg">
               <div className="flex items-start gap-4">
-                <div className="w-12 h-12 bg-maya-olive/10 rounded-xl flex items-center justify-center flex-shrink-0">
-                  <MapPin className="w-6 h-6 text-maya-olive" />
+                <div className="w-12 h-12 bg-maya-green/10 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <MapPin className="w-6 h-6 text-maya-green" />
                 </div>
                 <div>
-                  <h3 className="font-display font-bold text-xl text-maya-brown dark:text-white mb-2">
+                  <h3 className="font-display text-xl text-maya-brown dark:text-white mb-2">
                     Endereço
                   </h3>
                   <p className="text-maya-brown/70 dark:text-gray-300 mb-4">
@@ -56,7 +56,7 @@ export default function LocalizacaoPage() {
                     href={mapsUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 text-maya-olive hover:text-maya-olive-light font-semibold"
+                    className="inline-flex items-center gap-2 text-maya-green hover:text-maya-green font-semibold"
                   >
                     <Navigation size={18} />
                     Abrir no Google Maps
@@ -72,7 +72,7 @@ export default function LocalizacaoPage() {
                   <Clock className="w-6 h-6 text-maya-blue" />
                 </div>
                 <div>
-                  <h3 className="font-display font-bold text-xl text-maya-brown dark:text-white mb-3">
+                  <h3 className="font-display text-xl text-maya-brown dark:text-white mb-3">
                     Horário de Funcionamento
                   </h3>
                   <div className="space-y-2 text-maya-brown/70 dark:text-gray-300">
@@ -100,24 +100,24 @@ export default function LocalizacaoPage() {
             {/* Contact Card */}
             <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg">
               <div className="flex items-start gap-4">
-                <div className="w-12 h-12 bg-maya-olive/10 rounded-xl flex items-center justify-center flex-shrink-0">
-                  <Phone className="w-6 h-6 text-maya-olive" />
+                <div className="w-12 h-12 bg-maya-green/10 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <Phone className="w-6 h-6 text-maya-green" />
                 </div>
                 <div>
-                  <h3 className="font-display font-bold text-xl text-maya-brown dark:text-white mb-3">
+                  <h3 className="font-display text-xl text-maya-brown dark:text-white mb-3">
                     Contato
                   </h3>
                   <div className="space-y-3">
                     <a
                       href="tel:+5511999999999"
-                      className="flex items-center gap-2 text-maya-brown/70 dark:text-gray-300 hover:text-maya-olive"
+                      className="flex items-center gap-2 text-maya-brown/70 dark:text-gray-300 hover:text-maya-green"
                     >
                       <Phone size={18} />
                       (11) 9 9999-9999
                     </a>
                     <a
                       href="mailto:contato@projetomaya.org"
-                      className="flex items-center gap-2 text-maya-brown/70 dark:text-gray-300 hover:text-maya-olive"
+                      className="flex items-center gap-2 text-maya-brown/70 dark:text-gray-300 hover:text-maya-green"
                     >
                       <Mail size={18} />
                       contato@projetomaya.org
@@ -128,8 +128,8 @@ export default function LocalizacaoPage() {
             </div>
 
             {/* CTA */}
-            <div className="bg-gradient-to-br from-maya-olive to-maya-olive-light text-white rounded-2xl p-6">
-              <h3 className="font-display font-bold text-2xl mb-3">
+            <div className="bg-gradient-to-br from-maya-green to-maya-green text-white rounded-2xl p-6">
+              <h3 className="font-display text-2xl mb-3">
                 Agende sua Visita!
               </h3>
               <p className="mb-4 opacity-90">
@@ -140,7 +140,7 @@ export default function LocalizacaoPage() {
                   href="https://wa.me/5511999999999?text=Olá!%20Gostaria%20de%20agendar%20uma%20visita%20ao%20Projeto%20Maya"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="bg-white text-maya-olive hover:bg-maya-beige font-semibold px-6 py-3 rounded-xl transition-all inline-block"
+                  className="bg-white text-maya-green hover:bg-maya-beige font-semibold px-6 py-3 rounded-xl transition-all inline-block"
                 >
                   WhatsApp
                 </a>
@@ -158,15 +158,15 @@ export default function LocalizacaoPage() {
         {/* How to Get Here */}
         <div className="mt-16 max-w-4xl mx-auto">
           <div className="bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-lg">
-            <h2 className="font-display font-bold text-3xl text-maya-brown dark:text-white mb-6 text-center">
+            <h2 className="font-display text-3xl text-maya-brown dark:text-white mb-6 text-center">
               Como Chegar
             </h2>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="text-center">
                 <div className="flex justify-center mb-3">
-                  <div className="w-16 h-16 bg-maya-olive/10 rounded-2xl flex items-center justify-center">
-                    <Car className="w-8 h-8 text-maya-olive" />
+                  <div className="w-16 h-16 bg-maya-green/10 rounded-2xl flex items-center justify-center">
+                    <Car className="w-8 h-8 text-maya-green" />
                   </div>
                 </div>
                 <h3 className="font-bold text-maya-brown dark:text-white mb-2">De Carro</h3>
@@ -189,8 +189,8 @@ export default function LocalizacaoPage() {
 
               <div className="text-center">
                 <div className="flex justify-center mb-3">
-                  <div className="w-16 h-16 bg-maya-olive/10 rounded-2xl flex items-center justify-center">
-                    <Bus className="w-8 h-8 text-maya-olive" />
+                  <div className="w-16 h-16 bg-maya-green/10 rounded-2xl flex items-center justify-center">
+                    <Bus className="w-8 h-8 text-maya-green" />
                   </div>
                 </div>
                 <h3 className="font-bold text-maya-brown dark:text-white mb-2">Ônibus</h3>
