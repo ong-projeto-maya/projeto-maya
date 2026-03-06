@@ -49,6 +49,10 @@ export default function AdminCampanhasPage() {
 
   // Redirect if not authenticated
   if (!loading && !user) {
+    router.push('/admin/login')
+    return null
+  }
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
