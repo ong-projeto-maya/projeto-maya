@@ -43,17 +43,13 @@ const urgencyNames = {
 }
 
 export default function AdminCampanhasPage() {
-  const { user, isLoading } = useAuth()
+  const { user, loading } = useAuth()
   const router = useRouter()
   const [selectedFilter, setSelectedFilter] = useState<'all' | 'active' | 'inactive'>('all')
 
   // Redirect if not authenticated
-  if (!isLoading && !user) {
-    router.push('/admin/login')
-    return null
-  }
-
-  if (isLoading) {
+  if (!loading && !user) {
+  if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
