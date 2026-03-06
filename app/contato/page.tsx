@@ -41,8 +41,8 @@ export default function ContatoPage() {
       <div className="container mx-auto px-4">
         {/* Header */}
         <div className="text-center mb-12">
-          <MessageSquare className="w-16 h-16 text-maya-olive mx-auto mb-4" />
-          <h1 className="text-5xl md:text-6xl font-display font-bold text-maya-brown dark:text-white mb-4">
+          <MessageSquare className="w-16 h-16 text-maya-green mx-auto mb-4" />
+          <h1 className="text-5xl md:text-6xl font-display text-maya-brown dark:text-white mb-4">
             Entre em Contato
           </h1>
           <p className="text-xl text-maya-brown/70 dark:text-gray-300 max-w-2xl mx-auto">
@@ -54,28 +54,28 @@ export default function ContatoPage() {
           {/* Contact Info */}
           <div className="space-y-6">
             <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg">
-              <Mail className="w-8 h-8 text-maya-olive mb-4" />
-              <h3 className="font-display font-bold text-xl text-maya-brown dark:text-white mb-2">
+              <Mail className="w-8 h-8 text-maya-green mb-4" />
+              <h3 className="font-display text-xl text-maya-brown dark:text-white mb-2">
                 Email
               </h3>
-              <a href="mailto:contato@projetomaya.org" className="text-maya-brown/70 dark:text-gray-300 hover:text-maya-olive">
+              <a href="mailto:contato@projetomaya.org" className="text-maya-brown/70 dark:text-gray-300 hover:text-maya-green">
                 contato@projetomaya.org
               </a>
             </div>
 
             <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg">
-              <Phone className="w-8 h-8 text-maya-olive mb-4" />
-              <h3 className="font-display font-bold text-xl text-maya-brown dark:text-white mb-2">
+              <Phone className="w-8 h-8 text-maya-green mb-4" />
+              <h3 className="font-display text-xl text-maya-brown dark:text-white mb-2">
                 Telefone/WhatsApp
               </h3>
-              <a href="tel:+5511999999999" className="text-maya-brown/70 dark:text-gray-300 hover:text-maya-olive">
+              <a href="tel:+5511999999999" className="text-maya-brown/70 dark:text-gray-300 hover:text-maya-green">
                 (11) 9 9999-9999
               </a>
             </div>
 
             <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg">
-              <MapPin className="w-8 h-8 text-maya-olive mb-4" />
-              <h3 className="font-display font-bold text-xl text-maya-brown dark:text-white mb-2">
+              <MapPin className="w-8 h-8 text-maya-green mb-4" />
+              <h3 className="font-display text-xl text-maya-brown dark:text-white mb-2">
                 Localização
               </h3>
               <p className="text-maya-brown/70 dark:text-gray-300">
@@ -84,8 +84,8 @@ export default function ContatoPage() {
               </p>
             </div>
 
-            <div className="bg-gradient-to-br from-maya-olive to-maya-olive-light text-white rounded-2xl p-6">
-              <h3 className="font-display font-bold text-xl mb-2">
+            <div className="bg-gradient-to-br from-maya-green to-maya-green text-white rounded-2xl p-6">
+              <h3 className="font-display text-xl mb-2">
                 Horário de Atendimento
               </h3>
               <p className="text-sm opacity-90">
@@ -99,7 +99,7 @@ export default function ContatoPage() {
           {/* Contact Form */}
           <div className="lg:col-span-2">
             <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl p-8">
-              <h2 className="font-display font-bold text-3xl text-maya-brown dark:text-white mb-6">
+              <h2 className="font-display text-3xl text-maya-brown dark:text-white mb-6">
                 Envie sua Mensagem
               </h2>
 
@@ -127,7 +127,7 @@ export default function ContatoPage() {
                       value={formData.name}
                       onChange={handleChange}
                       required
-                      className="w-full px-4 py-3 border-2 border-maya-olive/20 dark:border-gray-600 rounded-xl focus:border-maya-olive focus:outline-none dark:bg-gray-700 dark:text-white"
+                      className="w-full px-4 py-3 border-2 border-maya-green/20 dark:border-gray-600 rounded-xl focus:border-maya-green focus:outline-none dark:bg-gray-700 dark:text-white"
                       placeholder="Seu nome"
                     />
                   </div>
@@ -142,7 +142,7 @@ export default function ContatoPage() {
                       value={formData.email}
                       onChange={handleChange}
                       required
-                      className="w-full px-4 py-3 border-2 border-maya-olive/20 dark:border-gray-600 rounded-xl focus:border-maya-olive focus:outline-none dark:bg-gray-700 dark:text-white"
+                      className="w-full px-4 py-3 border-2 border-maya-green/20 dark:border-gray-600 rounded-xl focus:border-maya-green focus:outline-none dark:bg-gray-700 dark:text-white"
                       placeholder="seu@email.com"
                     />
                   </div>
@@ -158,7 +158,7 @@ export default function ContatoPage() {
                       name="phone"
                       value={formData.phone}
                       onChange={handleChange}
-                      className="w-full px-4 py-3 border-2 border-maya-olive/20 dark:border-gray-600 rounded-xl focus:border-maya-olive focus:outline-none dark:bg-gray-700 dark:text-white"
+                      className="w-full px-4 py-3 border-2 border-maya-green/20 dark:border-gray-600 rounded-xl focus:border-maya-green focus:outline-none dark:bg-gray-700 dark:text-white"
                       placeholder="(11) 9 9999-9999"
                     />
                   </div>
@@ -172,7 +172,7 @@ export default function ContatoPage() {
                       value={formData.subject}
                       onChange={handleChange}
                       required
-                      className="w-full px-4 py-3 border-2 border-maya-olive/20 dark:border-gray-600 rounded-xl focus:border-maya-olive focus:outline-none dark:bg-gray-700 dark:text-white"
+                      className="w-full px-4 py-3 border-2 border-maya-green/20 dark:border-gray-600 rounded-xl focus:border-maya-green focus:outline-none dark:bg-gray-700 dark:text-white"
                     >
                       <option value="adocao">Interesse em Adoção</option>
                       <option value="doacao">Doações</option>
@@ -194,7 +194,7 @@ export default function ContatoPage() {
                     onChange={handleChange}
                     required
                     rows={6}
-                    className="w-full px-4 py-3 border-2 border-maya-olive/20 dark:border-gray-600 rounded-xl focus:border-maya-olive focus:outline-none resize-none dark:bg-gray-700 dark:text-white"
+                    className="w-full px-4 py-3 border-2 border-maya-green/20 dark:border-gray-600 rounded-xl focus:border-maya-green focus:outline-none resize-none dark:bg-gray-700 dark:text-white"
                     placeholder="Conte-nos como podemos ajudar..."
                   />
                 </div>

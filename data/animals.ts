@@ -11,6 +11,8 @@ export interface Animal {
   images: string[]
   isAdopted: boolean
   isPuppy: boolean
+  isRescued: boolean
+  isMixed: boolean
 }
 
 export const animals: Animal[] = [
@@ -30,7 +32,9 @@ export const animals: Animal[] = [
       'https://images.unsplash.com/photo-1598133893773-de3574464ef0?w=800&q=80'
     ],
     isAdopted: false,
-    isPuppy: false
+    isPuppy: false,
+    isRescued: true,
+    isMixed: true
   },
   {
     id: '2',
@@ -48,7 +52,9 @@ export const animals: Animal[] = [
       'https://images.unsplash.com/photo-1596492784531-6e6eb5ea9993?w=800&q=80'
     ],
     isAdopted: false,
-    isPuppy: true
+    isPuppy: true,
+    isRescued: true,
+    isMixed: false
   },
   {
     id: '3',
@@ -66,7 +72,9 @@ export const animals: Animal[] = [
       'https://images.unsplash.com/photo-1548681528-6a5c45b66b42?w=800&q=80'
     ],
     isAdopted: false,
-    isPuppy: false
+    isPuppy: false,
+    isRescued: true,
+    isMixed: false
   },
   {
     id: '4',
@@ -84,7 +92,9 @@ export const animals: Animal[] = [
       'https://images.unsplash.com/photo-1558788353-f76d92427f16?w=800&q=80'
     ],
     isAdopted: false,
-    isPuppy: false
+    isPuppy: false,
+    isRescued: true,
+    isMixed: true
   },
   {
     id: '5',
@@ -102,7 +112,9 @@ export const animals: Animal[] = [
       'https://images.unsplash.com/photo-1519052537078-e6302a4968d4?w=800&q=80'
     ],
     isAdopted: false,
-    isPuppy: true
+    isPuppy: true,
+    isRescued: true,
+    isMixed: false
   },
   {
     id: '6',
@@ -120,7 +132,9 @@ export const animals: Animal[] = [
       'https://images.unsplash.com/photo-1477884213360-7e9d7dcc1e48?w=800&q=80'
     ],
     isAdopted: false,
-    isPuppy: false
+    isPuppy: false,
+    isRescued: true,
+    isMixed: true
   },
   {
     id: '7',
@@ -138,7 +152,9 @@ export const animals: Animal[] = [
       'https://images.unsplash.com/photo-1513360371669-4adf3dd7dff8?w=800&q=80'
     ],
     isAdopted: false,
-    isPuppy: false
+    isPuppy: false,
+    isRescued: true,
+    isMixed: false
   },
   {
     id: '8',
@@ -156,7 +172,9 @@ export const animals: Animal[] = [
       'https://images.unsplash.com/photo-1588943211346-0908a1fb0b01?w=800&q=80'
     ],
     isAdopted: false,
-    isPuppy: true
+    isPuppy: true,
+    isRescued: true,
+    isMixed: true
   }
 ]
 

@@ -30,7 +30,7 @@ export default function PerfilPage() {
     return (
       <div className="min-h-screen bg-maya-beige dark:bg-gray-900 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-maya-olive mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-maya-green mx-auto mb-4"></div>
           <p className="text-maya-brown dark:text-white">Carregando...</p>
         </div>
       </div>
@@ -67,12 +67,12 @@ export default function PerfilPage() {
         <div className="mb-8">
           <Link
             href="/doador/dashboard"
-            className="inline-flex items-center gap-2 text-maya-olive hover:text-maya-olive-light mb-4"
+            className="inline-flex items-center gap-2 text-maya-green hover:text-maya-green mb-4"
           >
             <ArrowLeft size={20} />
             Voltar ao Dashboard
           </Link>
-          <h1 className="text-4xl font-display font-bold text-maya-brown dark:text-white mb-2">
+          <h1 className="text-4xl font-display text-maya-brown dark:text-white mb-2">
             Meu Perfil
           </h1>
           <p className="text-maya-brown/70 dark:text-gray-300">
@@ -90,7 +90,7 @@ export default function PerfilPage() {
 
           {/* Profile Form */}
           <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg mb-6">
-            <h2 className="font-display font-bold text-2xl text-maya-brown dark:text-white mb-6">
+            <h2 className="font-display text-2xl text-maya-brown dark:text-white mb-6">
               Informações Pessoais
             </h2>
 
@@ -107,7 +107,7 @@ export default function PerfilPage() {
                     type="text"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:border-maya-olive dark:focus:border-maya-olive focus:outline-none bg-white dark:bg-gray-700 text-maya-brown dark:text-white"
+                    className="w-full pl-10 pr-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:border-maya-green dark:focus:border-maya-green focus:outline-none bg-white dark:bg-gray-700 text-maya-brown dark:text-white"
                     required
                   />
                 </div>
@@ -146,7 +146,7 @@ export default function PerfilPage() {
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     placeholder="(11) 98765-4321"
-                    className="w-full pl-10 pr-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:border-maya-olive dark:focus:border-maya-olive focus:outline-none bg-white dark:bg-gray-700 text-maya-brown dark:text-white"
+                    className="w-full pl-10 pr-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:border-maya-green dark:focus:border-maya-green focus:outline-none bg-white dark:bg-gray-700 text-maya-brown dark:text-white"
                   />
                 </div>
               </div>
@@ -164,7 +164,7 @@ export default function PerfilPage() {
                     value={cpf}
                     onChange={(e) => setCpf(e.target.value)}
                     placeholder="000.000.000-00"
-                    className="w-full pl-10 pr-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:border-maya-olive dark:focus:border-maya-olive focus:outline-none bg-white dark:bg-gray-700 text-maya-brown dark:text-white"
+                    className="w-full pl-10 pr-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:border-maya-green dark:focus:border-maya-green focus:outline-none bg-white dark:bg-gray-700 text-maya-brown dark:text-white"
                   />
                 </div>
                 <p className="text-xs text-maya-brown/60 dark:text-gray-400 mt-2">
@@ -192,21 +192,21 @@ export default function PerfilPage() {
 
           {/* Account Actions */}
           <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg">
-            <h2 className="font-display font-bold text-2xl text-maya-brown dark:text-white mb-6">
+            <h2 className="font-display text-2xl text-maya-brown dark:text-white mb-6">
               Ações da Conta
             </h2>
 
             <div className="space-y-4">
               <button
                 onClick={() => alert('Funcionalidade de alterar senha será implementada')}
-                className="w-full px-6 py-4 bg-maya-beige dark:bg-gray-700 text-maya-brown dark:text-white rounded-xl hover:bg-maya-olive/10 dark:hover:bg-gray-600 transition-colors font-semibold text-left"
+                className="w-full px-6 py-4 bg-maya-beige dark:bg-gray-700 text-maya-brown dark:text-white rounded-xl hover:bg-maya-green/10 dark:hover:bg-gray-600 transition-colors font-semibold text-left"
               >
                 Alterar Senha
               </button>
 
               <button
                 onClick={() => alert('Funcionalidade de exportar dados será implementada')}
-                className="w-full px-6 py-4 bg-maya-beige dark:bg-gray-700 text-maya-brown dark:text-white rounded-xl hover:bg-maya-olive/10 dark:hover:bg-gray-600 transition-colors font-semibold text-left"
+                className="w-full px-6 py-4 bg-maya-beige dark:bg-gray-700 text-maya-brown dark:text-white rounded-xl hover:bg-maya-green/10 dark:hover:bg-gray-600 transition-colors font-semibold text-left"
               >
                 Exportar Meus Dados
               </button>

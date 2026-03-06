@@ -148,7 +148,7 @@ export default function AdminEventosPage() {
 
   const getEventTypeBadge = (type: Event['type']) => {
     const colors = {
-      adoption: 'bg-maya-olive/10 text-maya-olive dark:bg-maya-olive/20',
+      adoption: 'bg-maya-green/10 text-maya-green dark:bg-maya-green/20',
       fundraising: 'bg-maya-blue/10 text-maya-blue dark:bg-maya-blue/20',
       educational: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
       other: 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300',
@@ -163,14 +163,14 @@ export default function AdminEventosPage() {
         <div className="mb-8">
           <Link
             href="/admin"
-            className="inline-flex items-center gap-2 text-maya-olive hover:text-maya-olive-light mb-4"
+            className="inline-flex items-center gap-2 text-maya-green hover:text-maya-green mb-4"
           >
             <ArrowLeft size={20} />
             Voltar ao Dashboard
           </Link>
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-4xl font-display font-bold text-maya-brown dark:text-white mb-2">
+              <h1 className="text-4xl font-display text-maya-brown dark:text-white mb-2">
                 Gerenciar Eventos
               </h1>
               <p className="text-maya-brown/70 dark:text-gray-300">
@@ -207,7 +207,7 @@ export default function AdminEventosPage() {
                   placeholder="Buscar por título ou local..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:border-maya-olive focus:outline-none bg-white dark:bg-gray-700 text-maya-brown dark:text-white"
+                  className="w-full pl-10 pr-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:border-maya-green focus:outline-none bg-white dark:bg-gray-700 text-maya-brown dark:text-white"
                 />
               </div>
             </div>
@@ -218,7 +218,7 @@ export default function AdminEventosPage() {
                 onClick={() => setFilterTime('all')}
                 className={`px-4 py-2 rounded-xl font-semibold transition-all ${
                   filterTime === 'all'
-                    ? 'bg-maya-olive text-white'
+                    ? 'bg-maya-green text-white'
                     : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
                 }`}
               >
@@ -228,7 +228,7 @@ export default function AdminEventosPage() {
                 onClick={() => setFilterTime('upcoming')}
                 className={`px-4 py-2 rounded-xl font-semibold transition-all ${
                   filterTime === 'upcoming'
-                    ? 'bg-maya-olive text-white'
+                    ? 'bg-maya-green text-white'
                     : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
                 }`}
               >
@@ -238,7 +238,7 @@ export default function AdminEventosPage() {
                 onClick={() => setFilterTime('past')}
                 className={`px-4 py-2 rounded-xl font-semibold transition-all ${
                   filterTime === 'past'
-                    ? 'bg-maya-olive text-white'
+                    ? 'bg-maya-green text-white'
                     : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
                 }`}
               >
@@ -276,7 +276,7 @@ export default function AdminEventosPage() {
                           </span>
                         )}
                       </div>
-                      <h3 className="font-display font-bold text-xl text-maya-brown dark:text-white mb-2">
+                      <h3 className="font-display text-xl text-maya-brown dark:text-white mb-2">
                         {event.title}
                       </h3>
                     </div>
@@ -286,7 +286,7 @@ export default function AdminEventosPage() {
                         className="p-2 hover:bg-maya-beige dark:hover:bg-gray-700 rounded-lg transition-colors"
                         title="Editar"
                       >
-                        <Edit size={18} className="text-maya-olive" />
+                        <Edit size={18} className="text-maya-green" />
                       </button>
                       <button
                         onClick={() => handleDelete(event)}
@@ -300,7 +300,7 @@ export default function AdminEventosPage() {
 
                   <div className="space-y-3 mb-4">
                     <div className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-400">
-                      <CalendarIcon size={16} className="text-maya-olive flex-shrink-0" />
+                      <CalendarIcon size={16} className="text-maya-green flex-shrink-0" />
                       <span>
                         {new Date(event.date).toLocaleDateString('pt-BR', {
                           day: '2-digit',
@@ -359,7 +359,7 @@ export default function AdminEventosPage() {
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 overflow-y-auto">
           <div className="bg-white dark:bg-gray-800 rounded-3xl max-w-2xl w-full my-8">
             <div className="p-6 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
-              <h2 className="text-2xl font-display font-bold text-maya-brown dark:text-white">
+              <h2 className="text-2xl font-display text-maya-brown dark:text-white">
                 {editingEvent ? 'Editar Evento' : 'Criar Evento'}
               </h2>
               <button
@@ -380,7 +380,7 @@ export default function AdminEventosPage() {
                   type="text"
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:border-maya-olive focus:outline-none bg-white dark:bg-gray-700 text-maya-brown dark:text-white"
+                  className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:border-maya-green focus:outline-none bg-white dark:bg-gray-700 text-maya-brown dark:text-white"
                   required
                 />
               </div>
@@ -395,7 +395,7 @@ export default function AdminEventosPage() {
                     type="date"
                     value={formData.date}
                     onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                    className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:border-maya-olive focus:outline-none bg-white dark:bg-gray-700 text-maya-brown dark:text-white"
+                    className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:border-maya-green focus:outline-none bg-white dark:bg-gray-700 text-maya-brown dark:text-white"
                     required
                   />
                 </div>
@@ -408,7 +408,7 @@ export default function AdminEventosPage() {
                     type="time"
                     value={formData.time}
                     onChange={(e) => setFormData({ ...formData, time: e.target.value })}
-                    className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:border-maya-olive focus:outline-none bg-white dark:bg-gray-700 text-maya-brown dark:text-white"
+                    className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:border-maya-green focus:outline-none bg-white dark:bg-gray-700 text-maya-brown dark:text-white"
                     required
                   />
                 </div>
@@ -424,7 +424,7 @@ export default function AdminEventosPage() {
                   value={formData.location}
                   onChange={(e) => setFormData({ ...formData, location: e.target.value })}
                   placeholder="Ex: Shopping Maya - Piso 2"
-                  className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:border-maya-olive focus:outline-none bg-white dark:bg-gray-700 text-maya-brown dark:text-white"
+                  className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:border-maya-green focus:outline-none bg-white dark:bg-gray-700 text-maya-brown dark:text-white"
                   required
                 />
               </div>
@@ -438,7 +438,7 @@ export default function AdminEventosPage() {
                   <select
                     value={formData.type}
                     onChange={(e) => setFormData({ ...formData, type: e.target.value as Event['type'] })}
-                    className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:border-maya-olive focus:outline-none bg-white dark:bg-gray-700 text-maya-brown dark:text-white"
+                    className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:border-maya-green focus:outline-none bg-white dark:bg-gray-700 text-maya-brown dark:text-white"
                   >
                     <option value="adoption">Adoção</option>
                     <option value="fundraising">Arrecadação</option>
@@ -457,7 +457,7 @@ export default function AdminEventosPage() {
                     onChange={(e) => setFormData({ ...formData, capacity: e.target.value })}
                     placeholder="Ex: 100"
                     min="1"
-                    className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:border-maya-olive focus:outline-none bg-white dark:bg-gray-700 text-maya-brown dark:text-white"
+                    className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:border-maya-green focus:outline-none bg-white dark:bg-gray-700 text-maya-brown dark:text-white"
                   />
                 </div>
               </div>
@@ -471,7 +471,7 @@ export default function AdminEventosPage() {
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   rows={4}
-                  className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:border-maya-olive focus:outline-none bg-white dark:bg-gray-700 text-maya-brown dark:text-white resize-none"
+                  className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:border-maya-green focus:outline-none bg-white dark:bg-gray-700 text-maya-brown dark:text-white resize-none"
                   required
                 />
               </div>

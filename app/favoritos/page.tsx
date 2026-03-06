@@ -21,8 +21,8 @@ export default function FavoritosPage() {
       <div className="container mx-auto px-4">
         {/* Header */}
         <div className="text-center mb-12">
-          <Heart className="w-16 h-16 text-maya-olive mx-auto mb-4 fill-maya-olive" />
-          <h1 className="text-5xl md:text-6xl font-display font-bold text-maya-brown dark:text-white mb-4">
+          <Heart className="w-16 h-16 text-maya-green mx-auto mb-4 fill-maya-green" />
+          <h1 className="text-5xl md:text-6xl font-display text-maya-brown dark:text-white mb-4">
             Meus Favoritos
           </h1>
           <p className="text-xl text-maya-brown/70 dark:text-gray-300 max-w-2xl mx-auto">
@@ -33,8 +33,8 @@ export default function FavoritosPage() {
         {favoriteAnimals.length === 0 ? (
           // Empty State
           <div className="text-center py-20 bg-white dark:bg-gray-800 rounded-3xl shadow-lg">
-            <PawPrint className="w-20 h-20 text-maya-olive/30 mx-auto mb-6" />
-            <h3 className="font-display font-bold text-3xl text-maya-brown dark:text-white mb-4">
+            <PawPrint className="w-20 h-20 text-maya-green/30 mx-auto mb-6" />
+            <h3 className="font-display text-3xl text-maya-brown dark:text-white mb-4">
               Nenhum favorito ainda
             </h3>
             <p className="text-maya-brown/70 dark:text-gray-300 mb-8 max-w-md mx-auto">
@@ -50,7 +50,7 @@ export default function FavoritosPage() {
             {/* Stats & Actions */}
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-8 bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg">
               <div className="text-center sm:text-left">
-                <p className="text-3xl font-bold text-maya-olive mb-1">
+                <p className="text-3xl font-bold text-maya-green mb-1">
                   {favoriteAnimals.length}
                 </p>
                 <p className="text-maya-brown/70 dark:text-gray-300">
@@ -109,7 +109,7 @@ export default function FavoritosPage() {
                   <div className="px-4">
                     <div className="flex justify-between items-start mb-3">
                       <div>
-                        <h3 className="font-display font-bold text-2xl text-maya-brown dark:text-white mb-1">
+                        <h3 className="font-display text-2xl text-maya-brown dark:text-white mb-1">
                           {animal.name}
                         </h3>
                         <p className="text-maya-brown/60 dark:text-gray-300 text-sm flex items-center gap-1">
@@ -124,7 +124,7 @@ export default function FavoritosPage() {
                       {animal.temperament.slice(0, 3).map((trait) => (
                         <span
                           key={trait}
-                          className="text-xs bg-maya-olive/10 text-maya-olive px-3 py-1 rounded-full dark:bg-maya-olive/20 dark:text-maya-olive-light"
+                          className="text-xs bg-maya-green/10 text-maya-green px-3 py-1 rounded-full dark:bg-maya-green/20 dark:text-maya-green"
                         >
                           {trait}
                         </span>
@@ -152,9 +152,9 @@ export default function FavoritosPage() {
             </div>
 
             {/* CTA Section */}
-            <div className="mt-16 bg-gradient-to-r from-maya-olive to-maya-olive-light rounded-3xl p-8 md:p-12 text-center text-white shadow-2xl">
+            <div className="mt-16 bg-gradient-to-r from-maya-green to-maya-green rounded-3xl p-8 md:p-12 text-center text-white shadow-2xl">
               <Heart className="w-16 h-16 mx-auto mb-6 fill-white" />
-              <h2 className="font-display font-bold text-3xl md:text-4xl mb-4">
+              <h2 className="font-display text-3xl md:text-4xl mb-4">
                 Pronto para adotar?
               </h2>
               <p className="text-lg mb-8 max-w-2xl mx-auto opacity-90">
@@ -164,7 +164,7 @@ export default function FavoritosPage() {
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link
                   href="/contato"
-                  className="bg-white text-maya-olive px-8 py-4 rounded-xl font-bold hover:bg-gray-100 transition-colors inline-flex items-center justify-center gap-2"
+                  className="bg-white text-maya-green px-8 py-4 rounded-xl font-bold hover:bg-gray-100 transition-colors inline-flex items-center justify-center gap-2"
                 >
                   Entre em Contato
                   <ArrowRight size={20} />

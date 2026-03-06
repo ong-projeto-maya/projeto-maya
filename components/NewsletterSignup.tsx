@@ -23,11 +23,11 @@ export default function NewsletterSignup() {
   }
 
   return (
-    <section className="bg-gradient-to-br from-maya-olive to-maya-olive-light py-16">
+    <section className="bg-gradient-to-br from-maya-green to-maya-green py-16">
       <div className="container mx-auto px-4">
         <div className="max-w-2xl mx-auto text-center text-white">
           <Mail className="w-16 h-16 mx-auto mb-6" />
-          <h2 className="font-display font-bold text-4xl mb-4">
+          <h2 className="font-display text-4xl mb-4">
             Fique Por Dentro!
           </h2>
           <p className="text-xl mb-8 opacity-90">
@@ -52,7 +52,7 @@ export default function NewsletterSignup() {
               <button
                 type="submit"
                 disabled={loading}
-                className="bg-white text-maya-olive hover:bg-maya-beige font-semibold px-8 py-4 rounded-xl transition-all shadow-lg hover:shadow-xl disabled:opacity-50"
+                className="bg-white text-maya-green hover:bg-maya-beige font-semibold px-8 py-4 rounded-xl transition-all shadow-lg hover:shadow-xl disabled:opacity-50"
               >
                 {loading ? 'Inscrevendo...' : 'Inscrever'}
               </button>

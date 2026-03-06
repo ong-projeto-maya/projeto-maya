@@ -22,7 +22,7 @@ export default function DoacoesHistoricoPage() {
     return (
       <div className="min-h-screen bg-maya-beige dark:bg-gray-900 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-maya-olive mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-maya-green mx-auto mb-4"></div>
           <p className="text-maya-brown dark:text-white">Carregando...</p>
         </div>
       </div>
@@ -55,12 +55,12 @@ export default function DoacoesHistoricoPage() {
         <div className="mb-8">
           <Link
             href="/doador/dashboard"
-            className="inline-flex items-center gap-2 text-maya-olive hover:text-maya-olive-light mb-4"
+            className="inline-flex items-center gap-2 text-maya-green hover:text-maya-green mb-4"
           >
             <ArrowLeft size={20} />
             Voltar ao Dashboard
           </Link>
-          <h1 className="text-4xl font-display font-bold text-maya-brown dark:text-white mb-2">
+          <h1 className="text-4xl font-display text-maya-brown dark:text-white mb-2">
             Histórico de Doações
           </h1>
           <p className="text-maya-brown/70 dark:text-gray-300">
@@ -72,7 +72,7 @@ export default function DoacoesHistoricoPage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg">
             <div className="flex items-center gap-3 mb-2">
-              <DollarSign className="text-maya-olive" size={24} />
+              <DollarSign className="text-maya-green" size={24} />
               <span className="text-sm text-maya-brown/60 dark:text-gray-400">Total Doado</span>
             </div>
             <p className="text-3xl font-bold text-maya-brown dark:text-white">
@@ -113,7 +113,7 @@ export default function DoacoesHistoricoPage() {
                   placeholder="Buscar por ID, data ou valor..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:border-maya-olive dark:focus:border-maya-olive focus:outline-none bg-white dark:bg-gray-700 text-maya-brown dark:text-white"
+                  className="w-full pl-10 pr-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:border-maya-green dark:focus:border-maya-green focus:outline-none bg-white dark:bg-gray-700 text-maya-brown dark:text-white"
                 />
               </div>
             </div>
@@ -124,8 +124,8 @@ export default function DoacoesHistoricoPage() {
                 onClick={() => setFilter('all')}
                 className={`px-4 py-2 rounded-xl font-semibold transition-all ${
                   filter === 'all'
-                    ? 'bg-maya-olive text-white'
-                    : 'bg-maya-beige dark:bg-gray-700 text-maya-brown dark:text-white hover:bg-maya-olive/20 dark:hover:bg-maya-olive/30'
+                    ? 'bg-maya-green text-white'
+                    : 'bg-maya-beige dark:bg-gray-700 text-maya-brown dark:text-white hover:bg-maya-green/20 dark:hover:bg-maya-green/30'
                 }`}
               >
                 Todas
@@ -134,8 +134,8 @@ export default function DoacoesHistoricoPage() {
                 onClick={() => setFilter('single')}
                 className={`px-4 py-2 rounded-xl font-semibold transition-all ${
                   filter === 'single'
-                    ? 'bg-maya-olive text-white'
-                    : 'bg-maya-beige dark:bg-gray-700 text-maya-brown dark:text-white hover:bg-maya-olive/20 dark:hover:bg-maya-olive/30'
+                    ? 'bg-maya-green text-white'
+                    : 'bg-maya-beige dark:bg-gray-700 text-maya-brown dark:text-white hover:bg-maya-green/20 dark:hover:bg-maya-green/30'
                 }`}
               >
                 Únicas
@@ -144,8 +144,8 @@ export default function DoacoesHistoricoPage() {
                 onClick={() => setFilter('monthly')}
                 className={`px-4 py-2 rounded-xl font-semibold transition-all ${
                   filter === 'monthly'
-                    ? 'bg-maya-olive text-white'
-                    : 'bg-maya-beige dark:bg-gray-700 text-maya-brown dark:text-white hover:bg-maya-olive/20 dark:hover:bg-maya-olive/30'
+                    ? 'bg-maya-green text-white'
+                    : 'bg-maya-beige dark:bg-gray-700 text-maya-brown dark:text-white hover:bg-maya-green/20 dark:hover:bg-maya-green/30'
                 }`}
               >
                 Mensais
@@ -197,7 +197,7 @@ export default function DoacoesHistoricoPage() {
                       <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
                         donation.type === 'monthly'
                           ? 'bg-maya-blue/20 text-maya-blue dark:bg-maya-blue/30'
-                          : 'bg-maya-olive/20 text-maya-olive dark:bg-maya-olive/30'
+                          : 'bg-maya-green/20 text-maya-green dark:bg-maya-green/30'
                       }`}>
                         {donation.type === 'monthly' ? 'Mensal' : 'Única'}
                       </span>
@@ -219,7 +219,7 @@ export default function DoacoesHistoricoPage() {
                     </td>
                     <td className="px-6 py-4">
                       {donation.receipt && (
-                        <button className="inline-flex items-center gap-2 text-maya-olive hover:text-maya-olive-light transition-colors">
+                        <button className="inline-flex items-center gap-2 text-maya-green hover:text-maya-green transition-colors">
                           <Download size={18} />
                           <span className="text-sm font-medium">Baixar</span>
                         </button>

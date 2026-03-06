@@ -3,7 +3,7 @@ import { Heart, TrendingUp, Award, BarChart, DollarSign, PawPrint, CheckCircle }
 
 export default function DoadorCTA() {
   return (
-    <section className="py-20 bg-gradient-to-br from-maya-olive to-maya-olive-light text-white">
+    <section className="py-20 bg-gradient-to-br from-maya-green to-maya-blue text-white">
       <div className="container mx-auto px-4">
         <div className="max-w-5xl mx-auto">
           {/* Header */}
@@ -23,7 +23,7 @@ export default function DoadorCTA() {
               <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center mx-auto mb-4">
                 <TrendingUp className="w-6 h-6" />
               </div>
-              <h3 className="font-display font-bold text-lg mb-2">
+              <h3 className="font-display text-lg mb-2">
                 Histórico Completo
               </h3>
               <p className="text-white/80 text-sm">
@@ -35,7 +35,7 @@ export default function DoadorCTA() {
               <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center mx-auto mb-4">
                 <Award className="w-6 h-6" />
               </div>
-              <h3 className="font-display font-bold text-lg mb-2">
+              <h3 className="font-display text-lg mb-2">
                 Sistema de Níveis
               </h3>
               <p className="text-white/80 text-sm">
@@ -47,7 +47,7 @@ export default function DoadorCTA() {
               <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center mx-auto mb-4">
                 <BarChart className="w-6 h-6" />
               </div>
-              <h3 className="font-display font-bold text-lg mb-2">
+              <h3 className="font-display text-lg mb-2">
                 Veja Seu Impacto
               </h3>
               <p className="text-white/80 text-sm">
@@ -95,9 +95,9 @@ export default function DoadorCTA() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-6">
               <Link
                 href="/doador/registro"
-                className="bg-white text-maya-olive px-8 py-4 rounded-xl font-bold hover:bg-gray-100 transition-colors inline-flex items-center gap-2 shadow-lg"
+                className="bg-white text-maya-green px-8 py-4 rounded-xl font-bold hover:bg-gray-100 transition-colors inline-flex items-center gap-2 shadow-lg"
               >
-                <Heart size={20} className="fill-maya-olive" />
+                <Heart size={20} className="fill-maya-green" />
                 Criar Conta de Doador
               </Link>
               <Link

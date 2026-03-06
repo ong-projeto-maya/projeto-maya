@@ -43,7 +43,7 @@ export default function Testimonials() {
               {/* Stars */}
               <div className="flex gap-1 mb-4">
                 {[...Array(testimonial.rating)].map((_, i) => (
-                  <Star key={i} className="w-5 h-5 text-maya-olive fill-current" />
+                  <Star key={i} className="w-5 h-5 text-maya-green fill-current" />
                 ))}
               </div>
 
@@ -54,7 +54,7 @@ export default function Testimonials() {
 
               {/* Author Info */}
               <div className="flex items-center gap-3 pt-4 border-t border-maya-beige">
-                <div className="w-12 h-12 bg-maya-olive rounded-full flex items-center justify-center">
+                <div className="w-12 h-12 bg-maya-green rounded-full flex items-center justify-center">
                   <Heart className="w-6 h-6 text-white fill-current" />
                 </div>
                 <div>
@@ -72,7 +72,7 @@ export default function Testimonials() {
             "Cada adoção é uma história de amor que nos motiva a continuar. 
             Obrigado a todos que acreditam no nosso trabalho!"
           </p>
-          <p className="text-maya-olive font-semibold mt-4">— Equipe Projeto Maya</p>
+          <p className="text-maya-green font-semibold mt-4">— Equipe Projeto Maya</p>
         </div>
       </div>
     </section>

@@ -46,7 +46,7 @@ export default function AdminLoginPage() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-maya-beige to-white dark:from-gray-900 dark:to-gray-800 flex items-center justify-center">
         <div className="text-center">
-          <PawPrint className="w-12 h-12 text-maya-olive mx-auto mb-4 animate-pulse" />
+          <PawPrint className="w-12 h-12 text-maya-green mx-auto mb-4 animate-pulse" />
           <p className="text-maya-brown dark:text-white">Carregando...</p>
         </div>
       </div>
@@ -66,10 +66,10 @@ export default function AdminLoginPage() {
             />
           </div>
           <div className="flex justify-center items-center gap-3 mb-2">
-            <div className="w-12 h-12 bg-maya-olive rounded-full flex items-center justify-center">
+            <div className="w-12 h-12 bg-maya-green rounded-full flex items-center justify-center">
               <Lock className="w-6 h-6 text-white" />
             </div>
-            <h1 className="text-4xl font-display font-bold text-maya-brown dark:text-white">
+            <h1 className="text-4xl font-display text-maya-brown dark:text-white">
               Acesso Administrativo
             </h1>
           </div>
@@ -104,7 +104,7 @@ export default function AdminLoginPage() {
                   onChange={(e) => setUsername(e.target.value)}
                   required
                   autoComplete="username"
-                  className="w-full pl-10 pr-4 py-3 border-2 border-maya-olive/20 dark:border-gray-600 rounded-xl focus:border-maya-olive dark:focus:border-maya-olive focus:outline-none bg-white dark:bg-gray-700 text-maya-brown dark:text-white"
+                  className="w-full pl-10 pr-4 py-3 border-2 border-maya-green/20 dark:border-gray-600 rounded-xl focus:border-maya-green dark:focus:border-maya-green focus:outline-none bg-white dark:bg-gray-700 text-maya-brown dark:text-white"
                   placeholder="Digite seu usuário"
                   disabled={isLoading}
                 />
@@ -124,14 +124,14 @@ export default function AdminLoginPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   autoComplete="current-password"
-                  className="w-full pl-10 pr-12 py-3 border-2 border-maya-olive/20 dark:border-gray-600 rounded-xl focus:border-maya-olive dark:focus:border-maya-olive focus:outline-none bg-white dark:bg-gray-700 text-maya-brown dark:text-white"
+                  className="w-full pl-10 pr-12 py-3 border-2 border-maya-green/20 dark:border-gray-600 rounded-xl focus:border-maya-green dark:focus:border-maya-green focus:outline-none bg-white dark:bg-gray-700 text-maya-brown dark:text-white"
                   placeholder="Digite sua senha"
                   disabled={isLoading}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-maya-brown/40 dark:text-gray-400 hover:text-maya-olive dark:hover:text-maya-olive transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-maya-brown/40 dark:text-gray-400 hover:text-maya-green dark:hover:text-maya-green transition-colors"
                   disabled={isLoading}
                 >
                   {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
@@ -143,7 +143,7 @@ export default function AdminLoginPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-maya-olive hover:bg-maya-olive-light text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className="w-full bg-maya-green hover:bg-maya-green text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
               {isLoading ? (
                 <>
@@ -161,7 +161,7 @@ export default function AdminLoginPage() {
 
           {/* Informação de Credenciais (Apenas para demonstração) */}
           <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
-            <div className="bg-maya-olive/10 dark:bg-maya-olive/20 rounded-lg p-4">
+            <div className="bg-maya-green/10 dark:bg-maya-green/20 rounded-lg p-4">
               <p className="text-xs font-semibold text-maya-brown dark:text-white mb-2">
                 🔒 Credenciais de Demonstração:
               </p>
@@ -180,7 +180,7 @@ export default function AdminLoginPage() {
         <div className="text-center mt-6">
           <a
             href="/"
-            className="text-sm text-maya-olive hover:text-maya-olive-light font-semibold"
+            className="text-sm text-maya-green hover:text-maya-green font-semibold"
           >
             ← Voltar para o site
           </a>

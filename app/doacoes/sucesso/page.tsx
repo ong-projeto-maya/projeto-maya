@@ -14,16 +14,16 @@ export default function DonationSuccessPage() {
                 alt="Projeto Maya" 
                 className="h-32 w-auto animate-bounce drop-shadow-2xl"
               />
-              <div className="absolute -top-2 -right-2 w-16 h-16 bg-maya-olive rounded-full flex items-center justify-center animate-pulse shadow-xl">
+              <div className="absolute -top-2 -right-2 w-16 h-16 bg-maya-green rounded-full flex items-center justify-center animate-pulse shadow-xl">
                 <CheckCircle className="w-10 h-10 text-white" />
               </div>
             </div>
           </div>
 
           {/* Thank You Message */}
-          <h1 className="text-5xl md:text-6xl font-display font-bold text-maya-brown dark:text-white mb-6 flex items-center justify-center gap-4">
+          <h1 className="text-5xl md:text-6xl font-display text-maya-brown dark:text-white mb-6 flex items-center justify-center gap-4">
             Muito Obrigado! 
-            <Heart className="w-16 h-16 text-maya-olive fill-maya-olive" />
+            <Heart className="w-16 h-16 text-maya-green fill-maya-green" />
           </h1>
 
           <p className="text-xl text-maya-brown/80 dark:text-gray-300 mb-4">
@@ -37,7 +37,7 @@ export default function DonationSuccessPage() {
 
           {/* Impact Statement */}
           <div className="bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-lg mb-8">
-            <h2 className="font-display font-bold text-2xl text-maya-brown dark:text-white mb-4">
+            <h2 className="font-display text-2xl text-maya-brown dark:text-white mb-4">
               Seu Impacto
             </h2>
             <p className="text-maya-brown/70 dark:text-gray-300 mb-6">
@@ -49,24 +49,24 @@ export default function DonationSuccessPage() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
               <div className="bg-maya-beige dark:bg-gray-700 rounded-xl p-4">
                 <div className="flex justify-center mb-2">
-                  <div className="w-12 h-12 rounded-full bg-maya-olive/20 flex items-center justify-center">
-                    <Dog className="w-6 h-6 text-maya-olive" />
+                  <div className="w-12 h-12 rounded-full bg-maya-green/20 flex items-center justify-center">
+                    <Dog className="w-6 h-6 text-maya-green" />
                   </div>
                 </div>
                 <div className="font-semibold text-maya-brown dark:text-white">Resgate</div>
               </div>
               <div className="bg-maya-beige dark:bg-gray-700 rounded-xl p-4">
                 <div className="flex justify-center mb-2">
-                  <div className="w-12 h-12 rounded-full bg-maya-olive/20 flex items-center justify-center">
-                    <Heart className="w-6 h-6 text-maya-olive fill-maya-olive" />
+                  <div className="w-12 h-12 rounded-full bg-maya-green/20 flex items-center justify-center">
+                    <Heart className="w-6 h-6 text-maya-green fill-maya-green" />
                   </div>
                 </div>
                 <div className="font-semibold text-maya-brown dark:text-white">Cuidado</div>
               </div>
               <div className="bg-maya-beige dark:bg-gray-700 rounded-xl p-4">
                 <div className="flex justify-center mb-2">
-                  <div className="w-12 h-12 rounded-full bg-maya-olive/20 flex items-center justify-center">
-                    <HomeIcon className="w-6 h-6 text-maya-olive" />
+                  <div className="w-12 h-12 rounded-full bg-maya-green/20 flex items-center justify-center">
+                    <HomeIcon className="w-6 h-6 text-maya-green" />
                   </div>
                 </div>
                 <div className="font-semibold text-maya-brown dark:text-white">Adoção</div>
@@ -75,7 +75,7 @@ export default function DonationSuccessPage() {
           </div>
 
           {/* Next Steps */}
-          <div className="bg-maya-olive/10 dark:bg-maya-olive/20 rounded-2xl p-6 mb-8">
+          <div className="bg-maya-green/10 dark:bg-maya-green/20 rounded-2xl p-6 mb-8">
             <h3 className="font-bold text-maya-brown dark:text-white mb-3">
               Continue Fazendo a Diferença
             </h3>
@@ -107,7 +107,7 @@ export default function DonationSuccessPage() {
                 href="https://www.facebook.com/sharer/sharer.php?u=YOUR_SITE_URL"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-12 h-12 bg-maya-olive rounded-full flex items-center justify-center text-white hover:bg-maya-olive-light transition-colors"
+                className="w-12 h-12 bg-maya-green rounded-full flex items-center justify-center text-white hover:bg-maya-green transition-colors"
               >
                 f
               </a>
@@ -115,7 +115,7 @@ export default function DonationSuccessPage() {
                 href="https://twitter.com/intent/tweet?text=Acabei%20de%20doar%20para%20o%20Projeto%20Maya!&url=YOUR_SITE_URL"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-12 h-12 bg-maya-olive rounded-full flex items-center justify-center text-white hover:bg-maya-olive-light transition-colors"
+                className="w-12 h-12 bg-maya-green rounded-full flex items-center justify-center text-white hover:bg-maya-green transition-colors"
               >
                 X
               </a>
@@ -123,7 +123,7 @@ export default function DonationSuccessPage() {
                 href="https://wa.me/?text=Acabei%20de%20doar%20para%20o%20Projeto%20Maya!%20Venha%20conhecer:%20YOUR_SITE_URL"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-12 h-12 bg-maya-olive rounded-full flex items-center justify-center text-white hover:bg-maya-olive-light transition-colors"
+                className="w-12 h-12 bg-maya-green rounded-full flex items-center justify-center text-white hover:bg-maya-green transition-colors"
               >
                 W
               </a>

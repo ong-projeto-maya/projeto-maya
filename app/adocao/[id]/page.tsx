@@ -28,7 +28,7 @@ export default function AnimalDetailPage({ params }: { params: { id: string } })
         {/* Back Button */}
         <Link 
           href="/adocao" 
-          className="inline-flex items-center gap-2 text-maya-olive hover:text-maya-olive-light mb-8 font-semibold transition-colors"
+          className="inline-flex items-center gap-2 text-maya-green hover:text-maya-green mb-8 font-semibold transition-colors"
         >
           <ArrowLeft size={20} />
           Voltar para adoções
@@ -72,7 +72,7 @@ export default function AnimalDetailPage({ params }: { params: { id: string } })
           <div>
             <div className="flex items-start justify-between mb-4">
               <div>
-                <h1 className="text-5xl font-display font-bold text-maya-brown mb-2">
+                <h1 className="text-5xl font-display text-maya-brown mb-2">
                   {animal.name}
                 </h1>
                 <p className="text-xl text-maya-brown/60 flex items-center gap-2">
@@ -89,8 +89,8 @@ export default function AnimalDetailPage({ params }: { params: { id: string } })
                   )} • {animal.age}
                 </p>
               </div>
-              <button className="p-3 bg-maya-beige-dark rounded-full hover:bg-maya-olive/20 transition-colors">
-                <Heart className="w-6 h-6 text-maya-olive" />
+              <button className="p-3 bg-maya-beige-dark rounded-full hover:bg-maya-green/20 transition-colors">
+                <Heart className="w-6 h-6 text-maya-green" />
               </button>
             </div>
 
@@ -114,8 +114,8 @@ export default function AnimalDetailPage({ params }: { params: { id: string } })
               </div>
               <div className="bg-white rounded-xl p-4 text-center">
                 <div className="flex justify-center mb-2">
-                  <div className="w-10 h-10 rounded-full bg-maya-olive/10 flex items-center justify-center">
-                    <Ruler className="w-5 h-5 text-maya-olive" />
+                  <div className="w-10 h-10 rounded-full bg-maya-green/10 flex items-center justify-center">
+                    <Ruler className="w-5 h-5 text-maya-green" />
                   </div>
                 </div>
                 <div className="text-sm text-maya-brown/70">
@@ -134,14 +134,14 @@ export default function AnimalDetailPage({ params }: { params: { id: string } })
 
             {/* Temperament */}
             <div className="mb-8">
-              <h2 className="font-display font-bold text-2xl text-maya-brown mb-3">
+              <h2 className="font-display text-2xl text-maya-brown mb-3">
                 Temperamento
               </h2>
               <div className="flex flex-wrap gap-3">
                 {animal.temperament.map((trait) => (
                   <span
                     key={trait}
-                    className="bg-maya-olive/10 text-maya-olive px-4 py-2 rounded-full font-semibold"
+                    className="bg-maya-green/10 text-maya-green px-4 py-2 rounded-full font-semibold"
                   >
                     {trait}
                   </span>
@@ -151,7 +151,7 @@ export default function AnimalDetailPage({ params }: { params: { id: string } })
 
             {/* Story */}
             <div className="mb-8">
-              <h2 className="font-display font-bold text-2xl text-maya-brown mb-3">
+              <h2 className="font-display text-2xl text-maya-brown mb-3">
                 História
               </h2>
               <p className="text-maya-brown/80 leading-relaxed">
@@ -208,7 +208,7 @@ export default function AnimalDetailPage({ params }: { params: { id: string } })
                       className="object-cover"
                     />
                   </div>
-                  <h3 className="font-display font-bold text-xl text-maya-brown mb-2">
+                  <h3 className="font-display text-xl text-maya-brown mb-2">
                     {otherAnimal.name}
                   </h3>
                   <p className="text-maya-brown/60 text-sm flex items-center gap-1">

@@ -138,8 +138,8 @@ export default function QuizPage() {
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto text-center">
             <div className="mb-8">
-              <Award className="w-16 h-16 text-maya-olive mx-auto mb-4" />
-              <h1 className="text-5xl font-display font-bold text-maya-brown dark:text-white mb-4">
+              <Award className="w-16 h-16 text-maya-green mx-auto mb-4" />
+              <h1 className="text-5xl font-display text-maya-brown dark:text-white mb-4">
                 Seu Pet Ideal!
               </h1>
               <p className="text-xl text-maya-brown/70 dark:text-gray-300">
@@ -156,12 +156,12 @@ export default function QuizPage() {
                 />
               </div>
 
-              <h2 className="font-display font-bold text-4xl text-maya-brown dark:text-white mb-4">
+              <h2 className="font-display text-4xl text-maya-brown dark:text-white mb-4">
                 Conheça {result.name}!
               </h2>
 
               <div className="flex justify-center gap-2 mb-4">
-                <span className="text-sm bg-maya-olive/10 dark:bg-maya-olive/20 text-maya-olive px-3 py-1 rounded-full inline-flex items-center gap-1">
+                <span className="text-sm bg-maya-green/10 dark:bg-maya-green/20 text-maya-green px-3 py-1 rounded-full inline-flex items-center gap-1">
                   {result.type === 'dog' ? (
                     <>
                       <Dog size={16} />
@@ -177,7 +177,7 @@ export default function QuizPage() {
                 <span className="text-sm bg-maya-blue/10 dark:bg-maya-blue/20 text-maya-blue px-3 py-1 rounded-full">
                   {result.age}
                 </span>
-                <span className="text-sm bg-maya-olive/10 dark:bg-maya-olive/20 text-maya-olive px-3 py-1 rounded-full">
+                <span className="text-sm bg-maya-green/10 dark:bg-maya-green/20 text-maya-green px-3 py-1 rounded-full">
                   {result.size === 'small' ? 'Pequeno' : result.size === 'medium' ? 'Médio' : 'Grande'}
                 </span>
               </div>
@@ -223,8 +223,8 @@ export default function QuizPage() {
         <div className="max-w-2xl mx-auto">
           {/* Header */}
           <div className="text-center mb-12">
-            <ClipboardList className="w-16 h-16 text-maya-olive mx-auto mb-4" />
-            <h1 className="text-4xl md:text-5xl font-display font-bold text-maya-brown dark:text-white mb-4">
+            <ClipboardList className="w-16 h-16 text-maya-green mx-auto mb-4" />
+            <h1 className="text-4xl md:text-5xl font-display text-maya-brown dark:text-white mb-4">
               Qual Pet é Ideal Para Você?
             </h1>
             <p className="text-lg text-maya-brown/70 dark:text-gray-300">
@@ -240,7 +240,7 @@ export default function QuizPage() {
             </div>
             <div className="w-full bg-white dark:bg-gray-700 h-2 rounded-full overflow-hidden">
               <div
-                className="bg-maya-olive h-full transition-all duration-300"
+                className="bg-maya-green h-full transition-all duration-300"
                 style={{ width: `${((currentQuestion + 1) / questions.length) * 100}%` }}
               />
             </div>
@@ -249,10 +249,10 @@ export default function QuizPage() {
           {/* Question Card */}
           <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl p-8 md:p-12">
             <div className="flex items-center gap-4 mb-8">
-              <div className="w-16 h-16 bg-maya-olive/10 dark:bg-maya-olive/20 rounded-2xl flex items-center justify-center flex-shrink-0">
-                <Icon className="w-8 h-8 text-maya-olive" />
+              <div className="w-16 h-16 bg-maya-green/10 dark:bg-maya-green/20 rounded-2xl flex items-center justify-center flex-shrink-0">
+                <Icon className="w-8 h-8 text-maya-green" />
               </div>
-              <h2 className="text-2xl md:text-3xl font-display font-bold text-maya-brown dark:text-white">
+              <h2 className="text-2xl md:text-3xl font-display text-maya-brown dark:text-white">
                 {question.question}
               </h2>
             </div>
@@ -262,7 +262,7 @@ export default function QuizPage() {
                 <button
                   key={option.value}
                   onClick={() => handleAnswer(question.id, option.value)}
-                  className="w-full p-6 bg-maya-beige dark:bg-gray-700 hover:bg-maya-olive hover:text-white dark:hover:bg-maya-olive text-left rounded-2xl transition-all duration-300 group font-semibold text-maya-brown dark:text-white hover:shadow-lg"
+                  className="w-full p-6 bg-maya-beige dark:bg-gray-700 hover:bg-maya-green hover:text-white dark:hover:bg-maya-green text-left rounded-2xl transition-all duration-300 group font-semibold text-maya-brown dark:text-white hover:shadow-lg"
                 >
                   <div className="flex items-center justify-between">
                     <span>{option.text}</span>
@@ -278,7 +278,7 @@ export default function QuizPage() {
             <div className="mt-6 text-center">
               <button
                 onClick={() => setCurrentQuestion(currentQuestion - 1)}
-                className="text-maya-olive hover:underline"
+                className="text-maya-green hover:underline"
               >
                 ← Voltar para questão anterior
               </button>

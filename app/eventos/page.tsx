@@ -43,8 +43,8 @@ export default function EventosPage() {
       <div className="container mx-auto px-4">
         {/* Header */}
         <div className="text-center mb-12">
-          <Calendar className="w-16 h-16 text-maya-olive mx-auto mb-4" />
-          <h1 className="text-5xl md:text-6xl font-display font-bold text-maya-brown dark:text-white mb-4">
+          <Calendar className="w-16 h-16 text-maya-green mx-auto mb-4" />
+          <h1 className="text-5xl md:text-6xl font-display text-maya-brown dark:text-white mb-4">
             Próximos Eventos
           </h1>
           <p className="text-xl text-maya-brown/70 dark:text-gray-300 max-w-2xl mx-auto">
@@ -64,35 +64,35 @@ export default function EventosPage() {
                     alt={event.title}
                     className="w-full h-full object-cover"
                   />
-                  <div className="absolute top-4 right-4 bg-maya-olive text-white px-4 py-2 rounded-full font-bold text-sm">
+                  <div className="absolute top-4 right-4 bg-maya-green text-white px-4 py-2 rounded-full font-bold text-sm">
                     {event.spotsAvailable} vagas
                   </div>
                 </div>
 
                 {/* Content */}
                 <div className="md:col-span-2 p-8">
-                  <h2 className="font-display font-bold text-3xl text-maya-brown dark:text-white mb-4">
+                  <h2 className="font-display text-3xl text-maya-brown dark:text-white mb-4">
                     {event.title}
                   </h2>
 
                   <div className="space-y-3 mb-6">
                     <div className="flex items-center gap-3 text-maya-brown/70 dark:text-gray-300">
-                      <Calendar className="w-5 h-5 text-maya-olive" />
+                      <Calendar className="w-5 h-5 text-maya-green" />
                       <span>{new Date(event.date).toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>
                     </div>
 
                     <div className="flex items-center gap-3 text-maya-brown/70 dark:text-gray-300">
-                      <Clock className="w-5 h-5 text-maya-olive" />
+                      <Clock className="w-5 h-5 text-maya-green" />
                       <span>{event.time}</span>
                     </div>
 
                     <div className="flex items-center gap-3 text-maya-brown/70 dark:text-gray-300">
-                      <MapPin className="w-5 h-5 text-maya-olive" />
+                      <MapPin className="w-5 h-5 text-maya-green" />
                       <span>{event.location}</span>
                     </div>
 
                     <div className="flex items-center gap-3 text-maya-brown/70 dark:text-gray-300">
-                      <Users className="w-5 h-5 text-maya-olive" />
+                      <Users className="w-5 h-5 text-maya-green" />
                       <span>{event.spotsAvailable} de {event.spots} vagas disponíveis</span>
                     </div>
                   </div>
@@ -117,7 +117,7 @@ export default function EventosPage() {
 
         {/* CTA */}
         <div className="mt-16 bg-white dark:bg-gray-800 rounded-3xl p-12 text-center max-w-3xl mx-auto shadow-lg">
-          <h2 className="font-display font-bold text-3xl text-maya-brown dark:text-white mb-4">
+          <h2 className="font-display text-3xl text-maya-brown dark:text-white mb-4">
             Quer Organizar um Evento Conosco?
           </h2>
           <p className="text-maya-brown/70 dark:text-gray-300 mb-6">

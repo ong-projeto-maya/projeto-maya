@@ -16,6 +16,8 @@ export interface Animal {
   images: string[]
   isAdopted: boolean
   isPuppy: boolean
+  isRescued: boolean
+  isMixed: boolean
 }
 
 export function useAnimals() {
