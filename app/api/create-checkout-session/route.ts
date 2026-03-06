@@ -6,7 +6,7 @@ import { NextResponse } from 'next/server'
 
 export async function POST(request: Request) {
   try {
-    const { amount, donationType } = await request.json()
+    const { amount, donationType, campaignId, campaignName } = await request.json()
 
     // Validate amount
     if (!amount || amount < 5) {
@@ -18,6 +18,15 @@ export async function POST(request: Request) {
 
     // IMPORTANT: Uncomment this section after setting up Stripe keys
     /*
+    // Determine product name and description
+    let productName = donationType === 'monthly' ? 'Doação Mensal - Projeto Maya' : 'Doação - Projeto Maya'
+    let productDescription = 'Sua contribuição ajuda animais resgatados a encontrarem um lar'
+    
+    if (campaignId && campaignName) {
+      productName = `${donationType === 'monthly' ? 'Doação Mensal' : 'Doação'} - ${campaignName}`
+      productDescription = `Sua contribuição para a campanha: ${campaignName}`
+    }
+
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: [
@@ -25,8 +34,8 @@ export async function POST(request: Request) {
           price_data: {
             currency: 'brl',
             product_data: {
-              name: donationType === 'monthly' ? 'Doação Mensal - Projeto Maya' : 'Doação - Projeto Maya',
-              description: 'Sua contribuição ajuda animais resgatados a encontrarem um lar',
+              name: productName,
+              description: productDescription,
               images: ['https://your-logo-url.com/logo.png'],
             },
             unit_amount: Math.round(amount * 100), // Stripe uses cents
@@ -40,11 +49,15 @@ export async function POST(request: Request) {
         },
       ],
       mode: donationType === 'monthly' ? 'subscription' : 'payment',
-      success_url: `${process.env.NEXT_PUBLIC_SITE_URL}/doacoes/sucesso?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.NEXT_PUBLIC_SITE_URL}/doacoes`,
+      success_url: `${process.env.NEXT_PUBLIC_SITE_URL}/doacoes/sucesso?session_id={CHECKOUT_SESSION_ID}${campaignId ? `&campaign=${campaignId}` : ''}`,
+      cancel_url: campaignId 
+        ? `${process.env.NEXT_PUBLIC_SITE_URL}/campanhas/${campaignId}`
+        : `${process.env.NEXT_PUBLIC_SITE_URL}/doacoes`,
       metadata: {
         donationType,
         amount: amount.toString(),
+        ...(campaignId && { campaignId }),
+        ...(campaignName && { campaignName }),
       },
     })
 

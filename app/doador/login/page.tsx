@@ -61,7 +61,7 @@ export default function DoadorLoginPage() {
 
           {/* Header */}
           <div className="text-center mb-8">
-            <h2 className="text-3xl font-display font-bold text-maya-brown dark:text-white mb-2">
+            <h2 className="text-3xl font-display text-maya-brown dark:text-white mb-2">
               Área do Doador
             </h2>
             <p className="text-maya-brown/70 dark:text-gray-400">
@@ -90,7 +90,7 @@ export default function DoadorLoginPage() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:border-maya-olive dark:focus:border-maya-olive focus:outline-none bg-white dark:bg-gray-700 text-maya-brown dark:text-white"
+                  className="w-full pl-10 pr-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:border-maya-green dark:focus:border-maya-green focus:outline-none bg-white dark:bg-gray-700 text-maya-brown dark:text-white"
                   placeholder="seu@email.com"
                   required
                 />
@@ -109,7 +109,7 @@ export default function DoadorLoginPage() {
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-10 pr-12 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:border-maya-olive dark:focus:border-maya-olive focus:outline-none bg-white dark:bg-gray-700 text-maya-brown dark:text-white"
+                  className="w-full pl-10 pr-12 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:border-maya-green dark:focus:border-maya-green focus:outline-none bg-white dark:bg-gray-700 text-maya-brown dark:text-white"
                   placeholder="••••••••"
                   required
                 />
@@ -127,7 +127,7 @@ export default function DoadorLoginPage() {
             <div className="text-right">
               <Link
                 href="/doador/recuperar-senha"
-                className="text-sm text-maya-olive hover:text-maya-olive-light font-medium"
+                className="text-sm text-maya-green hover:text-maya-green font-medium"
               >
                 Esqueceu sua senha?
               </Link>
@@ -164,7 +164,7 @@ export default function DoadorLoginPage() {
             </p>
             <Link
               href="/doador/registro"
-              className="inline-flex items-center justify-center gap-2 w-full px-6 py-3 bg-maya-beige dark:bg-gray-700 text-maya-olive dark:text-maya-olive-light rounded-xl hover:bg-maya-olive/10 dark:hover:bg-gray-600 transition-colors font-semibold"
+              className="inline-flex items-center justify-center gap-2 w-full px-6 py-3 bg-maya-beige dark:bg-gray-700 text-maya-green dark:text-maya-green rounded-xl hover:bg-maya-green/10 dark:hover:bg-gray-600 transition-colors font-semibold"
             >
               <Heart size={20} />
               Criar Conta de Doador
@@ -175,7 +175,7 @@ export default function DoadorLoginPage() {
           <div className="mt-6 text-center">
             <Link
               href="/"
-              className="text-sm text-maya-brown/60 dark:text-gray-400 hover:text-maya-olive dark:hover:text-maya-olive-light"
+              className="text-sm text-maya-brown/60 dark:text-gray-400 hover:text-maya-green dark:hover:text-maya-green"
             >
               ← Voltar para o site
             </Link>
@@ -183,7 +183,7 @@ export default function DoadorLoginPage() {
         </div>
 
         {/* Info Box */}
-        <div className="mt-6 bg-maya-olive/10 dark:bg-maya-olive/20 rounded-2xl p-4 text-center">
+        <div className="mt-6 bg-maya-green/10 dark:bg-maya-green/20 rounded-2xl p-4 text-center">
           <p className="text-sm text-maya-brown dark:text-white">
             <strong>Teste:</strong> Use qualquer email e senha com 6+ caracteres
           </p>

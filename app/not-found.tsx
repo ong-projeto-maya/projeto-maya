@@ -9,18 +9,18 @@ export default function NotFound() {
           {/* Animated Icon */}
           <div className="mb-8 relative">
             <div className="w-32 h-32 mx-auto relative">
-              <PawPrint className="w-32 h-32 text-maya-olive/20 absolute animate-ping" />
-              <PawPrint className="w-32 h-32 text-maya-olive relative" />
+              <PawPrint className="w-32 h-32 text-maya-green/20 absolute animate-ping" />
+              <PawPrint className="w-32 h-32 text-maya-green relative" />
             </div>
           </div>
 
           {/* 404 */}
-          <h1 className="text-9xl font-display font-bold text-maya-brown mb-4">
+          <h1 className="text-9xl font-display text-maya-brown mb-4">
             404
           </h1>
 
           {/* Message */}
-          <h2 className="text-3xl md:text-4xl font-display font-bold text-maya-brown mb-4">
+          <h2 className="text-3xl md:text-4xl font-display text-maya-brown mb-4">
             Ops! Página não encontrada
           </h2>
 
@@ -43,29 +43,29 @@ export default function NotFound() {
 
           {/* Suggestions */}
           <div className="bg-white rounded-2xl p-6 shadow-lg">
-            <h3 className="font-display font-bold text-xl text-maya-brown mb-4">
+            <h3 className="font-display text-xl text-maya-brown mb-4">
               Que tal explorar:
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
               <Link 
                 href="/adocao" 
-                className="p-4 bg-maya-beige rounded-xl hover:bg-maya-olive/10 transition-colors"
+                className="p-4 bg-maya-beige rounded-xl hover:bg-maya-green/10 transition-colors"
               >
-                <PawPrint className="w-6 h-6 text-maya-olive mx-auto mb-2" />
+                <PawPrint className="w-6 h-6 text-maya-green mx-auto mb-2" />
                 <div className="font-semibold text-maya-brown">Adotar um Pet</div>
               </Link>
               <Link 
                 href="/doacoes" 
-                className="p-4 bg-maya-beige rounded-xl hover:bg-maya-olive/10 transition-colors"
+                className="p-4 bg-maya-beige rounded-xl hover:bg-maya-green/10 transition-colors"
               >
-                <Heart className="w-6 h-6 text-maya-olive mx-auto mb-2" />
+                <Heart className="w-6 h-6 text-maya-green mx-auto mb-2" />
                 <div className="font-semibold text-maya-brown">Fazer uma Doação</div>
               </Link>
               <Link 
                 href="/#sobre" 
-                className="p-4 bg-maya-beige rounded-xl hover:bg-maya-olive/10 transition-colors"
+                className="p-4 bg-maya-beige rounded-xl hover:bg-maya-green/10 transition-colors"
               >
-                <Search className="w-6 h-6 text-maya-olive mx-auto mb-2" />
+                <Search className="w-6 h-6 text-maya-green mx-auto mb-2" />
                 <div className="font-semibold text-maya-brown">Conhecer o Projeto</div>
               </Link>
             </div>

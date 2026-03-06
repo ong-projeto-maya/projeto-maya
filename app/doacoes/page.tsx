@@ -70,13 +70,13 @@ export default function DoacoesPage() {
       <div className="container mx-auto px-4">
         {/* Header */}
         <div className="text-center mb-12">
-          <Heart className="w-16 h-16 text-maya-olive mx-auto mb-4" />
-          <h1 className="text-5xl md:text-6xl font-display font-bold text-maya-brown dark:text-white mb-4">
+          <Heart className="w-16 h-16 text-maya-green mx-auto mb-4" />
+          <h1 className="text-5xl md:text-6xl font-display text-maya-brown dark:text-white mb-4">
             Faça uma Doação
           </h1>
           <p className="text-xl text-maya-brown/70 dark:text-gray-300 max-w-2xl mx-auto">
-            Sua contribuição transforma vidas. Cada doação nos ajuda a resgatar, 
-            cuidar e encontrar lares para animais abandonados.
+            Sua contribuição transforma vidas! Cada doação nos ajuda a resgatar, 
+            cuidar e encontrar lares pra esses pets que merecem tanto amor.
           </p>
         </div>
 
@@ -85,7 +85,7 @@ export default function DoacoesPage() {
           <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl p-8 md:p-12">
             {/* Donation Type Toggle */}
             <div className="mb-8">
-              <h2 className="font-display font-bold text-2xl text-maya-brown dark:text-white mb-4 text-center">
+              <h2 className="font-display text-2xl text-maya-brown dark:text-white mb-4 text-center">
                 Tipo de Doação
               </h2>
               <div className="grid grid-cols-2 gap-4">
@@ -93,16 +93,16 @@ export default function DoacoesPage() {
                   onClick={() => setDonationType('single')}
                   className={`relative p-6 rounded-2xl border-2 transition-all ${
                     donationType === 'single'
-                      ? 'border-maya-olive bg-maya-olive/5 dark:bg-maya-olive/10'
-                      : 'border-gray-200 dark:border-gray-600 hover:border-maya-olive/30 dark:hover:border-maya-olive/50'
+                      ? 'border-maya-green bg-maya-green/5 dark:bg-maya-green/10'
+                      : 'border-gray-200 dark:border-gray-600 hover:border-maya-green/30 dark:hover:border-maya-green/50'
                   }`}
                 >
                   {donationType === 'single' && (
-                    <div className="absolute top-3 right-3 w-6 h-6 bg-maya-olive rounded-full flex items-center justify-center">
+                    <div className="absolute top-3 right-3 w-6 h-6 bg-maya-green rounded-full flex items-center justify-center">
                       <Check className="w-4 h-4 text-white" />
                     </div>
                   )}
-                  <Heart className="w-8 h-8 text-maya-olive mx-auto mb-3" />
+                  <Heart className="w-8 h-8 text-maya-green mx-auto mb-3" />
                   <div className="font-bold text-maya-brown dark:text-white mb-1">Doação Única</div>
                   <div className="text-sm text-maya-brown/60 dark:text-gray-300">Contribua uma vez</div>
                 </button>
@@ -132,7 +132,7 @@ export default function DoacoesPage() {
 
             {/* Amount Selection */}
             <div className="mb-8">
-              <h2 className="font-display font-bold text-2xl text-maya-brown dark:text-white mb-4 text-center">
+              <h2 className="font-display text-2xl text-maya-brown dark:text-white mb-4 text-center">
                 Valor da Doação
               </h2>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
@@ -145,8 +145,8 @@ export default function DoacoesPage() {
                     }}
                     className={`p-4 rounded-xl border-2 font-bold transition-all ${
                       selectedAmount === amount && !customAmount
-                        ? 'border-maya-olive bg-maya-olive text-white'
-                        : 'border-gray-200 dark:border-gray-600 text-maya-brown dark:text-white hover:border-maya-olive/50 dark:hover:border-maya-olive'
+                        ? 'border-maya-green bg-maya-green text-white'
+                        : 'border-gray-200 dark:border-gray-600 text-maya-brown dark:text-white hover:border-maya-green/50 dark:hover:border-maya-green'
                     }`}
                   >
                     R$ {amount}
@@ -169,7 +169,7 @@ export default function DoacoesPage() {
                     setCustomAmount(e.target.value)
                     setSelectedAmount(0)
                   }}
-                  className="w-full pl-12 pr-4 py-4 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:border-maya-olive dark:focus:border-maya-olive focus:outline-none text-lg font-semibold bg-white dark:bg-gray-700 text-maya-brown dark:text-white"
+                  className="w-full pl-12 pr-4 py-4 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:border-maya-green dark:focus:border-maya-green focus:outline-none text-lg font-semibold bg-white dark:bg-gray-700 text-maya-brown dark:text-white"
                 />
               </div>
 
@@ -186,25 +186,25 @@ export default function DoacoesPage() {
               <div className="space-y-2 text-sm text-maya-brown/80 dark:text-gray-300">
                 {(customAmount ? parseFloat(customAmount) : selectedAmount) >= 25 && (
                   <div className="flex items-center gap-2">
-                    <Check className="w-5 h-5 text-maya-olive flex-shrink-0" />
+                    <Check className="w-5 h-5 text-maya-green flex-shrink-0" />
                     <span>Alimentação para 1 animal por 1 semana</span>
                   </div>
                 )}
                 {(customAmount ? parseFloat(customAmount) : selectedAmount) >= 50 && (
                   <div className="flex items-center gap-2">
-                    <Check className="w-5 h-5 text-maya-olive flex-shrink-0" />
+                    <Check className="w-5 h-5 text-maya-green flex-shrink-0" />
                     <span>Vacinas e vermífugos</span>
                   </div>
                 )}
                 {(customAmount ? parseFloat(customAmount) : selectedAmount) >= 100 && (
                   <div className="flex items-center gap-2">
-                    <Check className="w-5 h-5 text-maya-olive flex-shrink-0" />
+                    <Check className="w-5 h-5 text-maya-green flex-shrink-0" />
                     <span>Consulta veterinária completa</span>
                   </div>
                 )}
                 {(customAmount ? parseFloat(customAmount) : selectedAmount) >= 250 && (
                   <div className="flex items-center gap-2">
-                    <Check className="w-5 h-5 text-maya-olive flex-shrink-0" />
+                    <Check className="w-5 h-5 text-maya-green flex-shrink-0" />
                     <span>Cirurgia de castração</span>
                   </div>
                 )}
@@ -215,7 +215,7 @@ export default function DoacoesPage() {
             {donationType === 'monthly' && (
               <div className="bg-maya-blue/10 dark:bg-maya-blue/20 border-l-4 border-maya-blue rounded-lg p-4 mb-8">
                 <h3 className="font-bold text-maya-brown dark:text-white mb-2 flex items-center gap-2">
-                  <Heart className="w-5 h-5 text-maya-olive fill-maya-olive" />
+                  <Heart className="w-5 h-5 text-maya-green fill-maya-green" />
                   Vantagens de ser um doador mensal:
                 </h3>
                 <ul className="text-sm text-maya-brown/80 dark:text-gray-300 space-y-1">
@@ -250,10 +250,10 @@ export default function DoacoesPage() {
             </p>
 
             {/* Doador CTA */}
-            <div className="mt-8 bg-maya-olive/10 dark:bg-maya-olive/20 rounded-2xl p-6 border-2 border-maya-olive/30 dark:border-maya-olive/40">
+            <div className="mt-8 bg-maya-green/10 dark:bg-maya-green/20 rounded-2xl p-6 border-2 border-maya-green/30 dark:border-maya-green/40">
               <div className="text-center">
                 <h3 className="font-bold text-maya-brown dark:text-white mb-2 flex items-center justify-center gap-2">
-                  <Heart size={20} className="text-maya-olive fill-maya-olive" />
+                  <Heart size={20} className="text-maya-green fill-maya-green" />
                   Já é um doador?
                 </h3>
                 <p className="text-sm text-maya-brown/70 dark:text-gray-300 mb-4">
@@ -262,13 +262,13 @@ export default function DoacoesPage() {
                 <div className="flex flex-col sm:flex-row gap-3 justify-center">
                   <Link
                     href="/doador/login"
-                    className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-maya-olive text-white rounded-xl hover:bg-maya-olive-light transition-colors font-semibold"
+                    className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-maya-green text-white rounded-xl hover:bg-maya-green transition-colors font-semibold"
                   >
                     Acessar Área do Doador
                   </Link>
                   <Link
                     href="/doador/registro"
-                    className="inline-flex items-center justify-center gap-2 px-6 py-3 border-2 border-maya-olive text-maya-olive dark:text-maya-olive-light rounded-xl hover:bg-maya-olive/10 dark:hover:bg-maya-olive/20 transition-colors font-semibold"
+                    className="inline-flex items-center justify-center gap-2 px-6 py-3 border-2 border-maya-green text-maya-green dark:text-maya-green rounded-xl hover:bg-maya-green/10 dark:hover:bg-maya-green/20 transition-colors font-semibold"
                   >
                     Criar Conta
                   </Link>
@@ -281,8 +281,8 @@ export default function DoacoesPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
             <div className="text-center">
               <div className="flex justify-center mb-3">
-                <div className="w-16 h-16 bg-maya-olive/10 dark:bg-maya-olive/20 rounded-2xl flex items-center justify-center">
-                  <Shield className="w-8 h-8 text-maya-olive" />
+                <div className="w-16 h-16 bg-maya-green/10 dark:bg-maya-green/20 rounded-2xl flex items-center justify-center">
+                  <Shield className="w-8 h-8 text-maya-green" />
                 </div>
               </div>
               <h3 className="font-bold text-maya-brown dark:text-white mb-1">Seguro</h3>
@@ -303,8 +303,8 @@ export default function DoacoesPage() {
             </div>
             <div className="text-center">
               <div className="flex justify-center mb-3">
-                <div className="w-16 h-16 bg-maya-olive/10 dark:bg-maya-olive/20 rounded-2xl flex items-center justify-center">
-                  <CreditCard className="w-8 h-8 text-maya-olive" />
+                <div className="w-16 h-16 bg-maya-green/10 dark:bg-maya-green/20 rounded-2xl flex items-center justify-center">
+                  <CreditCard className="w-8 h-8 text-maya-green" />
                 </div>
               </div>
               <h3 className="font-bold text-maya-brown dark:text-white mb-1">Flexível</h3>

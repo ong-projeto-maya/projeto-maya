@@ -3,7 +3,7 @@ import { Heart, PawPrint, Sparkles } from 'lucide-react'
 
 export default function CTAFinal() {
   return (
-    <section className="py-20 bg-gradient-to-br from-maya-olive to-maya-olive-light text-white relative overflow-hidden">
+    <section className="py-20 bg-gradient-to-br from-maya-green to-maya-blue text-white relative overflow-hidden">
       {/* Decorative Elements */}
       <div className="absolute top-10 left-10 opacity-10">
         <PawPrint size={150} />
@@ -22,7 +22,7 @@ export default function CTAFinal() {
           </div>
 
           {/* Heading */}
-          <h2 className="text-4xl md:text-6xl font-display font-bold mb-6">
+          <h2 className="text-4xl md:text-6xl font-display mb-6">
             Sua doação<br />
             <span className="text-maya-blue">salva vidas.</span>
           </h2>
@@ -59,7 +59,7 @@ export default function CTAFinal() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link 
               href="/doacoes" 
-              className="bg-white text-maya-olive hover:bg-maya-beige font-semibold py-4 px-10 rounded-2xl transition-all duration-300 shadow-xl hover:shadow-2xl hover:-translate-y-1 inline-flex items-center justify-center gap-2"
+              className="bg-white text-maya-green hover:bg-maya-beige font-semibold py-4 px-10 rounded-2xl transition-all duration-300 shadow-xl hover:shadow-2xl hover:-translate-y-1 inline-flex items-center justify-center gap-2"
             >
               <Heart size={20} />
               Fazer uma Doação

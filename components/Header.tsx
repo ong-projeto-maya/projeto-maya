@@ -9,16 +9,18 @@ import {
   Heart, 
   Home, 
   PawPrint, 
-  ClipboardList, 
   Calendar, 
-  BookOpen, 
-  HelpCircle, 
-  MapPin, 
   MessageSquare,
   Search,
   Bell,
   User,
-  LogOut
+  LogOut,
+  Target,
+  ChevronDown,
+  BookOpen,
+  HelpCircle,
+  MapPin,
+  ClipboardList
 } from 'lucide-react'
 import DarkModeToggle from './DarkModeToggle'
 import { useFavorites } from '@/hooks/useFavorites'
@@ -31,6 +33,7 @@ export default function Header() {
   const [searchQuery, setSearchQuery] = useState('')
   const [isScrolled, setIsScrolled] = useState(false)
   const [hasNewAnimals, setHasNewAnimals] = useState(true) // Mock - seria dinâmico
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null)
   const pathname = usePathname()
   const { favorites } = useFavorites()
   const { user, logout } = useAuth()
@@ -65,20 +68,48 @@ export default function Header() {
   useEffect(() => {
     setIsMenuOpen(false)
     setIsSearchOpen(false)
+    setOpenDropdown(null)
   }, [pathname])
 
   const isActive = (path: string) => pathname === path
 
   const navLinks = [
     { href: '/', label: 'Início', icon: Home },
-    { href: '/adocao', label: 'Adotar', icon: PawPrint, badge: hasNewAnimals },
-    { href: '/doacoes', label: 'Doar', icon: Heart },
-    { href: '/quiz', label: 'Quiz', icon: ClipboardList },
-    { href: '/eventos', label: 'Eventos', icon: Calendar },
-    { href: '/blog', label: 'Blog', icon: BookOpen },
-    { href: '/faq', label: 'FAQ', icon: HelpCircle },
-    { href: '/localizacao', label: 'Mapa', icon: MapPin },
-    { href: '/contato', label: 'Contato', icon: MessageSquare },
+    { 
+      href: '/adocao', 
+      label: 'Adotar', 
+      icon: PawPrint, 
+      badge: hasNewAnimals,
+      submenu: [
+        { href: '/adocao', label: 'Ver Animais', icon: PawPrint },
+        { href: '/quiz', label: 'Quiz de Compatibilidade', icon: ClipboardList },
+      ]
+    },
+    { 
+      label: 'Como Ajudar', 
+      icon: Heart,
+      submenu: [
+        { href: '/doacoes', label: 'Fazer Doação', icon: Heart },
+        { href: '/campanhas', label: 'Campanhas Ativas', icon: Target },
+      ]
+    },
+    { 
+      label: 'Institucional', 
+      icon: BookOpen,
+      submenu: [
+        { href: '/eventos', label: 'Eventos', icon: Calendar },
+        { href: '/blog', label: 'Blog', icon: BookOpen },
+        { href: '/faq', label: 'Perguntas Frequentes', icon: HelpCircle },
+      ]
+    },
+    { 
+      label: 'Contato', 
+      icon: MessageSquare,
+      submenu: [
+        { href: '/contato', label: 'Fale Conosco', icon: MessageSquare },
+        { href: '/localizacao', label: 'Nossa Localização', icon: MapPin },
+      ]
+    },
   ]
 
   return (
@@ -103,17 +134,67 @@ export default function Header() {
 
             {/* Desktop Navigation */}
             <div className="hidden xl:flex items-center gap-1">
-              {navLinks.map((link) => {
+              {navLinks.map((link, idx) => {
                 const Icon = link.icon
-                const active = isActive(link.href)
+                const active = link.href && isActive(link.href)
+                const hasSubmenu = link.submenu && link.submenu.length > 0
+                
+                if (hasSubmenu) {
+                  return (
+                    <div 
+                      key={idx}
+                      className="relative"
+                      onMouseEnter={() => setOpenDropdown(link.label)}
+                      onMouseLeave={() => setOpenDropdown(null)}
+                    >
+                      <button
+                        className={`relative flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-200 text-sm font-medium ${
+                          'text-maya-brown dark:text-white hover:bg-maya-green/5 dark:hover:bg-gray-700'
+                        }`}
+                      >
+                        <Icon size={16} />
+                        {link.label}
+                        <ChevronDown size={14} className={`transition-transform ${openDropdown === link.label ? 'rotate-180' : ''}`} />
+                        {link.badge && (
+                          <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+                        )}
+                      </button>
+                      
+                      {/* Dropdown Menu */}
+                      {openDropdown === link.label && (
+                        <div className="absolute top-full left-0 mt-1 w-56 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-maya-green/10 dark:border-gray-700 py-2 z-50">
+                          {link.submenu!.map((sublink) => {
+                            const SubIcon = sublink.icon
+                            const subActive = isActive(sublink.href)
+                            return (
+                              <Link
+                                key={sublink.href}
+                                href={sublink.href}
+                                className={`flex items-center gap-3 px-4 py-2.5 text-sm transition-colors ${
+                                  subActive
+                                    ? 'bg-maya-green/10 text-maya-green dark:bg-maya-green/20'
+                                    : 'text-maya-brown dark:text-white hover:bg-maya-green/5 dark:hover:bg-gray-700'
+                                }`}
+                              >
+                                <SubIcon size={16} />
+                                {sublink.label}
+                              </Link>
+                            )
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  )
+                }
+                
                 return (
                   <Link
                     key={link.href}
-                    href={link.href}
+                    href={link.href!}
                     className={`relative flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-200 text-sm font-medium ${
                       active
-                        ? 'bg-maya-olive/10 text-maya-olive dark:bg-maya-olive/20'
-                        : 'text-maya-brown dark:text-white hover:bg-maya-olive/5 dark:hover:bg-gray-700'
+                        ? 'bg-maya-green/10 text-maya-green dark:bg-maya-green/20'
+                        : 'text-maya-brown dark:text-white hover:bg-maya-green/5 dark:hover:bg-gray-700'
                     }`}
                   >
                     <Icon size={16} />
@@ -131,7 +212,7 @@ export default function Header() {
               {/* Search Button */}
               <button
                 onClick={() => setIsSearchOpen(!isSearchOpen)}
-                className="p-2 text-maya-brown dark:text-white hover:bg-maya-olive/5 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                className="p-2 text-maya-brown dark:text-white hover:bg-maya-green/5 dark:hover:bg-gray-700 rounded-lg transition-colors"
                 aria-label="Buscar"
               >
                 <Search size={20} />
@@ -140,12 +221,12 @@ export default function Header() {
               {/* Favorites */}
               <Link
                 href="/favoritos"
-                className="relative p-2 text-maya-brown dark:text-white hover:bg-maya-olive/5 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                className="relative p-2 text-maya-brown dark:text-white hover:bg-maya-green/5 dark:hover:bg-gray-700 rounded-lg transition-colors"
                 aria-label="Favoritos"
               >
                 <Heart size={20} />
                 {favorites.length > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-maya-olive text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold">
+                  <span className="absolute -top-1 -right-1 bg-maya-green text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold">
                     {favorites.length}
                   </span>
                 )}
@@ -153,7 +234,7 @@ export default function Header() {
 
               {/* Notifications */}
               <button
-                className="relative p-2 text-maya-brown dark:text-white hover:bg-maya-olive/5 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                className="relative p-2 text-maya-brown dark:text-white hover:bg-maya-green/5 dark:hover:bg-gray-700 rounded-lg transition-colors"
                 aria-label="Notificações"
               >
                 <Bell size={20} />
@@ -184,17 +265,17 @@ export default function Header() {
                   </button>
                 </div>
               ) : doador ? (
-                <Link
-                  href="/doador/dashboard"
-                  className="flex items-center gap-2 px-3 py-2 bg-maya-olive/10 dark:bg-maya-olive/20 text-maya-olive dark:text-maya-olive-light rounded-lg hover:bg-maya-olive/20 dark:hover:bg-maya-olive/30 transition-colors ml-2"
-                >
-                  <User size={16} />
-                  <span className="text-sm font-medium">Minha Conta</span>
-                </Link>
-              ) : (
-                <Link 
-                  href="/doador/login" 
-                  className="flex items-center gap-2 px-3 py-2 border-2 border-maya-olive text-maya-olive dark:text-maya-olive-light rounded-lg hover:bg-maya-olive hover:text-white dark:hover:bg-maya-olive dark:hover:text-white transition-colors ml-2 font-medium"
+                  <Link
+                    href="/doador/dashboard"
+                    className="flex items-center gap-2 px-3 py-2 bg-maya-green/10 dark:bg-maya-green/20 text-maya-green dark:text-maya-green rounded-lg hover:bg-maya-green/20 dark:hover:bg-maya-green/30 transition-colors ml-2"
+                  >
+                    <User size={16} />
+                    <span className="text-sm font-medium">Minha Conta</span>
+                  </Link>
+                ) : (
+                  <Link 
+                    href="/doador/login" 
+                    className="flex items-center gap-2 px-3 py-2 border-2 border-maya-green text-maya-green dark:text-maya-green rounded-lg hover:bg-maya-green hover:text-white dark:hover:bg-maya-green dark:hover:text-white transition-colors ml-2 font-medium"
                 >
                   <User size={16} />
                   <span className="text-sm">Área do Doador</span>
@@ -212,7 +293,7 @@ export default function Header() {
               >
                 <Heart size={20} />
                 {favorites.length > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-maya-olive text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold">
+                  <span className="absolute -top-1 -right-1 bg-maya-green text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold">
                     {favorites.length}
                   </span>
                 )}
@@ -240,7 +321,7 @@ export default function Header() {
                   placeholder="Buscar animais por nome, raça ou características..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-12 pr-4 py-3 rounded-xl border-2 border-maya-olive/20 dark:border-gray-600 focus:border-maya-olive dark:focus:border-maya-olive focus:outline-none text-maya-brown dark:text-white bg-white dark:bg-gray-700"
+                  className="w-full pl-12 pr-4 py-3 rounded-xl border-2 border-maya-green/20 dark:border-gray-600 focus:border-maya-green dark:focus:border-maya-green focus:outline-none text-maya-brown dark:text-white bg-white dark:bg-gray-700"
                   autoFocus
                 />
               </div>
@@ -267,7 +348,7 @@ export default function Header() {
         <div className="flex flex-col h-full">
           {/* Mobile Menu Header */}
           <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
-            <h2 className="font-display font-bold text-xl text-maya-brown dark:text-white">Menu</h2>
+            <h2 className="font-display text-xl text-maya-brown dark:text-white">Menu</h2>
             <button
               onClick={() => setIsMenuOpen(false)}
               className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
@@ -283,24 +364,75 @@ export default function Header() {
               <input
                 type="text"
                 placeholder="Buscar animais..."
-                className="w-full pl-10 pr-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 focus:border-maya-olive focus:outline-none text-sm bg-white dark:bg-gray-700 text-maya-brown dark:text-white"
+                className="w-full pl-10 pr-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 focus:border-maya-green focus:outline-none text-sm bg-white dark:bg-gray-700 text-maya-brown dark:text-white"
               />
             </div>
           </div>
 
           {/* Mobile Navigation Links */}
           <div className="flex-1 overflow-y-auto p-4 space-y-1">
-            {navLinks.map((link) => {
+            {navLinks.map((link, idx) => {
               const Icon = link.icon
-              const active = isActive(link.href)
+              const active = link.href && isActive(link.href)
+              const hasSubmenu = link.submenu && link.submenu.length > 0
+              const isExpanded = openDropdown === link.label
+              
+              if (hasSubmenu) {
+                return (
+                  <div key={idx}>
+                    <button
+                      onClick={() => setOpenDropdown(isExpanded ? null : link.label)}
+                      className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all w-full ${
+                        'text-maya-brown dark:text-white hover:bg-maya-green/10 dark:hover:bg-gray-700'
+                      }`}
+                    >
+                      <Icon size={20} />
+                      <span className="font-medium">{link.label}</span>
+                      <ChevronDown 
+                        size={16} 
+                        className={`ml-auto transition-transform ${isExpanded ? 'rotate-180' : ''}`}
+                      />
+                      {link.badge && (
+                        <span className="w-2 h-2 bg-red-500 rounded-full" />
+                      )}
+                    </button>
+                    
+                    {/* Submenu */}
+                    {isExpanded && (
+                      <div className="ml-4 mt-1 space-y-1">
+                        {link.submenu!.map((sublink) => {
+                          const SubIcon = sublink.icon
+                          const subActive = isActive(sublink.href)
+                          return (
+                            <Link
+                              key={sublink.href}
+                              href={sublink.href}
+                              className={`flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all text-sm ${
+                                subActive
+                                  ? 'bg-maya-green text-white'
+                                  : 'text-maya-brown/80 dark:text-white/80 hover:bg-maya-green/5 dark:hover:bg-gray-700'
+                              }`}
+                              onClick={() => setIsMenuOpen(false)}
+                            >
+                              <SubIcon size={18} />
+                              <span>{sublink.label}</span>
+                            </Link>
+                          )
+                        })}
+                      </div>
+                    )}
+                  </div>
+                )
+              }
+              
               return (
                 <Link
                   key={link.href}
-                  href={link.href}
+                  href={link.href!}
                   className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
                     active
-                      ? 'bg-maya-olive text-white'
-                      : 'text-maya-brown dark:text-white hover:bg-maya-olive/10 dark:hover:bg-gray-700'
+                      ? 'bg-maya-green text-white'
+                      : 'text-maya-brown dark:text-white hover:bg-maya-green/10 dark:hover:bg-gray-700'
                   }`}
                   onClick={() => setIsMenuOpen(false)}
                 >
@@ -340,7 +472,7 @@ export default function Header() {
             ) : doador ? (
               <Link
                 href="/doador/dashboard"
-                className="flex items-center justify-center gap-2 w-full px-4 py-3 bg-maya-olive/10 dark:bg-maya-olive/20 text-maya-olive dark:text-maya-olive-light rounded-xl hover:bg-maya-olive/20 dark:hover:bg-maya-olive/30 transition-colors"
+                className="flex items-center justify-center gap-2 w-full px-4 py-3 bg-maya-green/10 dark:bg-maya-green/20 text-maya-green dark:text-maya-green rounded-xl hover:bg-maya-green/20 dark:hover:bg-maya-green/30 transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
                 <User size={20} />
@@ -350,7 +482,7 @@ export default function Header() {
               <>
                 <Link
                   href="/doador/login"
-                  className="flex items-center justify-center gap-2 w-full px-4 py-3 border-2 border-maya-olive text-maya-olive dark:text-maya-olive-light rounded-xl hover:bg-maya-olive hover:text-white dark:hover:bg-maya-olive dark:hover:text-white transition-colors"
+                  className="flex items-center justify-center gap-2 w-full px-4 py-3 border-2 border-maya-green text-maya-green dark:text-maya-green rounded-xl hover:bg-maya-green hover:text-white dark:hover:bg-maya-green dark:hover:text-white transition-colors"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   <User size={20} />

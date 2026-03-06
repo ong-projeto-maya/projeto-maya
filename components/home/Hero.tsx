@@ -1,69 +1,83 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { Heart, PawPrint } from 'lucide-react'
 
 export default function Hero() {
   return (
-    <section className="relative bg-gradient-to-b from-maya-beige to-white py-20 md:py-32 overflow-hidden">
+    <section className="relative bg-gradient-to-br from-maya-beige via-maya-sand/20 to-white py-16 md:py-24 overflow-hidden min-h-[70vh] flex items-center">
       {/* Decorative Elements */}
       <div className="absolute top-10 right-10 opacity-10">
-        <PawPrint size={120} className="text-maya-olive" />
+        <PawPrint size={120} className="text-maya-green" />
       </div>
       <div className="absolute bottom-10 left-10 opacity-10">
         <Heart size={100} className="text-maya-blue" />
       </div>
 
       <div className="container mx-auto px-4">
-        <div className="max-w-4xl mx-auto text-center">
-          {/* Logo */}
-          <div className="mb-8 flex justify-center">
-            <img 
-              src="/logo.png" 
-              alt="Projeto Maya" 
-              className="h-32 w-auto drop-shadow-2xl"
-            />
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center max-w-7xl mx-auto">
+          {/* Texto à Esquerda */}
+          <div className="space-y-8 order-2 lg:order-1">
+            {/* Main Heading */}
+            <h1 className="text-5xl md:text-7xl font-display text-maya-brown leading-tight">
+              Do resgate,<br />
+              <span className="text-maya-green">à adoção.</span>
+            </h1>
+
+            {/* Subtitle */}
+            <p className="text-xl md:text-2xl text-maya-brown/80 max-w-xl">
+              Cada vida importa. Juntos, transformamos histórias de abandono em 
+              histórias de amor e esperança.
+            </p>
+
+            {/* CTA Buttons */}
+            <div className="flex flex-col sm:flex-row gap-4">
+              <Link href="/adocao" className="btn-primary inline-flex items-center gap-2 justify-center">
+                <PawPrint size={20} />
+                Quero Adotar
+              </Link>
+              <Link href="/doacoes" className="btn-secondary inline-flex items-center gap-2 justify-center">
+                <Heart size={20} />
+                Quero Ajudar
+              </Link>
+            </div>
+
+            {/* Quick Stats */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 pt-8">
+              <div>
+                <div className="text-4xl font-display text-maya-green mb-1">347</div>
+                <div className="text-sm text-maya-brown/70">Resgatados</div>
+              </div>
+              <div>
+                <div className="text-4xl font-display text-maya-green mb-1">289</div>
+                <div className="text-sm text-maya-brown/70">Adotados</div>
+              </div>
+              <div>
+                <div className="text-4xl font-display text-maya-green mb-1">52</div>
+                <div className="text-sm text-maya-brown/70">Voluntários</div>
+              </div>
+              <div>
+                <div className="text-4xl font-display text-maya-green mb-1">100%</div>
+                <div className="text-sm text-maya-brown/70">Amor 🐾</div>
+              </div>
+            </div>
           </div>
 
-          {/* Main Heading */}
-          <h1 className="text-5xl md:text-7xl font-display font-bold text-maya-brown mb-6 leading-tight">
-            Do resgate,<br />
-            <span className="text-maya-olive">à adoção.</span>
-          </h1>
-
-          {/* Subtitle */}
-          <p className="text-xl md:text-2xl text-maya-brown/80 mb-12 max-w-2xl mx-auto">
-            Cada vida importa. Juntos, transformamos histórias de abandono em 
-            histórias de amor e esperança.
-          </p>
-
-          {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Link href="/adocao" className="btn-primary inline-flex items-center gap-2">
-              <PawPrint size={20} />
-              Quero Adotar
-            </Link>
-            <Link href="/doacoes" className="btn-secondary inline-flex items-center gap-2">
-              <Heart size={20} />
-              Quero Ajudar
-            </Link>
-          </div>
-
-          {/* Quick Stats */}
-          <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-8">
-            <div className="text-center">
-              <div className="text-4xl font-display font-bold text-maya-olive mb-2">347</div>
-              <div className="text-sm text-maya-brown/70">Animais Resgatados</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl font-display font-bold text-maya-olive mb-2">289</div>
-              <div className="text-sm text-maya-brown/70">Adoções Realizadas</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl font-display font-bold text-maya-olive mb-2">52</div>
-              <div className="text-sm text-maya-brown/70">Voluntários Ativos</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl font-display font-bold text-maya-olive mb-2">100%</div>
-              <div className="text-sm text-maya-brown/70">Amor e Dedicação</div>
+          {/* Imagem do Cachorro à Direita */}
+          <div className="relative order-1 lg:order-2 flex items-center justify-center">
+            <div className="relative w-full max-w-[350px] md:max-w-[450px] lg:max-w-[550px] mx-auto">
+              {/* Imagem do cachorro */}
+              <div className="relative z-10">
+                <Image
+                  src="/images/hero-logo.png"
+                  alt="Cachorro Maya - Ilustração"
+                  width={1200}
+                  height={1200}
+                  className="w-full h-auto object-contain"
+                  priority
+                  quality={100}
+                  unoptimized
+                />
+              </div>
             </div>
           </div>
         </div>
