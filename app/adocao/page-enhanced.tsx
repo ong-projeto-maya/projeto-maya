@@ -65,7 +65,7 @@ export default function AdocaoPageEnhanced() {
       <div className="container mx-auto px-4">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-5xl md:text-6xl font-display font-bold text-maya-brown mb-4">
+          <h1 className="text-5xl md:text-6xl font-display text-maya-brown mb-4">
             Animais para Adoção
           </h1>
           <p className="text-xl text-maya-brown/70 max-w-2xl mx-auto">
@@ -82,7 +82,7 @@ export default function AdocaoPageEnhanced() {
               placeholder="Buscar por nome, características ou temperamento..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-12 pr-12 py-4 rounded-2xl border-2 border-maya-olive/20 focus:border-maya-olive focus:outline-none text-maya-brown"
+              className="w-full pl-12 pr-12 py-4 rounded-2xl border-2 border-maya-green/20 focus:border-maya-green focus:outline-none text-maya-brown"
             />
             {searchQuery && (
               <button
@@ -99,13 +99,13 @@ export default function AdocaoPageEnhanced() {
         <div className="bg-white rounded-2xl shadow-lg p-6 mb-8 max-w-6xl mx-auto">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
-              <Filter className="text-maya-olive" size={24} />
-              <h2 className="font-display font-bold text-xl text-maya-brown">Filtros</h2>
+              <Filter className="text-maya-green" size={24} />
+              <h2 className="font-display text-xl text-maya-brown">Filtros</h2>
             </div>
             <div className="flex gap-2">
               <button
                 onClick={() => setShowFilters(!showFilters)}
-                className="text-maya-olive font-semibold text-sm md:hidden"
+                className="text-maya-green font-semibold text-sm md:hidden"
               >
                 {showFilters ? 'Ocultar' : 'Mostrar'} Filtros
               </button>
@@ -132,8 +132,8 @@ export default function AdocaoPageEnhanced() {
                   onClick={() => setActiveFilter('all')}
                   className={`px-4 py-2 rounded-xl font-semibold transition-all ${
                     activeFilter === 'all'
-                      ? 'bg-maya-olive text-white shadow-lg'
-                      : 'bg-maya-beige text-maya-brown hover:bg-maya-olive/20'
+                      ? 'bg-maya-green text-white shadow-lg'
+                      : 'bg-maya-beige text-maya-brown hover:bg-maya-green/20'
                   }`}
                 >
                   Todos
@@ -142,8 +142,8 @@ export default function AdocaoPageEnhanced() {
                   onClick={() => setActiveFilter('dog')}
                   className={`px-4 py-2 rounded-xl font-semibold transition-all ${
                     activeFilter === 'dog'
-                      ? 'bg-maya-olive text-white shadow-lg'
-                      : 'bg-maya-beige text-maya-brown hover:bg-maya-olive/20'
+                      ? 'bg-maya-green text-white shadow-lg'
+                      : 'bg-maya-beige text-maya-brown hover:bg-maya-green/20'
                   }`}
                 >
                   🐕 Cães
@@ -152,8 +152,8 @@ export default function AdocaoPageEnhanced() {
                   onClick={() => setActiveFilter('cat')}
                   className={`px-4 py-2 rounded-xl font-semibold transition-all ${
                     activeFilter === 'cat'
-                      ? 'bg-maya-olive text-white shadow-lg'
-                      : 'bg-maya-beige text-maya-brown hover:bg-maya-olive/20'
+                      ? 'bg-maya-green text-white shadow-lg'
+                      : 'bg-maya-beige text-maya-brown hover:bg-maya-green/20'
                   }`}
                 >
                   🐈 Gatos
@@ -162,8 +162,8 @@ export default function AdocaoPageEnhanced() {
                   onClick={() => setActiveFilter('puppy')}
                   className={`px-4 py-2 rounded-xl font-semibold transition-all ${
                     activeFilter === 'puppy'
-                      ? 'bg-maya-olive text-white shadow-lg'
-                      : 'bg-maya-beige text-maya-brown hover:bg-maya-olive/20'
+                      ? 'bg-maya-green text-white shadow-lg'
+                      : 'bg-maya-beige text-maya-brown hover:bg-maya-green/20'
                   }`}
                 >
                   ✨ Filhotes
@@ -230,8 +230,8 @@ export default function AdocaoPageEnhanced() {
                   onClick={() => setGenderFilter('all')}
                   className={`px-4 py-2 rounded-xl font-semibold transition-all ${
                     genderFilter === 'all'
-                      ? 'bg-maya-olive-light text-white shadow-lg'
-                      : 'bg-maya-beige text-maya-brown hover:bg-maya-olive-light/20'
+                      ? 'bg-maya-green text-white shadow-lg'
+                      : 'bg-maya-beige text-maya-brown hover:bg-maya-green/20'
                   }`}
                 >
                   Todos
@@ -240,8 +240,8 @@ export default function AdocaoPageEnhanced() {
                   onClick={() => setGenderFilter('male')}
                   className={`px-4 py-2 rounded-xl font-semibold transition-all ${
                     genderFilter === 'male'
-                      ? 'bg-maya-olive-light text-white shadow-lg'
-                      : 'bg-maya-beige text-maya-brown hover:bg-maya-olive-light/20'
+                      ? 'bg-maya-green text-white shadow-lg'
+                      : 'bg-maya-beige text-maya-brown hover:bg-maya-green/20'
                   }`}
                 >
                   ♂️ Macho
@@ -250,8 +250,8 @@ export default function AdocaoPageEnhanced() {
                   onClick={() => setGenderFilter('female')}
                   className={`px-4 py-2 rounded-xl font-semibold transition-all ${
                     genderFilter === 'female'
-                      ? 'bg-maya-olive-light text-white shadow-lg'
-                      : 'bg-maya-beige text-maya-brown hover:bg-maya-olive-light/20'
+                      ? 'bg-maya-green text-white shadow-lg'
+                      : 'bg-maya-beige text-maya-brown hover:bg-maya-green/20'
                   }`}
                 >
                   ♀️ Fêmea
@@ -290,7 +290,7 @@ export default function AdocaoPageEnhanced() {
               {/* Info */}
               <div className="flex justify-between items-start mb-3">
                 <div>
-                  <h3 className="font-display font-bold text-2xl text-maya-brown mb-1">
+                  <h3 className="font-display text-2xl text-maya-brown mb-1">
                     {animal.name}
                   </h3>
                   <p className="text-maya-brown/60 text-sm">
@@ -307,7 +307,7 @@ export default function AdocaoPageEnhanced() {
                 {animal.temperament.map((trait) => (
                   <span
                     key={trait}
-                    className="text-xs bg-maya-olive/10 text-maya-olive px-3 py-1 rounded-full"
+                    className="text-xs bg-maya-green/10 text-maya-green px-3 py-1 rounded-full"
                   >
                     {trait}
                   </span>
@@ -334,7 +334,7 @@ export default function AdocaoPageEnhanced() {
         {filteredAnimals.length === 0 && (
           <div className="text-center py-20">
             <div className="text-6xl mb-4">🐾</div>
-            <h3 className="font-display font-bold text-2xl text-maya-brown mb-2">
+            <h3 className="font-display text-2xl text-maya-brown mb-2">
               Nenhum animal encontrado
             </h3>
             <p className="text-maya-brown/70 mb-4">
@@ -351,12 +351,12 @@ export default function AdocaoPageEnhanced() {
 
         {/* Info Box */}
         <div className="mt-16 max-w-4xl mx-auto bg-white rounded-3xl p-8 shadow-lg">
-          <h3 className="font-display font-bold text-2xl text-maya-brown mb-4 text-center">
+          <h3 className="font-display text-2xl text-maya-brown mb-4 text-center">
             Como funciona a adoção?
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="text-center">
-              <div className="w-12 h-12 bg-maya-olive text-white rounded-full flex items-center justify-center mx-auto mb-3 font-bold text-xl">
+              <div className="w-12 h-12 bg-maya-green text-white rounded-full flex items-center justify-center mx-auto mb-3 font-bold text-xl">
                 1
               </div>
               <h4 className="font-semibold text-maya-brown mb-2">Escolha seu amigo</h4>
@@ -365,7 +365,7 @@ export default function AdocaoPageEnhanced() {
               </p>
             </div>
             <div className="text-center">
-              <div className="w-12 h-12 bg-maya-olive text-white rounded-full flex items-center justify-center mx-auto mb-3 font-bold text-xl">
+              <div className="w-12 h-12 bg-maya-green text-white rounded-full flex items-center justify-center mx-auto mb-3 font-bold text-xl">
                 2
               </div>
               <h4 className="font-semibold text-maya-brown mb-2">Entre em contato</h4>
@@ -374,7 +374,7 @@ export default function AdocaoPageEnhanced() {
               </p>
             </div>
             <div className="text-center">
-              <div className="w-12 h-12 bg-maya-olive text-white rounded-full flex items-center justify-center mx-auto mb-3 font-bold text-xl">
+              <div className="w-12 h-12 bg-maya-green text-white rounded-full flex items-center justify-center mx-auto mb-3 font-bold text-xl">
                 3
               </div>
               <h4 className="font-semibold text-maya-brown mb-2">Leve para casa</h4>

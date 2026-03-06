@@ -22,7 +22,7 @@ export default function AnimaisAjudadosPage() {
     return (
       <div className="min-h-screen bg-maya-beige dark:bg-gray-900 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-maya-olive mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-maya-green mx-auto mb-4"></div>
           <p className="text-maya-brown dark:text-white">Carregando...</p>
         </div>
       </div>
@@ -43,12 +43,12 @@ export default function AnimaisAjudadosPage() {
         <div className="mb-8">
           <Link
             href="/doador/dashboard"
-            className="inline-flex items-center gap-2 text-maya-olive hover:text-maya-olive-light mb-4"
+            className="inline-flex items-center gap-2 text-maya-green hover:text-maya-green mb-4"
           >
             <ArrowLeft size={20} />
             Voltar ao Dashboard
           </Link>
-          <h1 className="text-4xl font-display font-bold text-maya-brown dark:text-white mb-2">
+          <h1 className="text-4xl font-display text-maya-brown dark:text-white mb-2">
             Animais que Ajudei
           </h1>
           <p className="text-maya-brown/70 dark:text-gray-300">
@@ -57,7 +57,7 @@ export default function AnimaisAjudadosPage() {
         </div>
 
         {/* Stats Banner */}
-        <div className="bg-gradient-to-r from-maya-olive to-maya-olive-light rounded-3xl p-8 mb-12 text-white shadow-2xl">
+        <div className="bg-gradient-to-r from-maya-green to-maya-green rounded-3xl p-8 mb-12 text-white shadow-2xl">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
             <div>
               <p className="text-5xl font-bold mb-2">{doador.animalsHelped}</p>
@@ -77,8 +77,8 @@ export default function AnimaisAjudadosPage() {
         {animalsHelped.length === 0 ? (
           /* Empty State */
           <div className="bg-white dark:bg-gray-800 rounded-3xl p-12 text-center shadow-lg">
-            <PawPrint className="w-20 h-20 text-maya-olive/30 mx-auto mb-6" />
-            <h3 className="font-display font-bold text-3xl text-maya-brown dark:text-white mb-4">
+            <PawPrint className="w-20 h-20 text-maya-green/30 mx-auto mb-6" />
+            <h3 className="font-display text-3xl text-maya-brown dark:text-white mb-4">
               Continue Ajudando!
             </h3>
             <p className="text-maya-brown/70 dark:text-gray-300 mb-8 max-w-md mx-auto">
@@ -93,7 +93,7 @@ export default function AnimaisAjudadosPage() {
           <>
             {/* Impact Timeline */}
             <div className="mb-12">
-              <h2 className="font-display font-bold text-2xl text-maya-brown dark:text-white mb-6">
+              <h2 className="font-display text-2xl text-maya-brown dark:text-white mb-6">
                 História de Impacto
               </h2>
               <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg">
@@ -107,8 +107,8 @@ export default function AnimaisAjudadosPage() {
                     const Icon = item.Icon
                     return (
                       <div key={index} className="flex items-start gap-4">
-                        <div className="w-12 h-12 bg-maya-olive/10 dark:bg-maya-olive/20 rounded-xl flex items-center justify-center flex-shrink-0">
-                          <Icon className="w-6 h-6 text-maya-olive" />
+                        <div className="w-12 h-12 bg-maya-green/10 dark:bg-maya-green/20 rounded-xl flex items-center justify-center flex-shrink-0">
+                          <Icon className="w-6 h-6 text-maya-green" />
                         </div>
                         <div>
                           <h3 className="font-semibold text-maya-brown dark:text-white mb-1">{item.title}</h3>
@@ -124,7 +124,7 @@ export default function AnimaisAjudadosPage() {
 
             {/* Animals Grid */}
             <div>
-              <h2 className="font-display font-bold text-2xl text-maya-brown dark:text-white mb-6">
+              <h2 className="font-display text-2xl text-maya-brown dark:text-white mb-6">
                 Conheça Quem Você Ajudou
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -148,7 +148,7 @@ export default function AnimaisAjudadosPage() {
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center pb-4">
                         <Link
                           href={`/adocao/${animal.id}`}
-                          className="bg-white text-maya-olive px-6 py-2 rounded-xl font-semibold hover:bg-maya-beige transition-colors"
+                          className="bg-white text-maya-green px-6 py-2 rounded-xl font-semibold hover:bg-maya-beige transition-colors"
                         >
                           Ver Perfil
                         </Link>
@@ -157,7 +157,7 @@ export default function AnimaisAjudadosPage() {
 
                     {/* Info */}
                     <div className="p-6">
-                      <h3 className="font-display font-bold text-2xl text-maya-brown dark:text-white mb-2">
+                      <h3 className="font-display text-2xl text-maya-brown dark:text-white mb-2">
                         {animal.name}
                       </h3>
                       <p className="text-maya-brown/60 dark:text-gray-400 text-sm mb-4">
@@ -165,8 +165,8 @@ export default function AnimaisAjudadosPage() {
                       </p>
                       
                       {/* Impact Badge */}
-                      <div className="bg-maya-olive/10 dark:bg-maya-olive/20 rounded-xl p-3 mb-4">
-                        <p className="text-sm text-maya-olive dark:text-maya-olive-light font-medium">
+                      <div className="bg-maya-green/10 dark:bg-maya-green/20 rounded-xl p-3 mb-4">
+                        <p className="text-sm text-maya-green dark:text-maya-green font-medium">
                           <Sparkles size={14} className="inline" /> Sua doação ajudou no resgate e cuidado de {animal.name}
                         </p>
                       </div>
@@ -191,7 +191,7 @@ export default function AnimaisAjudadosPage() {
             {/* CTA */}
             <div className="mt-16 bg-gradient-to-br from-maya-blue to-blue-600 rounded-3xl p-8 md:p-12 text-center text-white shadow-2xl">
               <Heart className="w-16 h-16 mx-auto mb-6 fill-white" />
-              <h2 className="font-display font-bold text-3xl md:text-4xl mb-4">
+              <h2 className="font-display text-3xl md:text-4xl mb-4">
                 Continue Transformando Vidas!
               </h2>
               <p className="text-lg mb-8 max-w-2xl mx-auto opacity-90">

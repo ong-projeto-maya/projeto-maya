@@ -28,7 +28,7 @@ export default function FavoriteButton({ animalId, size = 24, className = '' }: 
         className={`transition-colors ${
           favorite
             ? 'fill-red-500 text-red-500'
-            : 'text-maya-olive hover:text-red-500'
+            : 'text-maya-green hover:text-red-500'
         }`}
       />
     </button>

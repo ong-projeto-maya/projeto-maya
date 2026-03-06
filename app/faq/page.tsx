@@ -108,10 +108,10 @@ export default function FAQPage() {
       <div className="container mx-auto px-4">
         {/* Header */}
         <div className="text-center mb-12">
-          <div className="w-16 h-16 bg-maya-olive rounded-full flex items-center justify-center mx-auto mb-4">
+          <div className="w-16 h-16 bg-maya-green rounded-full flex items-center justify-center mx-auto mb-4">
             <HelpCircle className="w-8 h-8 text-white" />
           </div>
-          <h1 className="text-5xl md:text-6xl font-display font-bold text-maya-brown dark:text-white mb-4">
+          <h1 className="text-5xl md:text-6xl font-display text-maya-brown dark:text-white mb-4">
             Perguntas Frequentes
           </h1>
           <p className="text-xl text-maya-brown/70 dark:text-gray-300 max-w-2xl mx-auto">
@@ -123,7 +123,7 @@ export default function FAQPage() {
         <div className="max-w-4xl mx-auto space-y-8">
           {faqs.map((category) => (
             <div key={category.category} className="bg-white dark:bg-gray-800 rounded-3xl shadow-lg p-8">
-              <h2 className="font-display font-bold text-3xl text-maya-brown dark:text-white mb-6">
+              <h2 className="font-display text-3xl text-maya-brown dark:text-white mb-6">
                 {category.category}
               </h2>
               
@@ -141,11 +141,11 @@ export default function FAQPage() {
                         onClick={() => toggleQuestion(category.category, index)}
                         className="w-full flex items-center justify-between text-left py-4 group"
                       >
-                        <span className="font-semibold text-lg text-maya-brown dark:text-white group-hover:text-maya-olive transition-colors pr-4">
+                        <span className="font-semibold text-lg text-maya-brown dark:text-white group-hover:text-maya-green transition-colors pr-4">
                           {faq.q}
                         </span>
                         {isOpen ? (
-                          <ChevronUp className="w-6 h-6 text-maya-olive flex-shrink-0" />
+                          <ChevronUp className="w-6 h-6 text-maya-green flex-shrink-0" />
                         ) : (
                           <ChevronDown className="w-6 h-6 text-maya-brown/40 dark:text-gray-400 flex-shrink-0" />
                         )}
@@ -165,8 +165,8 @@ export default function FAQPage() {
         </div>
 
         {/* CTA */}
-        <div className="mt-16 bg-gradient-to-br from-maya-olive to-maya-olive-light text-white rounded-3xl p-12 text-center max-w-4xl mx-auto">
-          <h2 className="font-display font-bold text-3xl mb-4">
+        <div className="mt-16 bg-gradient-to-br from-maya-green to-maya-green text-white rounded-3xl p-12 text-center max-w-4xl mx-auto">
+          <h2 className="font-display text-3xl mb-4">
             Ainda tem dúvidas?
           </h2>
           <p className="text-xl mb-8 opacity-90">
@@ -177,7 +177,7 @@ export default function FAQPage() {
               href="https://wa.me/5511999999999?text=Olá!%20Tenho%20uma%20dúvida%20sobre%20o%20Projeto%20Maya"
               target="_blank"
               rel="noopener noreferrer"
-              className="bg-white text-maya-olive hover:bg-maya-beige font-semibold py-4 px-8 rounded-2xl transition-all duration-300 shadow-lg hover:shadow-xl inline-block"
+              className="bg-white text-maya-green hover:bg-maya-beige font-semibold py-4 px-8 rounded-2xl transition-all duration-300 shadow-lg hover:shadow-xl inline-block"
             >
               WhatsApp
             </a>
@@ -194,13 +194,13 @@ export default function FAQPage() {
         <div className="mt-12 text-center">
           <p className="text-maya-brown/60 dark:text-gray-400 mb-4">Ou explore:</p>
           <div className="flex flex-wrap gap-4 justify-center">
-            <Link href="/adocao" className="text-maya-olive hover:underline font-semibold">
+            <Link href="/adocao" className="text-maya-green hover:underline font-semibold">
               Ver Animais para Adoção
             </Link>
-            <Link href="/doacoes" className="text-maya-olive hover:underline font-semibold">
+            <Link href="/doacoes" className="text-maya-green hover:underline font-semibold">
               Fazer uma Doação
             </Link>
-            <Link href="/#sobre" className="text-maya-olive hover:underline font-semibold">
+            <Link href="/#sobre" className="text-maya-green hover:underline font-semibold">
               Sobre o Projeto
             </Link>
           </div>

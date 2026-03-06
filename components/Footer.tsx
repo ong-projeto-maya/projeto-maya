@@ -24,14 +24,14 @@ export default function Footer() {
                 href="https://instagram.com" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="hover:text-maya-olive transition-colors"
+                className="hover:text-maya-green transition-colors"
                 aria-label="Instagram"
               >
                 <Instagram size={24} />
               </a>
               <a 
                 href="mailto:contato@projetomaya.org" 
-                className="hover:text-maya-olive transition-colors"
+                className="hover:text-maya-green transition-colors"
                 aria-label="Email"
               >
                 <Mail size={24} />
@@ -41,31 +41,31 @@ export default function Footer() {
 
           {/* Links Rápidos */}
           <div>
-            <h3 className="font-display font-bold text-lg mb-4">Links Rápidos</h3>
+            <h3 className="font-display text-lg mb-4">Links Rápidos</h3>
             <ul className="space-y-2">
               <li>
-                <Link href="/" className="text-white/80 hover:text-maya-olive transition-colors">
+                <Link href="/" className="text-white/80 hover:text-maya-green transition-colors">
                   Início
                 </Link>
               </li>
               <li>
-                <Link href="/#sobre" className="text-white/80 hover:text-maya-olive transition-colors">
+                <Link href="/#sobre" className="text-white/80 hover:text-maya-green transition-colors">
                   Sobre Nós
                 </Link>
               </li>
               <li>
-                <Link href="/adocao" className="text-white/80 hover:text-maya-olive transition-colors">
+                <Link href="/adocao" className="text-white/80 hover:text-maya-green transition-colors">
                   Adotar
                 </Link>
               </li>
               <li>
-                <Link href="/doacoes" className="text-white/80 hover:text-maya-olive transition-colors">
+                <Link href="/doacoes" className="text-white/80 hover:text-maya-green transition-colors">
                   Doar
                 </Link>
               </li>
               <li>
-                <Link href="/doador/login" className="text-maya-olive-light hover:text-maya-olive font-semibold transition-colors inline-flex items-center gap-1">
-                  <Heart size={14} className="fill-maya-olive-light" />
+                <Link href="/doador/login" className="text-maya-green hover:text-maya-blue font-semibold transition-colors inline-flex items-center gap-1">
+                  <Heart size={14} className="fill-maya-green" />
                   Área do Doador
                 </Link>
               </li>
@@ -74,7 +74,7 @@ export default function Footer() {
 
           {/* Contato */}
           <div>
-            <h3 className="font-display font-bold text-lg mb-4">Contato</h3>
+            <h3 className="font-display text-lg mb-4">Contato</h3>
             <ul className="space-y-3">
               <li className="flex items-start space-x-2">
                 <MapPin size={20} className="mt-0.5 flex-shrink-0" />
@@ -101,7 +101,7 @@ export default function Footer() {
         <div className="border-t border-white/20 mt-8 pt-8 text-center text-white/60 text-sm">
           <p>© 2026 Projeto Maya. Todos os direitos reservados.</p>
           <p className="mt-2 flex items-center justify-center gap-2">
-            Feito com <Heart size={16} className="text-maya-olive fill-maya-olive" /> para os animais
+            Feito com <Heart size={16} className="text-maya-green fill-maya-green" /> para os animais
           </p>
         </div>
       </div>

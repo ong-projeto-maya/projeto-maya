@@ -21,7 +21,7 @@ export default function AssinaturaPage() {
     return (
       <div className="min-h-screen bg-maya-beige dark:bg-gray-900 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-maya-olive mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-maya-green mx-auto mb-4"></div>
           <p className="text-maya-brown dark:text-white">Carregando...</p>
         </div>
       </div>
@@ -34,14 +34,14 @@ export default function AssinaturaPage() {
         <div className="container mx-auto px-4">
           <Link
             href="/doador/dashboard"
-            className="inline-flex items-center gap-2 text-maya-olive hover:text-maya-olive-light mb-8"
+            className="inline-flex items-center gap-2 text-maya-green hover:text-maya-green mb-8"
           >
             <ArrowLeft size={20} />
             Voltar ao Dashboard
           </Link>
           <div className="max-w-2xl mx-auto bg-white dark:bg-gray-800 rounded-3xl p-12 text-center shadow-lg">
             <CreditCard className="w-20 h-20 text-maya-brown/30 dark:text-gray-600 mx-auto mb-6" />
-            <h2 className="text-3xl font-display font-bold text-maya-brown dark:text-white mb-4">
+            <h2 className="text-3xl font-display text-maya-brown dark:text-white mb-4">
               Nenhuma Assinatura Ativa
             </h2>
             <p className="text-maya-brown/70 dark:text-gray-300 mb-8">
@@ -82,12 +82,12 @@ export default function AssinaturaPage() {
         <div className="mb-8">
           <Link
             href="/doador/dashboard"
-            className="inline-flex items-center gap-2 text-maya-olive hover:text-maya-olive-light mb-4"
+            className="inline-flex items-center gap-2 text-maya-green hover:text-maya-green mb-4"
           >
             <ArrowLeft size={20} />
             Voltar ao Dashboard
           </Link>
-          <h1 className="text-4xl font-display font-bold text-maya-brown dark:text-white mb-2">
+          <h1 className="text-4xl font-display text-maya-brown dark:text-white mb-2">
             Gerenciar Assinatura
           </h1>
           <p className="text-maya-brown/70 dark:text-gray-300">
@@ -127,14 +127,14 @@ export default function AssinaturaPage() {
 
           {/* Subscription Details */}
           <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg mb-8">
-            <h2 className="font-display font-bold text-2xl text-maya-brown dark:text-white mb-6">
+            <h2 className="font-display text-2xl text-maya-brown dark:text-white mb-6">
               Detalhes da Assinatura
             </h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
               <div className="flex items-start gap-4">
-                <div className="w-12 h-12 bg-maya-olive/10 dark:bg-maya-olive/20 rounded-xl flex items-center justify-center">
-                  <DollarSign className="text-maya-olive" size={24} />
+                <div className="w-12 h-12 bg-maya-green/10 dark:bg-maya-green/20 rounded-xl flex items-center justify-center">
+                  <DollarSign className="text-maya-green" size={24} />
                 </div>
                 <div>
                   <p className="text-sm text-maya-brown/60 dark:text-gray-400 mb-1">Valor Mensal</p>
@@ -203,7 +203,7 @@ export default function AssinaturaPage() {
                     </button>
                     <button
                       onClick={() => alert('Funcionalidade de alterar valor será integrada com Stripe')}
-                      className="flex items-center justify-center gap-2 px-6 py-3 bg-maya-olive/10 dark:bg-maya-olive/20 text-maya-olive dark:text-maya-olive-light rounded-xl hover:bg-maya-olive/20 dark:hover:bg-maya-olive/30 transition-colors font-semibold"
+                      className="flex items-center justify-center gap-2 px-6 py-3 bg-maya-green/10 dark:bg-maya-green/20 text-maya-green dark:text-maya-green rounded-xl hover:bg-maya-green/20 dark:hover:bg-maya-green/30 transition-colors font-semibold"
                     >
                       <DollarSign size={20} />
                       Alterar Valor
@@ -242,8 +242,8 @@ export default function AssinaturaPage() {
           </div>
 
           {/* Impact Info */}
-          <div className="bg-gradient-to-r from-maya-olive to-maya-olive-light rounded-2xl p-8 text-white shadow-lg">
-            <h3 className="font-display font-bold text-2xl mb-4 flex items-center gap-2">
+          <div className="bg-gradient-to-r from-maya-green to-maya-green rounded-2xl p-8 text-white shadow-lg">
+            <h3 className="font-display text-2xl mb-4 flex items-center gap-2">
               <Heart size={24} className="fill-white" />
               Seu Impacto Mensal
             </h3>
@@ -276,7 +276,7 @@ export default function AssinaturaPage() {
       {showCancelModal && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
           <div className="bg-white dark:bg-gray-800 rounded-3xl p-8 max-w-md w-full">
-            <h3 className="font-display font-bold text-2xl text-maya-brown dark:text-white mb-4">
+            <h3 className="font-display text-2xl text-maya-brown dark:text-white mb-4">
               Cancelar Assinatura?
             </h3>
             <p className="text-maya-brown/70 dark:text-gray-300 mb-6">

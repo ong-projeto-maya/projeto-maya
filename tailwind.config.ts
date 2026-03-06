@@ -10,17 +10,24 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Paleta Projeto Maya
-        'maya-brown': '#5D4037',
-        'maya-olive': '#8FBC8F',
-        'maya-olive-light': '#A8D5A8',
-        'maya-blue': '#87CEEB',
-        'maya-beige': '#F5F5DC',
-        'maya-beige-dark': '#E8E8D0',
+        // Paleta Projeto Maya - Brandbook Nov. 2025
+        'maya-brown': '#564334',      // Marrom principal (substituiu #5D4037)
+        'maya-green': '#B2C09D',      // Verde principal (substituiu olive)
+        'maya-blue': '#96B6D3',       // Azul (atualizado)
+        'maya-beige': '#D9D3D3',      // Bege principal (atualizado)
+        'maya-orange': '#D5934F',     // Laranja (nova cor)
+        'maya-sand': '#978062',       // Areia (nova cor)
+        'maya-pink': '#DA5F75',       // Rosa urgência (nova cor)
+        'maya-pink-light': '#E99797', // Rosa claro (nova cor)
+        
+        // Aliases para compatibilidade
+        'maya-green': '#B2C09D',      // Alias para green
+        'maya-green': '#B2C09D',// Alias para green
+        'maya-beige-dark': '#978062', // Alias para sand
       },
       fontFamily: {
-        'display': ['Playfair Display', 'serif'],
-        'body': ['Inter', 'sans-serif'],
+        'display': ['Caprasimo', 'cursive'],      // Título - conforme brandbook
+        'body': ['Nunito', 'sans-serif'],         // Corpo - conforme brandbook
       },
       borderRadius: {
         'xl': '1rem',

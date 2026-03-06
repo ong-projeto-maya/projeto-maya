@@ -69,14 +69,14 @@ export default function Breadcrumbs() {
                 )}
                 
                 {isLast ? (
-                  <span className="text-maya-olive dark:text-maya-olive-light font-medium flex items-center gap-1">
+                  <span className="text-maya-green dark:text-maya-green font-medium flex items-center gap-1">
                     {isFirst && <Home size={14} />}
                     {crumb.label}
                   </span>
                 ) : (
                   <Link
                     href={crumb.href}
-                    className="text-maya-brown/60 dark:text-gray-400 hover:text-maya-olive dark:hover:text-maya-olive-light transition-colors flex items-center gap-1"
+                    className="text-maya-brown/60 dark:text-gray-400 hover:text-maya-green dark:hover:text-maya-green transition-colors flex items-center gap-1"
                   >
                     {isFirst && <Home size={14} />}
                     {crumb.label}
