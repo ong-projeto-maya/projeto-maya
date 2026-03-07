@@ -21,8 +21,6 @@ const config: Config = {
         'maya-pink-light': '#E99797', // Rosa claro (nova cor)
         
         // Aliases para compatibilidade
-        'maya-green': '#B2C09D',      // Alias para green
-        'maya-green': '#B2C09D',// Alias para green
         'maya-beige-dark': '#978062', // Alias para sand
       },
       fontFamily: {
