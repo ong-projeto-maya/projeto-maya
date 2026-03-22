@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { Heart, DollarSign, CreditCard, Check, Shield, Lock, TrendingUp } from 'lucide-react'
+import { Heart, DollarSign, CreditCard, Check, Lock } from 'lucide-react'
 import { loadStripe } from '@stripe/stripe-js'
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || '')
@@ -211,22 +211,6 @@ export default function DoacoesPage() {
               </div>
             </div>
 
-            {/* Monthly Donation Benefits */}
-            {donationType === 'monthly' && (
-              <div className="bg-maya-blue/10 dark:bg-maya-blue/20 border-l-4 border-maya-blue rounded-lg p-4 mb-8">
-                <h3 className="font-bold text-maya-brown dark:text-white mb-2 flex items-center gap-2">
-                  <Heart className="w-5 h-5 text-maya-green fill-maya-green" />
-                  Vantagens de ser um doador mensal:
-                </h3>
-                <ul className="text-sm text-maya-brown/80 dark:text-gray-300 space-y-1">
-                  <li>✓ Sustentabilidade para nossos projetos</li>
-                  <li>✓ Cancele quando quiser</li>
-                  <li>✓ Acompanhe o impacto das suas doações</li>
-                  <li>✓ Receba atualizações exclusivas</li>
-                </ul>
-              </div>
-            )}
-
             {/* Donate Button */}
             <button
               onClick={handleDonation}
@@ -274,43 +258,6 @@ export default function DoacoesPage() {
                   </Link>
                 </div>
               </div>
-            </div>
-          </div>
-
-          {/* Additional Info */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
-            <div className="text-center">
-              <div className="flex justify-center mb-3">
-                <div className="w-16 h-16 bg-maya-green/10 dark:bg-maya-green/20 rounded-2xl flex items-center justify-center">
-                  <Shield className="w-8 h-8 text-maya-green" />
-                </div>
-              </div>
-              <h3 className="font-bold text-maya-brown dark:text-white mb-1">Seguro</h3>
-              <p className="text-sm text-maya-brown/70 dark:text-gray-300">
-                Pagamentos criptografados
-              </p>
-            </div>
-            <div className="text-center">
-              <div className="flex justify-center mb-3">
-                <div className="w-16 h-16 bg-maya-blue/10 dark:bg-maya-blue/20 rounded-2xl flex items-center justify-center">
-                  <TrendingUp className="w-8 h-8 text-maya-blue" />
-                </div>
-              </div>
-              <h3 className="font-bold text-maya-brown dark:text-white mb-1">Transparente</h3>
-              <p className="text-sm text-maya-brown/70 dark:text-gray-300">
-                100% para os animais
-              </p>
-            </div>
-            <div className="text-center">
-              <div className="flex justify-center mb-3">
-                <div className="w-16 h-16 bg-maya-green/10 dark:bg-maya-green/20 rounded-2xl flex items-center justify-center">
-                  <CreditCard className="w-8 h-8 text-maya-green" />
-                </div>
-              </div>
-              <h3 className="font-bold text-maya-brown dark:text-white mb-1">Flexível</h3>
-              <p className="text-sm text-maya-brown/70 dark:text-gray-300">
-                Cancele a qualquer momento
-              </p>
             </div>
           </div>
         </div>

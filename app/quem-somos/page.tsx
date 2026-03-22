@@ -31,62 +31,6 @@ export default function QuemSomosPage() {
         </div>
       </section>
 
-      {/* A História da Maya */}
-      <section className="py-20">
-        <div className="container mx-auto px-4">
-          <div className="max-w-6xl mx-auto">
-            <div className="bg-white dark:bg-gray-800 rounded-3xl p-8 md:p-12 shadow-lg">
-              <h2 className="font-display text-4xl mb-8 text-maya-brown dark:text-white text-center">
-                prazer, maya. 🐾
-              </h2>
-
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-                {/* Foto da Maya */}
-                <div className="relative h-[400px] lg:h-[500px] rounded-2xl overflow-hidden shadow-2xl">
-                  <Image
-                    src="/images/maya-foto.jpg"
-                    alt="Maya - A cachorrinha que inspirou o projeto"
-                    fill
-                    className="object-cover"
-                    priority
-                  />
-                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-6">
-                    <p className="text-white font-display text-xl">
-                      Maya ⭐ 2018
-                    </p>
-                    <p className="text-white/90 text-sm">
-                      A estrelinha que inspirou tudo isso
-                    </p>
-                  </div>
-                </div>
-
-                {/* Texto da História */}
-                <div className="space-y-5 text-maya-brown/80 dark:text-gray-300 leading-relaxed text-lg">
-                  <p>
-                    Tudo começou com ela. Uma cachorrinha adotada em 2018, que acabou virando
-                    estrelinha depois de alguns meses... mas foi tempo de sobra pra conquistar
-                    muitos corações.
-                  </p>
-                  <p>
-                    O Projeto Maya nasce daí. Desse amor incondicional. Do termo de origem grega
-                    <strong className="text-maya-brown dark:text-white"> ágape</strong>: que prioriza o bem-estar do outro sem esperar nada em troca.
-                  </p>
-                  <p>
-                    Aqui, lutas individuais se unificaram e propósitos em comum se fortaleceram.
-                    Existimos pela diminuição de cães e gatos nas ruas. Através da conscientização
-                    e da adoção responsável, conseguimos fazer com que esses animais encontrem lares,
-                    onde serão amados e protegidos.
-                  </p>
-                  <p className="font-bold text-maya-green text-2xl text-center mt-8 font-display">
-                    nós acreditamos que<br />o amor transforma.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* Missão, Visão e Valores */}
       <section className="py-20 bg-white dark:bg-gray-800">
         <div className="container mx-auto px-4">

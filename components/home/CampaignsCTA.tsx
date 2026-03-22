@@ -64,14 +64,14 @@ export default function CampaignsCTA() {
               </p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
                 <Link
-                  href="/campanhas/3"
+                  href="/campanhas/2"
                   className="inline-flex items-center gap-2 bg-white text-maya-brown px-6 py-3 rounded-xl font-bold hover:shadow-lg hover:-translate-y-0.5 transition-all justify-center"
                 >
                   Quero Contribuir
                   <ArrowRight size={18} />
                 </Link>
                 <Link
-                  href="/campanhas/3#inscricao"
+                  href="/campanhas/2#inscricao"
                   className="inline-flex items-center gap-2 bg-white/15 border-2 border-white/50 text-white px-6 py-3 rounded-xl font-bold hover:bg-white/25 transition-all justify-center"
                 >
                   <ClipboardList size={18} />

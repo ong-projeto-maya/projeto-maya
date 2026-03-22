@@ -123,16 +123,6 @@ export default function DoadorLoginPage() {
               </div>
             </div>
 
-            {/* Forgot Password */}
-            <div className="text-right">
-              <Link
-                href="/doador/recuperar-senha"
-                className="text-sm text-maya-green hover:text-maya-green font-medium"
-              >
-                Esqueceu sua senha?
-              </Link>
-            </div>
-
             {/* Submit Button */}
             <button
               type="submit"

@@ -7,7 +7,7 @@ export default function Footer() {
       {/* Wave Top */}
       <div className="absolute top-0 left-0 w-full overflow-hidden leading-none">
         <svg viewBox="0 0 1440 60" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" className="w-full h-8 md:h-12">
-          <path d="M0,30 C360,60 720,0 1440,30 L1440,0 L0,0 Z" fill="currentColor" className="text-maya-blue dark:text-gray-800" />
+          <path d="M0,30 C360,60 720,0 1440,30 L1440,0 L0,0 Z" fill="currentColor" className="text-maya-beige dark:text-gray-800" />
         </svg>
       </div>
 

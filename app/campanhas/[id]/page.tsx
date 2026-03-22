@@ -82,9 +82,7 @@ export default function CampanhaDetailPage() {
     )
   }
 
-  const progress = getCampaignProgress(campaign)
   const daysLeft = getCampaignDaysLeft(campaign)
-  const remaining = campaign.goal - campaign.raised
 
   const handleDonation = async () => {
     setIsLoading(true)
@@ -179,37 +177,6 @@ export default function CampanhaDetailPage() {
               {campaign.title}
             </h1>
 
-            {/* Stats Cards */}
-            <div className="grid grid-cols-3 gap-4 mb-8">
-              <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 text-center">
-                <Target className="w-6 h-6 text-maya-green mx-auto mb-2" />
-                <div className="text-2xl font-bold text-maya-brown dark:text-white">
-                  {progress}%
-                </div>
-                <div className="text-xs text-maya-brown/60 dark:text-gray-400">
-                  Alcançado
-                </div>
-              </div>
-              <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 text-center">
-                <Calendar className="w-6 h-6 text-maya-blue mx-auto mb-2" />
-                <div className="text-2xl font-bold text-maya-brown dark:text-white">
-                  {daysLeft}
-                </div>
-                <div className="text-xs text-maya-brown/60 dark:text-gray-400">
-                  Dias restantes
-                </div>
-              </div>
-              <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 text-center">
-                <Users className="w-6 h-6 text-maya-orange mx-auto mb-2" />
-                <div className="text-2xl font-bold text-maya-brown dark:text-white">
-                  {Math.floor(campaign.raised / 50)}
-                </div>
-                <div className="text-xs text-maya-brown/60 dark:text-gray-400">
-                  Apoiadores
-                </div>
-              </div>
-            </div>
-
             {/* Description */}
             <div className="bg-white dark:bg-gray-800 rounded-3xl p-8 mb-8">
               <h2 className="font-display text-2xl text-maya-brown dark:text-white mb-4">
@@ -259,25 +226,6 @@ export default function CampanhaDetailPage() {
                 <p className="text-maya-brown/80 dark:text-gray-300 mb-6">
                   {campaign.registrationInfo.description}
                 </p>
-
-                {/* Spots info */}
-                <div className="bg-maya-blue/10 dark:bg-maya-blue/20 rounded-2xl p-4 mb-6">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-semibold text-maya-brown/60 dark:text-gray-400">Vagas preenchidas</span>
-                    <span className="text-sm font-bold text-maya-blue">
-                      {campaign.registrationInfo.registered}/{campaign.registrationInfo.spots}
-                    </span>
-                  </div>
-                  <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 overflow-hidden">
-                    <div
-                      className="bg-maya-blue h-full rounded-full transition-all duration-500"
-                      style={{ width: `${Math.round((campaign.registrationInfo.registered / campaign.registrationInfo.spots) * 100)}%` }}
-                    />
-                  </div>
-                  <p className="text-xs text-maya-brown/60 dark:text-gray-400 mt-2">
-                    {campaign.registrationInfo.spots - campaign.registrationInfo.registered} vagas restantes
-                  </p>
-                </div>
 
                 {/* Requirements */}
                 <h4 className="font-bold text-maya-brown dark:text-white mb-3">
@@ -456,36 +404,7 @@ export default function CampanhaDetailPage() {
           {/* Donation Sidebar */}
           <div className="lg:col-span-1">
             <div className="sticky top-8">
-              {/* Progress Card */}
               <div className="bg-white dark:bg-gray-800 rounded-3xl p-6 mb-6">
-                <div className="mb-6">
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="text-sm font-semibold text-maya-brown/60 dark:text-gray-400">
-                      Arrecadado
-                    </span>
-                    <span className="text-sm font-semibold text-maya-green">
-                      {progress}%
-                    </span>
-                  </div>
-                  <div className="text-3xl font-display text-maya-brown dark:text-white mb-1">
-                    R$ {campaign.raised.toLocaleString('pt-BR')}
-                  </div>
-                  <div className="text-sm text-maya-brown/60 dark:text-gray-400 mb-4">
-                    de R$ {campaign.goal.toLocaleString('pt-BR')}
-                  </div>
-                  <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-4 overflow-hidden">
-                    <div
-                      className="bg-gradient-to-r from-maya-green to-maya-blue h-full rounded-full transition-all duration-500"
-                      style={{ width: `${progress}%` }}
-                    />
-                  </div>
-                  {remaining > 0 && (
-                    <div className="mt-2 text-sm text-maya-brown/60 dark:text-gray-400">
-                      Faltam <span className="font-bold text-maya-green">R$ {remaining.toLocaleString('pt-BR')}</span>
-                    </div>
-                  )}
-                </div>
-
                 {/* Donation Type */}
                 <div className="mb-6">
                   <h3 className="font-bold text-maya-brown dark:text-white mb-3">
