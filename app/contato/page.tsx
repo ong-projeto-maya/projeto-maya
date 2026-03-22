@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Mail, Phone, MapPin, Send, Check, MessageSquare } from 'lucide-react'
+import { Mail, Phone, Send, Check, MessageSquare, AlertTriangle } from 'lucide-react'
 
 export default function ContatoPage() {
   const [formData, setFormData] = useState({
@@ -42,7 +42,7 @@ export default function ContatoPage() {
         {/* Header */}
         <div className="text-center mb-12">
           <MessageSquare className="w-16 h-16 text-maya-green mx-auto mb-4" />
-          <h1 className="text-5xl md:text-6xl font-display text-maya-brown dark:text-white mb-4">
+          <h1 className="text-3xl sm:text-5xl md:text-6xl font-display text-maya-brown dark:text-white mb-4">
             Entre em Contato
           </h1>
           <p className="text-xl text-maya-brown/70 dark:text-gray-300 max-w-2xl mx-auto">
@@ -74,14 +74,16 @@ export default function ContatoPage() {
             </div>
 
             <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg">
-              <MapPin className="w-8 h-8 text-maya-green mb-4" />
+              <AlertTriangle className="w-8 h-8 text-maya-orange mb-4" />
               <h3 className="font-display text-xl text-maya-brown dark:text-white mb-2">
-                Localização
+                Resgate
               </h3>
-              <p className="text-maya-brown/70 dark:text-gray-300">
-                São Paulo, SP<br />
-                Brasil
+              <p className="text-maya-brown/70 dark:text-gray-300 text-sm mb-2">
+                Encontrou um animal em risco?
               </p>
+              <a href="/reportar-resgate" className="text-maya-orange font-semibold hover:text-maya-orange/80 transition-colors text-sm">
+                Reportar Resgate →
+              </a>
             </div>
 
             <div className="bg-gradient-to-br from-maya-green to-maya-green text-white rounded-2xl p-6">

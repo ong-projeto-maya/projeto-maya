@@ -1,14 +1,18 @@
+'use client'
+
 import Link from 'next/link'
 import Image from 'next/image'
 import { animals } from '@/data/animals'
 import { ArrowRight, Heart, Dog, Cat } from 'lucide-react'
+import { useScrollAnimation } from '@/hooks/useScrollAnimation'
 
 export default function Animals() {
+  const { ref: gridRef, isVisible: gridVisible } = useScrollAnimation({ threshold: 0.1 })
   // Show only first 6 animals on home page
   const featuredAnimals = animals.slice(0, 6)
 
   return (
-    <section className="py-20 bg-gradient-to-b from-white to-maya-beige">
+    <section className="py-20 bg-maya-beige">
       <div className="container mx-auto px-4">
         {/* Section Header */}
         <div className="text-center mb-16">
@@ -19,9 +23,9 @@ export default function Animals() {
         </div>
 
         {/* Animals Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-          {featuredAnimals.map((animal) => (
-            <div key={animal.id} className="card group hover:scale-105 transition-transform duration-300">
+        <div ref={gridRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+          {featuredAnimals.map((animal, index) => (
+            <div key={animal.id} className={`card group card-hover-lift card-hover-glow scroll-hidden scroll-up ${gridVisible ? 'scroll-visible' : ''} stagger-${index + 1}`}>
               {/* Image */}
               <div className="relative h-64 mb-4 rounded-xl overflow-hidden bg-gray-200">
                 <Image
@@ -29,13 +33,13 @@ export default function Animals() {
                   alt={animal.name}
                   fill
                   sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                  className="object-cover"
+                  className="object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
                   priority={false}
                 />
                 {/* Badges do Brandbook */}
                 <div className="absolute top-4 left-4 flex flex-col gap-2">
                   {animal.isAdopted && (
-                    <div className="relative w-24 h-24">
+                    <div className="relative w-16 h-16">
                       <Image
                         src="/images/badge-adotado.png"
                         alt="Adotado"
@@ -45,7 +49,7 @@ export default function Animals() {
                     </div>
                   )}
                   {animal.isRescued && !animal.isAdopted && (
-                    <div className="relative w-24 h-24">
+                    <div className="relative w-16 h-16">
                       <Image
                         src="/images/badge-novo-resgatado.png"
                         alt="Resgatado"
@@ -55,7 +59,7 @@ export default function Animals() {
                     </div>
                   )}
                   {animal.isPuppy && !animal.isAdopted && !animal.isRescued && (
-                    <div className="relative w-24 h-24">
+                    <div className="relative w-16 h-16">
                       <Image
                         src="/images/badge-novo-resgatado.png"
                         alt="Novo/Filhote"
@@ -65,7 +69,7 @@ export default function Animals() {
                     </div>
                   )}
                   {animal.isMixed && !animal.isAdopted && (
-                    <div className="relative w-24 h-24">
+                    <div className="relative w-16 h-16">
                       <Image
                         src="/images/badge-sem-raca.png"
                         alt="Sem Raça Definida"
@@ -75,7 +79,7 @@ export default function Animals() {
                     </div>
                   )}
                   {!animal.isAdopted && !animal.isRescued && !animal.isPuppy && !animal.isMixed && (
-                    <div className="relative w-24 h-24">
+                    <div className="relative w-16 h-16">
                       <Image
                         src="/images/badge-quer-mea-adotar.png"
                         alt="Quer me adotar?"

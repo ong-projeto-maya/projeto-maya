@@ -15,13 +15,20 @@ import {
   Users,
   Share2,
   AlertCircle,
-  Sparkles
+  Sparkles,
+  ClipboardList,
+  UserPlus,
+  Phone,
+  Mail,
+  MapPin,
+  FileText
 } from 'lucide-react'
 import { loadStripe } from '@stripe/stripe-js'
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || '')
 
 type DonationType = 'single' | 'monthly'
+type ActiveTab = 'donate' | 'register'
 
 const presetAmounts = [25, 50, 100, 250, 500]
 
@@ -34,6 +41,30 @@ export default function CampanhaDetailPage() {
   const [selectedAmount, setSelectedAmount] = useState<number>(50)
   const [customAmount, setCustomAmount] = useState<string>('')
   const [isLoading, setIsLoading] = useState(false)
+  const [activeTab, setActiveTab] = useState<ActiveTab>('donate')
+
+  // Registration form state
+  const [regForm, setRegForm] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    cpf: '',
+    address: '',
+    petName: '',
+    petType: 'cachorro',
+    reason: ''
+  })
+  const [regSubmitted, setRegSubmitted] = useState(false)
+  const [regLoading, setRegLoading] = useState(false)
+
+  const handleRegistration = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setRegLoading(true)
+    // Simula envio (futuramente integrar com backend)
+    await new Promise(resolve => setTimeout(resolve, 1500))
+    setRegSubmitted(true)
+    setRegLoading(false)
+  }
 
   if (!campaign) {
     return (
@@ -215,6 +246,211 @@ export default function CampanhaDetailPage() {
                 {campaign.impactStory}
               </p>
             </div>
+
+            {/* Registration Section - only for campaigns that allow it */}
+            {campaign.allowsRegistration && campaign.registrationInfo && (
+              <div className="bg-white dark:bg-gray-800 rounded-3xl p-8 mt-8">
+                <div className="flex items-center gap-3 mb-4">
+                  <ClipboardList className="w-8 h-8 text-maya-blue" />
+                  <h3 className="font-display text-2xl text-maya-brown dark:text-white">
+                    Inscrição para Beneficiários
+                  </h3>
+                </div>
+                <p className="text-maya-brown/80 dark:text-gray-300 mb-6">
+                  {campaign.registrationInfo.description}
+                </p>
+
+                {/* Spots info */}
+                <div className="bg-maya-blue/10 dark:bg-maya-blue/20 rounded-2xl p-4 mb-6">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-semibold text-maya-brown/60 dark:text-gray-400">Vagas preenchidas</span>
+                    <span className="text-sm font-bold text-maya-blue">
+                      {campaign.registrationInfo.registered}/{campaign.registrationInfo.spots}
+                    </span>
+                  </div>
+                  <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 overflow-hidden">
+                    <div
+                      className="bg-maya-blue h-full rounded-full transition-all duration-500"
+                      style={{ width: `${Math.round((campaign.registrationInfo.registered / campaign.registrationInfo.spots) * 100)}%` }}
+                    />
+                  </div>
+                  <p className="text-xs text-maya-brown/60 dark:text-gray-400 mt-2">
+                    {campaign.registrationInfo.spots - campaign.registrationInfo.registered} vagas restantes
+                  </p>
+                </div>
+
+                {/* Requirements */}
+                <h4 className="font-bold text-maya-brown dark:text-white mb-3">
+                  Requisitos para inscrição:
+                </h4>
+                <ul className="space-y-2 mb-6">
+                  {campaign.registrationInfo.requirements.map((req, index) => (
+                    <li key={index} className="flex items-start gap-3">
+                      <FileText className="w-4 h-4 text-maya-blue flex-shrink-0 mt-0.5" />
+                      <span className="text-sm text-maya-brown/80 dark:text-gray-300">{req}</span>
+                    </li>
+                  ))}
+                </ul>
+
+                {/* Registration Form */}
+                {regSubmitted ? (
+                  <div className="bg-maya-green/10 dark:bg-maya-green/20 rounded-2xl p-6 text-center">
+                    <Check className="w-12 h-12 text-maya-green mx-auto mb-3" />
+                    <h4 className="font-display text-xl text-maya-brown dark:text-white mb-2">
+                      Inscrição enviada!
+                    </h4>
+                    <p className="text-maya-brown/70 dark:text-gray-300 text-sm">
+                      Recebemos sua inscrição. Entraremos em contato pelo e-mail ou telefone informado
+                      para confirmar os próximos passos.
+                    </p>
+                  </div>
+                ) : (
+                  <form onSubmit={handleRegistration} className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-semibold text-maya-brown dark:text-white mb-1">
+                          Nome completo *
+                        </label>
+                        <div className="relative">
+                          <UserPlus className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-maya-brown/40" />
+                          <input
+                            type="text"
+                            required
+                            value={regForm.name}
+                            onChange={(e) => setRegForm({...regForm, name: e.target.value})}
+                            className="w-full pl-10 pr-4 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-600 focus:border-maya-blue focus:outline-none text-maya-brown dark:text-white bg-white dark:bg-gray-700"
+                            placeholder="Seu nome completo"
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-semibold text-maya-brown dark:text-white mb-1">
+                          CPF *
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          value={regForm.cpf}
+                          onChange={(e) => setRegForm({...regForm, cpf: e.target.value})}
+                          className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-600 focus:border-maya-blue focus:outline-none text-maya-brown dark:text-white bg-white dark:bg-gray-700"
+                          placeholder="000.000.000-00"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-semibold text-maya-brown dark:text-white mb-1">
+                          E-mail *
+                        </label>
+                        <div className="relative">
+                          <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-maya-brown/40" />
+                          <input
+                            type="email"
+                            required
+                            value={regForm.email}
+                            onChange={(e) => setRegForm({...regForm, email: e.target.value})}
+                            className="w-full pl-10 pr-4 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-600 focus:border-maya-blue focus:outline-none text-maya-brown dark:text-white bg-white dark:bg-gray-700"
+                            placeholder="seu@email.com"
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-semibold text-maya-brown dark:text-white mb-1">
+                          Telefone/WhatsApp *
+                        </label>
+                        <div className="relative">
+                          <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-maya-brown/40" />
+                          <input
+                            type="tel"
+                            required
+                            value={regForm.phone}
+                            onChange={(e) => setRegForm({...regForm, phone: e.target.value})}
+                            className="w-full pl-10 pr-4 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-600 focus:border-maya-blue focus:outline-none text-maya-brown dark:text-white bg-white dark:bg-gray-700"
+                            placeholder="(11) 99999-9999"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-semibold text-maya-brown dark:text-white mb-1">
+                        Endereço *
+                      </label>
+                      <div className="relative">
+                        <MapPin className="absolute left-3 top-3 w-4 h-4 text-maya-brown/40" />
+                        <input
+                          type="text"
+                          required
+                          value={regForm.address}
+                          onChange={(e) => setRegForm({...regForm, address: e.target.value})}
+                          className="w-full pl-10 pr-4 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-600 focus:border-maya-blue focus:outline-none text-maya-brown dark:text-white bg-white dark:bg-gray-700"
+                          placeholder="Rua, número, bairro, cidade"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-semibold text-maya-brown dark:text-white mb-1">
+                          Nome do pet
+                        </label>
+                        <input
+                          type="text"
+                          value={regForm.petName}
+                          onChange={(e) => setRegForm({...regForm, petName: e.target.value})}
+                          className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-600 focus:border-maya-blue focus:outline-none text-maya-brown dark:text-white bg-white dark:bg-gray-700"
+                          placeholder="Nome do animal"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-semibold text-maya-brown dark:text-white mb-1">
+                          Tipo de animal
+                        </label>
+                        <select
+                          value={regForm.petType}
+                          onChange={(e) => setRegForm({...regForm, petType: e.target.value})}
+                          className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-600 focus:border-maya-blue focus:outline-none text-maya-brown dark:text-white bg-white dark:bg-gray-700"
+                        >
+                          <option value="cachorro">Cachorro</option>
+                          <option value="gato">Gato</option>
+                          <option value="outro">Outro</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-semibold text-maya-brown dark:text-white mb-1">
+                        Por que deseja participar? *
+                      </label>
+                      <textarea
+                        required
+                        rows={3}
+                        value={regForm.reason}
+                        onChange={(e) => setRegForm({...regForm, reason: e.target.value})}
+                        className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-600 focus:border-maya-blue focus:outline-none text-maya-brown dark:text-white bg-white dark:bg-gray-700 resize-none"
+                        placeholder="Conte brevemente sua situação e por que precisa deste benefício..."
+                      />
+                    </div>
+
+                    <button
+                      type="submit"
+                      disabled={regLoading}
+                      className="w-full px-6 py-4 bg-maya-blue text-white font-bold rounded-2xl hover:bg-maya-blue/90 transition-all shadow-lg disabled:opacity-50 flex items-center justify-center gap-2"
+                    >
+                      {regLoading ? (
+                        'Enviando...'
+                      ) : (
+                        <>
+                          <ClipboardList size={20} />
+                          Enviar Inscrição
+                        </>
+                      )}
+                    </button>
+                  </form>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Donation Sidebar */}

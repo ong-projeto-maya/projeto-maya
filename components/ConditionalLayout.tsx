@@ -3,6 +3,7 @@
 import { usePathname } from 'next/navigation'
 import Header from './Header'
 import Footer from './Footer'
+import ScrollProgressBar from './ScrollProgressBar'
 import ScrollToTop from './ScrollToTop'
 import Breadcrumbs from './Breadcrumbs'
 
@@ -22,6 +23,7 @@ export default function ConditionalLayout({
 
   return (
     <>
+      <ScrollProgressBar />
       <Header />
       <Breadcrumbs />
       <main className="min-h-screen">

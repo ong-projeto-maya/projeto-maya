@@ -22,7 +22,7 @@ export default function FavoritosPage() {
         {/* Header */}
         <div className="text-center mb-12">
           <Heart className="w-16 h-16 text-maya-green mx-auto mb-4 fill-maya-green" />
-          <h1 className="text-5xl md:text-6xl font-display text-maya-brown dark:text-white mb-4">
+          <h1 className="text-3xl sm:text-5xl md:text-6xl font-display text-maya-brown dark:text-white mb-4">
             Meus Favoritos
           </h1>
           <p className="text-xl text-maya-brown/70 dark:text-gray-300 max-w-2xl mx-auto">
@@ -170,10 +170,10 @@ export default function FavoritosPage() {
                   <ArrowRight size={20} />
                 </Link>
                 <Link
-                  href="/faq"
+                  href="/quem-somos"
                   className="bg-white/10 backdrop-blur text-white px-8 py-4 rounded-xl font-bold hover:bg-white/20 transition-colors inline-flex items-center justify-center gap-2 border-2 border-white/30"
                 >
-                  Tire suas Dúvidas
+                  Quem Somos
                 </Link>
               </div>
             </div>

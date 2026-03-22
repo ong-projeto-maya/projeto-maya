@@ -1,23 +1,20 @@
+'use client'
+
 import Link from 'next/link'
-import { Target, TrendingUp, ArrowRight, Sparkles } from 'lucide-react'
-import { getActiveCampaigns } from '@/data/campaigns'
+import { Target, ArrowRight, Scissors, UtensilsCrossed, ClipboardList } from 'lucide-react'
+import { useScrollAnimation } from '@/hooks/useScrollAnimation'
 
 export default function CampaignsCTA() {
-  const campaigns = getActiveCampaigns()
-  const activeCampaignsCount = campaigns.length
-  
-  const totalRaised = campaigns.reduce((sum, c) => sum + c.raised, 0)
-  const totalGoal = campaigns.reduce((sum, c) => sum + c.goal, 0)
-  const overallProgress = Math.round((totalRaised / totalGoal) * 100)
+  const { ref: cardsRef, isVisible: cardsVisible } = useScrollAnimation({ threshold: 0.15 })
 
   return (
-    <section className="py-20 bg-gradient-to-br from-maya-blue to-maya-green text-white">
+    <section className="py-20 bg-maya-blue text-white">
       <div className="container mx-auto px-4">
         <div className="max-w-5xl mx-auto">
           {/* Header */}
           <div className="text-center mb-12">
             <Target className="w-16 h-16 mx-auto mb-6" />
-            <h2 className="text-4xl md:text-5xl font-display mb-4">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-display mb-4">
               Campanhas Especiais
             </h2>
             <p className="text-xl text-white/90 max-w-2xl mx-auto">
@@ -25,75 +22,74 @@ export default function CampaignsCTA() {
             </p>
           </div>
 
-          {/* Stats Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-            <div className="bg-white/10 backdrop-blur rounded-2xl p-6 text-center">
-              <Sparkles className="w-8 h-8 mx-auto mb-3" />
-              <div className="text-4xl font-display mb-2">
-                {activeCampaignsCount}
+          {/* Campaign CTAs */}
+          <div ref={cardsRef} className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10 max-w-3xl mx-auto">
+            <div
+              className={`bg-white/10 backdrop-blur rounded-2xl p-8 text-center scroll-hidden scroll-up ${cardsVisible ? 'scroll-visible' : ''} stagger-1`}
+            >
+              <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Scissors className="w-8 h-8" />
               </div>
-              <div className="text-white/80">
-                Campanhas Ativas
+              <h3 className="font-display text-2xl mb-3">Castração Solidária</h3>
+              <p className="text-white/80 mb-6">
+                Ajude a custear castrações gratuitas para pets de famílias em situação de vulnerabilidade
+              </p>
+              <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                <Link
+                  href="/campanhas/1"
+                  className="inline-flex items-center gap-2 bg-white text-maya-brown px-6 py-3 rounded-xl font-bold hover:shadow-lg hover:-translate-y-0.5 transition-all justify-center"
+                >
+                  Quero Contribuir
+                  <ArrowRight size={18} />
+                </Link>
+                <Link
+                  href="/campanhas/1#inscricao"
+                  className="inline-flex items-center gap-2 bg-white/15 border-2 border-white/50 text-white px-6 py-3 rounded-xl font-bold hover:bg-white/25 transition-all justify-center"
+                >
+                  <ClipboardList size={18} />
+                  Quero me Inscrever
+                </Link>
               </div>
             </div>
 
-            <div className="bg-white/10 backdrop-blur rounded-2xl p-6 text-center">
-              <TrendingUp className="w-8 h-8 mx-auto mb-3" />
-              <div className="text-4xl font-display mb-2">
-                {overallProgress}%
+            <div
+              className={`bg-white/10 backdrop-blur rounded-2xl p-8 text-center scroll-hidden scroll-up ${cardsVisible ? 'scroll-visible' : ''} stagger-2`}
+            >
+              <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <UtensilsCrossed className="w-8 h-8" />
               </div>
-              <div className="text-white/80">
-                Progresso Geral
-              </div>
-            </div>
-
-            <div className="bg-white/10 backdrop-blur rounded-2xl p-6 text-center">
-              <Target className="w-8 h-8 mx-auto mb-3" />
-              <div className="text-4xl font-display mb-2">
-                R$ {totalRaised.toLocaleString('pt-BR')}
-              </div>
-              <div className="text-white/80">
-                Já Arrecadado
+              <h3 className="font-display text-2xl mb-3">Doação de Rações</h3>
+              <p className="text-white/80 mb-6">
+                Garanta alimentação para os animais resgatados durante os meses mais frios do ano
+              </p>
+              <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                <Link
+                  href="/campanhas/3"
+                  className="inline-flex items-center gap-2 bg-white text-maya-brown px-6 py-3 rounded-xl font-bold hover:shadow-lg hover:-translate-y-0.5 transition-all justify-center"
+                >
+                  Quero Contribuir
+                  <ArrowRight size={18} />
+                </Link>
+                <Link
+                  href="/campanhas/3#inscricao"
+                  className="inline-flex items-center gap-2 bg-white/15 border-2 border-white/50 text-white px-6 py-3 rounded-xl font-bold hover:bg-white/25 transition-all justify-center"
+                >
+                  <ClipboardList size={18} />
+                  Quero me Inscrever
+                </Link>
               </div>
             </div>
           </div>
 
-          {/* Featured Campaigns Preview */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-            {campaigns.slice(0, 3).map((campaign) => {
-              const progress = Math.round((campaign.raised / campaign.goal) * 100)
-              
-              return (
-                <div key={campaign.id} className="bg-white/10 backdrop-blur rounded-xl p-4">
-                  <h3 className="font-bold text-lg mb-2 line-clamp-2">
-                    {campaign.title}
-                  </h3>
-                  <div className="w-full bg-white/20 rounded-full h-2 mb-2">
-                    <div
-                      className="bg-white h-full rounded-full"
-                      style={{ width: `${Math.min(progress, 100)}%` }}
-                    />
-                  </div>
-                  <div className="text-sm text-white/80">
-                    {progress}% alcançado
-                  </div>
-                </div>
-              )
-            })}
-          </div>
-
-          {/* CTA Buttons */}
+          {/* Link to all campaigns */}
           <div className="text-center">
             <Link
               href="/campanhas"
-              className="bg-white text-maya-green hover:bg-maya-beige px-8 py-4 rounded-xl font-bold inline-flex items-center gap-2 shadow-xl hover:shadow-2xl transition-all"
+              className="text-white/80 hover:text-white font-semibold inline-flex items-center gap-2 transition-colors"
             >
-              Ver Todas as Campanhas
-              <ArrowRight size={20} />
+              Ver todas as campanhas
+              <ArrowRight size={16} />
             </Link>
-            <p className="mt-4 text-white/70 text-sm">
-              Escolha a causa que mais te toca e faça a diferença!
-            </p>
           </div>
         </div>
       </div>

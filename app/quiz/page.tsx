@@ -139,7 +139,7 @@ export default function QuizPage() {
           <div className="max-w-3xl mx-auto text-center">
             <div className="mb-8">
               <Award className="w-16 h-16 text-maya-green mx-auto mb-4" />
-              <h1 className="text-5xl font-display text-maya-brown dark:text-white mb-4">
+              <h1 className="text-3xl sm:text-5xl font-display text-maya-brown dark:text-white mb-4">
                 Seu Pet Ideal!
               </h1>
               <p className="text-xl text-maya-brown/70 dark:text-gray-300">
