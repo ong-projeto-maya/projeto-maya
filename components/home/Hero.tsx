@@ -4,7 +4,7 @@ import { Heart, PawPrint } from 'lucide-react'
 
 export default function Hero() {
   return (
-    <section className="relative bg-maya-blue overflow-hidden min-h-[85vh] flex items-center">
+    <section className="relative bg-maya-blue overflow-hidden min-h-[85vh] landscape:min-h-0 flex items-center">
       {/* Logo — canto superior esquerdo (diagonal) */}
       <div className="absolute top-8 left-6 md:top-12 md:left-12 lg:top-16 lg:left-16 z-10">
         <Image
@@ -12,7 +12,7 @@ export default function Hero() {
           alt="Projeto Maya - Logo"
           width={500}
           height={500}
-          className="w-28 md:w-40 lg:w-56 h-auto object-contain drop-shadow-2xl"
+          className="w-28 md:w-40 lg:w-56 landscape:w-20 landscape:md:w-40 h-auto object-contain drop-shadow-2xl"
           priority
           quality={100}
           unoptimized
@@ -20,13 +20,13 @@ export default function Hero() {
       </div>
 
       {/* Maya — canto inferior direito (diagonal) */}
-      <div className="absolute bottom-20 right-4 md:bottom-24 md:right-10 lg:bottom-16 lg:right-16 z-10 hidden sm:block">
+      <div className="absolute bottom-20 right-4 md:bottom-24 md:right-10 lg:bottom-16 lg:right-16 z-10 hidden sm:block landscape:bottom-4 landscape:md:bottom-24">
         <Image
           src="/images/maya-hero.png"
           alt="Maya - Mascote do Projeto"
           width={1200}
           height={1200}
-          className="w-36 md:w-48 lg:w-64 h-auto object-contain"
+          className="w-36 md:w-48 lg:w-64 landscape:w-24 landscape:md:w-48 h-auto object-contain"
           priority
           quality={100}
           unoptimized
@@ -57,27 +57,27 @@ export default function Hero() {
       </div>
 
       {/* Conteúdo centralizado */}
-      <div className="container mx-auto px-4 py-16 md:py-20 relative z-20">
-        <div className="flex flex-col items-center text-center max-w-3xl mx-auto space-y-8">
+      <div className="container mx-auto px-4 py-16 md:py-20 landscape:py-8 landscape:md:py-20 relative z-20">
+        <div className="flex flex-col items-center text-center max-w-3xl mx-auto space-y-8 landscape:space-y-4 landscape:md:space-y-8">
           {/* Main Heading */}
-          <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-display text-white leading-tight drop-shadow-md">
+          <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl landscape:text-2xl landscape:md:text-6xl font-display text-white leading-tight drop-shadow-md">
             Nós acreditamos que<br />
             <span className="text-maya-orange">o amor transforma.</span>
           </h1>
 
           {/* Subtitle */}
-          <p className="text-lg md:text-xl text-white/90 max-w-xl">
+          <p className="text-lg md:text-xl landscape:text-base landscape:md:text-xl text-white/90 max-w-xl">
             Do resgate, à adoção. Juntos, transformamos histórias de abandono em 
             histórias de amor e esperança.
           </p>
 
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 pt-2">
-            <Link href="/adocao" className="inline-flex items-center gap-2 justify-center px-8 py-4 bg-maya-green text-maya-brown font-bold rounded-2xl hover:bg-maya-green/90 transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5">
+            <Link href="/adocao" className="inline-flex items-center gap-2 justify-center px-8 py-4 landscape:px-6 landscape:py-3 landscape:md:px-8 landscape:md:py-4 bg-maya-green text-maya-brown font-bold rounded-2xl hover:bg-maya-green/90 transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5">
               <PawPrint size={20} />
               Quero Adotar
             </Link>
-            <Link href="/doacoes" className="inline-flex items-center gap-2 justify-center px-8 py-4 bg-white/20 text-white font-bold rounded-2xl border-2 border-white/40 hover:bg-white/30 transition-all backdrop-blur-sm hover:-translate-y-0.5">
+            <Link href="/doacoes" className="inline-flex items-center gap-2 justify-center px-8 py-4 landscape:px-6 landscape:py-3 landscape:md:px-8 landscape:md:py-4 bg-white/20 text-white font-bold rounded-2xl border-2 border-white/40 hover:bg-white/30 transition-all backdrop-blur-sm hover:-translate-y-0.5">
               <Heart size={20} />
               Quero Doar
             </Link>
