@@ -15,7 +15,8 @@ import {
   Ambulance,
   Users,
   HeartPulse,
-  Sparkles
+  Sparkles,
+  ClipboardList
 } from 'lucide-react'
 
 type CategoryFilter = 'all' | 'saude' | 'resgate' | 'infraestrutura' | 'alimentacao'
@@ -69,7 +70,7 @@ export default function CampanhasPage() {
         {/* Header */}
         <div className="text-center mb-12">
           <Target className="w-16 h-16 text-maya-green mx-auto mb-4" />
-          <h1 className="text-5xl md:text-6xl font-display text-maya-brown dark:text-white mb-4">
+          <h1 className="text-3xl sm:text-5xl md:text-6xl font-display text-maya-brown dark:text-white mb-4">
             Nossas Campanhas
           </h1>
           <p className="text-xl text-maya-brown/70 dark:text-gray-300 max-w-2xl mx-auto">
@@ -223,6 +224,21 @@ export default function CampanhasPage() {
                       Contribuir →
                     </span>
                   </div>
+
+                  {/* Registration Badge */}
+                  {campaign.allowsRegistration && campaign.registrationInfo && (
+                    <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2 text-maya-blue text-sm font-semibold">
+                          <ClipboardList size={16} />
+                          Inscrições abertas
+                        </div>
+                        <span className="text-xs text-maya-brown/60 dark:text-gray-400">
+                          {campaign.registrationInfo.spots - campaign.registrationInfo.registered} vagas
+                        </span>
+                      </div>
+                    </div>
+                  )}
                 </Link>
               )
             })}

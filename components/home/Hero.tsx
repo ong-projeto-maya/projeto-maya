@@ -4,89 +4,91 @@ import { Heart, PawPrint } from 'lucide-react'
 
 export default function Hero() {
   return (
-    <section className="relative bg-gradient-to-br from-maya-beige via-maya-sand/20 to-white py-16 md:py-24 overflow-hidden min-h-[70vh] flex items-center">
-      {/* Decorative Elements */}
-      <div className="absolute top-10 right-10 opacity-10">
-        <PawPrint size={120} className="text-maya-green" />
+    <section className="relative bg-maya-blue overflow-hidden min-h-[85vh] flex items-center">
+      {/* Logo — canto superior esquerdo (diagonal) */}
+      <div className="absolute top-8 left-6 md:top-12 md:left-12 lg:top-16 lg:left-16 z-10">
+        <Image
+          src="/images/hero-logo.png"
+          alt="Projeto Maya - Logo"
+          width={500}
+          height={500}
+          className="w-28 md:w-40 lg:w-56 h-auto object-contain drop-shadow-2xl"
+          priority
+          quality={100}
+          unoptimized
+        />
       </div>
-      <div className="absolute bottom-10 left-10 opacity-10">
-        <Heart size={100} className="text-maya-blue" />
+
+      {/* Maya — canto inferior direito (diagonal) */}
+      <div className="absolute bottom-20 right-4 md:bottom-24 md:right-10 lg:bottom-16 lg:right-16 z-10 hidden sm:block">
+        <Image
+          src="/images/maya-hero.png"
+          alt="Maya - Mascote do Projeto"
+          width={1200}
+          height={1200}
+          className="w-36 md:w-48 lg:w-64 h-auto object-contain"
+          priority
+          quality={100}
+          unoptimized
+        />
       </div>
 
-      <div className="container mx-auto px-4">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center max-w-7xl mx-auto">
-          {/* Texto à Esquerda */}
-          <div className="space-y-8 order-2 lg:order-1">
-            {/* Main Heading */}
-            <h1 className="text-5xl md:text-7xl font-display text-maya-brown leading-tight">
-              Do resgate,<br />
-              <span className="text-maya-green">à adoção.</span>
-            </h1>
+      {/* Decorative paw prints */}
+      <div className="absolute top-12 right-1/3 opacity-[0.08]">
+        <PawPrint size={45} className="text-white rotate-[25deg]" />
+      </div>
+      <div className="absolute top-1/3 left-[8%] opacity-[0.06] hidden md:block">
+        <PawPrint size={70} className="text-white -rotate-[15deg]" />
+      </div>
+      <div className="absolute top-[15%] right-[10%] opacity-[0.07] hidden lg:block">
+        <PawPrint size={55} className="text-white rotate-[40deg]" />
+      </div>
+      <div className="absolute bottom-[30%] right-[25%] opacity-[0.06] hidden md:block">
+        <PawPrint size={40} className="text-white -rotate-[30deg]" />
+      </div>
+      <div className="absolute bottom-[20%] left-[15%] opacity-[0.08] hidden lg:block">
+        <PawPrint size={50} className="text-white rotate-[10deg]" />
+      </div>
+      <div className="absolute top-[55%] right-[8%] opacity-[0.05] hidden lg:block">
+        <PawPrint size={35} className="text-white rotate-[60deg]" />
+      </div>
+      <div className="absolute bottom-[45%] left-[35%] opacity-[0.07] hidden md:block">
+        <PawPrint size={30} className="text-white -rotate-[45deg]" />
+      </div>
 
-            {/* Subtitle */}
-            <p className="text-xl md:text-2xl text-maya-brown/80 max-w-xl">
-              Cada vida importa. Juntos, transformamos histórias de abandono em 
-              histórias de amor e esperança.
-            </p>
+      {/* Conteúdo centralizado */}
+      <div className="container mx-auto px-4 py-16 md:py-20 relative z-20">
+        <div className="flex flex-col items-center text-center max-w-3xl mx-auto space-y-8">
+          {/* Main Heading */}
+          <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-display text-white leading-tight drop-shadow-md">
+            Nós acreditamos que<br />
+            <span className="text-maya-orange">o amor transforma.</span>
+          </h1>
 
-            {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4">
-              <Link href="/adocao" className="btn-primary inline-flex items-center gap-2 justify-center">
-                <PawPrint size={20} />
-                Quero Adotar
-              </Link>
-              <Link href="/doacoes" className="btn-secondary inline-flex items-center gap-2 justify-center">
-                <Heart size={20} />
-                Quero Ajudar
-              </Link>
-            </div>
+          {/* Subtitle */}
+          <p className="text-lg md:text-xl text-white/90 max-w-xl">
+            Do resgate, à adoção. Juntos, transformamos histórias de abandono em 
+            histórias de amor e esperança.
+          </p>
 
-            {/* Quick Stats */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 pt-8">
-              <div>
-                <div className="text-4xl font-display text-maya-green mb-1">347</div>
-                <div className="text-sm text-maya-brown/70">Resgatados</div>
-              </div>
-              <div>
-                <div className="text-4xl font-display text-maya-green mb-1">289</div>
-                <div className="text-sm text-maya-brown/70">Adotados</div>
-              </div>
-              <div>
-                <div className="text-4xl font-display text-maya-green mb-1">52</div>
-                <div className="text-sm text-maya-brown/70">Voluntários</div>
-              </div>
-              <div>
-                <div className="text-4xl font-display text-maya-green mb-1">100%</div>
-                <div className="text-sm text-maya-brown/70">Amor 🐾</div>
-              </div>
-            </div>
-          </div>
-
-          {/* Imagem do Cachorro à Direita */}
-          <div className="relative order-1 lg:order-2 flex items-center justify-center">
-            <div className="relative w-full max-w-[350px] md:max-w-[450px] lg:max-w-[550px] mx-auto">
-              {/* Imagem do cachorro */}
-              <div className="relative z-10">
-                <Image
-                  src="/images/hero-logo.png"
-                  alt="Cachorro Maya - Ilustração"
-                  width={1200}
-                  height={1200}
-                  className="w-full h-auto object-contain"
-                  priority
-                  quality={100}
-                  unoptimized
-                />
-              </div>
-            </div>
+          {/* CTA Buttons */}
+          <div className="flex flex-col sm:flex-row gap-4 pt-2">
+            <Link href="/adocao" className="inline-flex items-center gap-2 justify-center px-8 py-4 bg-maya-green text-maya-brown font-bold rounded-2xl hover:bg-maya-green/90 transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5">
+              <PawPrint size={20} />
+              Quero Adotar
+            </Link>
+            <Link href="/doacoes" className="inline-flex items-center gap-2 justify-center px-8 py-4 bg-white/20 text-white font-bold rounded-2xl border-2 border-white/40 hover:bg-white/30 transition-all backdrop-blur-sm hover:-translate-y-0.5">
+              <Heart size={20} />
+              Quero Doar
+            </Link>
           </div>
         </div>
       </div>
 
       {/* Wave Divider */}
-      <div className="absolute bottom-0 left-0 w-full">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none" className="w-full h-16">
-          <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z" fill="#ffffff"/>
+      <div className="absolute bottom-0 left-0 w-full overflow-hidden leading-none">
+        <svg viewBox="0 0 1440 100" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" className="w-full h-16 md:h-24">
+          <path d="M0,40 C240,80 480,0 720,50 C960,100 1200,20 1440,60 L1440,100 L0,100 Z" fill="#ffffff"/>
         </svg>
       </div>
     </section>

@@ -37,7 +37,7 @@ export default function AnimalDetailPage({ params }: { params: { id: string } })
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           {/* Images */}
           <div>
-            <div className="relative h-96 rounded-3xl overflow-hidden bg-gray-200 mb-4">
+            <div className="relative h-96 mb-4 rounded-3xl overflow-hidden bg-gray-200">
               <Image
                 src={animal.image}
                 alt={animal.name}

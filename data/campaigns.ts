@@ -15,6 +15,13 @@ export type Campaign = {
   urgency: 'baixa' | 'media' | 'alta' | 'urgente'
   benefits: string[]
   impactStory: string
+  allowsRegistration: boolean // permite inscrição de beneficiários
+  registrationInfo?: {
+    description: string // descrição de quem pode se inscrever
+    spots: number // vagas totais
+    registered: number // inscritos até agora
+    requirements: string[] // requisitos para inscrição
+  }
 }
 
 export const campaigns: Campaign[] = [
@@ -40,7 +47,20 @@ export const campaigns: Campaign[] = [
       'Diminuição de animais nas ruas',
       'Atendimento a famílias de baixa renda'
     ],
-    impactStory: 'A cada R$ 300 doados, conseguimos realizar uma castração completa, incluindo exames pré-operatórios, cirurgia, medicação e acompanhamento pós-operatório. Isso significa menos filhotes abandonados e mais qualidade de vida pros pets!'
+    impactStory: 'A cada R$ 300 doados, conseguimos realizar uma castração completa, incluindo exames pré-operatórios, cirurgia, medicação e acompanhamento pós-operatório. Isso significa menos filhotes abandonados e mais qualidade de vida pros pets!',
+    allowsRegistration: true,
+    registrationInfo: {
+      description: 'Inscreva seu pet para castração gratuita. Voltado para tutores de baixa renda.',
+      spots: 50,
+      registered: 32,
+      requirements: [
+        'Comprovar renda familiar de até 2 salários mínimos',
+        'Ser morador de São Paulo (SP)',
+        'Animal deve ter mais de 6 meses',
+        'Apresentar RG/CPF do tutor',
+        'Animal em bom estado de saúde geral'
+      ]
+    }
   },
   {
     id: '2',
@@ -64,7 +84,8 @@ export const campaigns: Campaign[] = [
       'Espaço de isolamento pra novos resgates',
       'Área de convivência pra socialização'
     ],
-    impactStory: 'Com um abrigo melhor, conseguimos resgatar mais animais e oferecer melhores condições enquanto eles esperam por um lar definitivo. Cada doação nos aproxima desse sonho!'
+    impactStory: 'Com um abrigo melhor, conseguimos resgatar mais animais e oferecer melhores condições enquanto eles esperam por um lar definitivo. Cada doação nos aproxima desse sonho!',
+    allowsRegistration: false
   },
   {
     id: '3',
@@ -88,7 +109,19 @@ export const campaigns: Campaign[] = [
       'Alimentação adequada pra filhotes',
       'Dieta especial pra idosos'
     ],
-    impactStory: 'R$ 80 por mês garante a alimentação completa de um pet durante todo o inverno. Animais bem alimentados são mais saudáveis e felizes!'
+    impactStory: 'R$ 80 por mês garante a alimentação completa de um pet durante todo o inverno. Animais bem alimentados são mais saudáveis e felizes!',
+    allowsRegistration: true,
+    registrationInfo: {
+      description: 'Cadastre-se para receber ração e suplementação gratuita para seu pet durante o inverno.',
+      spots: 100,
+      registered: 67,
+      requirements: [
+        'Comprovar renda familiar de até 2 salários mínimos',
+        'Ser morador da região metropolitana de São Paulo',
+        'Informar quantidade e tipo de animais',
+        'Apresentar documento com foto'
+      ]
+    }
   },
   {
     id: '4',
@@ -112,7 +145,8 @@ export const campaigns: Campaign[] = [
       'Medicação de emergência',
       'Internação quando necessário'
     ],
-    impactStory: 'Um resgate de emergência custa em média R$ 500 (transporte, primeiros socorros, veterinário). Sua doação pode salvar uma vida hoje mesmo!'
+    impactStory: 'Um resgate de emergência custa em média R$ 500 (transporte, primeiros socorros, veterinário). Sua doação pode salvar uma vida hoje mesmo!',
+    allowsRegistration: false
   },
   {
     id: '5',
@@ -136,7 +170,8 @@ export const campaigns: Campaign[] = [
       'Prioridade pra conhecer o pet',
       'Relatórios de saúde'
     ],
-    impactStory: 'Por apenas R$ 50/mês você garante alimentação, vacinas e cuidados veterinários pra um pet. Muitos dos nossos apadrinhados acabam sendo adotados pelos próprios padrinhos!'
+    impactStory: 'Por apenas R$ 50/mês você garante alimentação, vacinas e cuidados veterinários pra um pet. Muitos dos nossos apadrinhados acabam sendo adotados pelos próprios padrinhos!',
+    allowsRegistration: false
   },
   {
     id: '6',
@@ -160,7 +195,20 @@ export const campaigns: Campaign[] = [
       'Equipamentos adaptativos',
       'Alimentação especial'
     ],
-    impactStory: 'Pets especiais precisam de cuidados extras, mas são tão amorosos quanto qualquer outro! Com R$ 200/mês conseguimos dar todo o suporte que eles precisam.'
+    impactStory: 'Pets especiais precisam de cuidados extras, mas são tão amorosos quanto qualquer outro! Com R$ 200/mês conseguimos dar todo o suporte que eles precisam.',
+    allowsRegistration: true,
+    registrationInfo: {
+      description: 'Inscreva seu pet com necessidades especiais para receber tratamento veterinário gratuito e contínuo.',
+      spots: 20,
+      registered: 14,
+      requirements: [
+        'Pet com deficiência física ou doença crônica diagnosticada',
+        'Apresentar laudo veterinário atualizado',
+        'Comprovar renda familiar de até 3 salários mínimos',
+        'Ser morador de São Paulo (SP)',
+        'Comprometer-se com o acompanhamento do tratamento'
+      ]
+    }
   }
 ]
 

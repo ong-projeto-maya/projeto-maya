@@ -20,7 +20,9 @@ import {
   BookOpen,
   HelpCircle,
   MapPin,
-  ClipboardList
+  ClipboardList,
+  Users,
+  AlertTriangle
 } from 'lucide-react'
 import DarkModeToggle from './DarkModeToggle'
 import { useFavorites } from '@/hooks/useFavorites'
@@ -34,6 +36,7 @@ export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false)
   const [hasNewAnimals, setHasNewAnimals] = useState(true) // Mock - seria dinâmico
   const [openDropdown, setOpenDropdown] = useState<string | null>(null)
+  const dropdownTimeout = useRef<NodeJS.Timeout | null>(null)
   const pathname = usePathname()
   const { favorites } = useFavorites()
   const { user, logout } = useAuth()
@@ -97,9 +100,9 @@ export default function Header() {
       label: 'Institucional', 
       icon: BookOpen,
       submenu: [
+        { href: '/quem-somos', label: 'Quem Somos', icon: Users },
         { href: '/eventos', label: 'Eventos', icon: Calendar },
-        { href: '/blog', label: 'Blog', icon: BookOpen },
-        { href: '/faq', label: 'Perguntas Frequentes', icon: HelpCircle },
+        { href: '/manual-cuidados', label: 'Manual de Cuidados', icon: BookOpen },
       ]
     },
     { 
@@ -107,7 +110,7 @@ export default function Header() {
       icon: MessageSquare,
       submenu: [
         { href: '/contato', label: 'Fale Conosco', icon: MessageSquare },
-        { href: '/localizacao', label: 'Nossa Localização', icon: MapPin },
+        { href: '/reportar-resgate', label: 'Reportar Resgate', icon: AlertTriangle },
       ]
     },
   ]
@@ -115,8 +118,8 @@ export default function Header() {
   return (
     <>
       <header 
-        className={`bg-white dark:bg-gray-800 shadow-md sticky top-0 z-50 transition-all duration-300 ${
-          isScrolled ? 'py-2' : 'py-4'
+        className={`bg-white/95 dark:bg-gray-800/95 backdrop-blur-md shadow-md sticky top-0 z-50 transition-all duration-500 ease-out ${
+          isScrolled ? 'py-2 shadow-lg' : 'py-4'
         }`}
       >
         <nav className="container mx-auto px-4">
@@ -144,8 +147,13 @@ export default function Header() {
                     <div 
                       key={idx}
                       className="relative"
-                      onMouseEnter={() => setOpenDropdown(link.label)}
-                      onMouseLeave={() => setOpenDropdown(null)}
+                      onMouseEnter={() => {
+                        if (dropdownTimeout.current) clearTimeout(dropdownTimeout.current)
+                        setOpenDropdown(link.label)
+                      }}
+                      onMouseLeave={() => {
+                        dropdownTimeout.current = setTimeout(() => setOpenDropdown(null), 300)
+                      }}
                     >
                       <button
                         className={`relative flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-200 text-sm font-medium ${
@@ -162,7 +170,8 @@ export default function Header() {
                       
                       {/* Dropdown Menu */}
                       {openDropdown === link.label && (
-                        <div className="absolute top-full left-0 mt-1 w-56 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-maya-green/10 dark:border-gray-700 py-2 z-50">
+                        <div className="absolute top-full left-0 pt-2 w-56 z-50">
+                          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-maya-green/10 dark:border-gray-700 py-2">
                           {link.submenu!.map((sublink) => {
                             const SubIcon = sublink.icon
                             const subActive = isActive(sublink.href)
@@ -181,6 +190,7 @@ export default function Header() {
                               </Link>
                             )
                           })}
+                          </div>
                         </div>
                       )}
                     </div>
@@ -218,30 +228,34 @@ export default function Header() {
                 <Search size={20} />
               </button>
 
-              {/* Favorites */}
-              <Link
-                href="/favoritos"
-                className="relative p-2 text-maya-brown dark:text-white hover:bg-maya-green/5 dark:hover:bg-gray-700 rounded-lg transition-colors"
-                aria-label="Favoritos"
-              >
-                <Heart size={20} />
-                {favorites.length > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-maya-green text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold">
-                    {favorites.length}
-                  </span>
-                )}
-              </Link>
+              {/* Favorites - only when logged in */}
+              {(doador || user) && (
+                <Link
+                  href="/favoritos"
+                  className="relative p-2 text-maya-brown dark:text-white hover:bg-maya-green/5 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                  aria-label="Favoritos"
+                >
+                  <Heart size={20} />
+                  {favorites.length > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-maya-green text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold">
+                      {favorites.length}
+                    </span>
+                  )}
+                </Link>
+              )}
 
-              {/* Notifications */}
-              <button
-                className="relative p-2 text-maya-brown dark:text-white hover:bg-maya-green/5 dark:hover:bg-gray-700 rounded-lg transition-colors"
-                aria-label="Notificações"
-              >
-                <Bell size={20} />
-                {hasNewAnimals && (
-                  <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full animate-pulse" />
-                )}
-              </button>
+              {/* Notifications - only when logged in */}
+              {(doador || user) && (
+                <button
+                  className="relative p-2 text-maya-brown dark:text-white hover:bg-maya-green/5 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                  aria-label="Notificações"
+                >
+                  <Bell size={20} />
+                  {hasNewAnimals && (
+                    <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+                  )}
+                </button>
+              )}
 
               {/* Dark Mode */}
               <DarkModeToggle />
@@ -285,19 +299,21 @@ export default function Header() {
 
             {/* Mobile Actions */}
             <div className="flex items-center gap-2 xl:hidden">
-              {/* Favorites Mobile */}
-              <Link
-                href="/favoritos"
-                className="relative p-2 text-maya-brown dark:text-white"
-                aria-label="Favoritos"
-              >
-                <Heart size={20} />
-                {favorites.length > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-maya-green text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold">
-                    {favorites.length}
-                  </span>
-                )}
-              </Link>
+              {/* Favorites Mobile - only when logged in */}
+              {(doador || user) && (
+                <Link
+                  href="/favoritos"
+                  className="relative p-2 text-maya-brown dark:text-white"
+                  aria-label="Favoritos"
+                >
+                  <Heart size={20} />
+                  {favorites.length > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-maya-green text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold">
+                      {favorites.length}
+                    </span>
+                  )}
+                </Link>
+              )}
 
               <DarkModeToggle />
               

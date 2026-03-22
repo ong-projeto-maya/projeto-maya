@@ -5,10 +5,10 @@ export default function CTAFinal() {
   return (
     <section className="py-20 bg-gradient-to-br from-maya-green to-maya-blue text-white relative overflow-hidden">
       {/* Decorative Elements */}
-      <div className="absolute top-10 left-10 opacity-10">
+      <div className="absolute top-10 left-10 opacity-10 animate-float-slow">
         <PawPrint size={150} />
       </div>
-      <div className="absolute bottom-10 right-10 opacity-10">
+      <div className="absolute bottom-10 right-10 opacity-10 animate-float-delay">
         <Heart size={120} />
       </div>
 
@@ -16,7 +16,7 @@ export default function CTAFinal() {
         <div className="max-w-4xl mx-auto text-center">
           {/* Icon */}
           <div className="mb-8 flex justify-center">
-            <div className="w-24 h-24 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
+            <div className="w-24 h-24 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm animate-pulse-glow">
               <Heart className="w-12 h-12 text-white fill-current" />
             </div>
           </div>

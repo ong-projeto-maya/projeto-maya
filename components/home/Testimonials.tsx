@@ -1,4 +1,7 @@
+'use client'
+
 import { Heart, Star } from 'lucide-react'
+import { useScrollAnimation } from '@/hooks/useScrollAnimation'
 
 const testimonials = [
   {
@@ -25,6 +28,8 @@ const testimonials = [
 ]
 
 export default function Testimonials() {
+  const { ref: gridRef, isVisible: gridVisible } = useScrollAnimation({ threshold: 0.1 })
+
   return (
     <section className="py-20 bg-gradient-to-b from-maya-beige to-white">
       <div className="container mx-auto px-4">
@@ -37,9 +42,9 @@ export default function Testimonials() {
         </div>
 
         {/* Testimonials Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-          {testimonials.map((testimonial) => (
-            <div key={testimonial.id} className="card">
+        <div ref={gridRef} className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+          {testimonials.map((testimonial, index) => (
+            <div key={testimonial.id} className={`card card-hover-lift card-hover-glow scroll-hidden scroll-up ${gridVisible ? 'scroll-visible' : ''} stagger-${index + 1}`}>
               {/* Stars */}
               <div className="flex gap-1 mb-4">
                 {[...Array(testimonial.rating)].map((_, i) => (
