@@ -29,10 +29,26 @@
     @apply dark:bg-gray-900 dark:text-gray-100;
   }
 
-  /* Landscape mobile adjustments */
+  /* Landscape mobile adjustments (phones only, max-height 500px) */
   @media (orientation: landscape) and (max-height: 500px) {
     .min-h-screen {
       min-height: auto;
+    }
+
+    .hero-section {
+      min-height: auto;
+    }
+
+    .hero-section h1 {
+      font-size: 1.5rem;
+    }
+
+    .hero-section p {
+      font-size: 0.875rem;
+    }
+
+    .hero-section .space-y-8 > * + * {
+      margin-top: 1rem;
     }
   }
 
