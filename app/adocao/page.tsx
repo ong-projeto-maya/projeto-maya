@@ -97,11 +97,11 @@ export default function AdocaoPageEnhanced() {
         </div>
 
         {/* Filters */}
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 mb-8 max-w-6xl mx-auto">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-3">
-              <Filter className="text-maya-green" size={24} />
-              <h2 className="font-display text-xl text-maya-brown dark:text-white">Filtros</h2>
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-4 mb-8 max-w-6xl mx-auto">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <Filter className="text-maya-green" size={18} />
+              <h2 className="font-display text-lg text-maya-brown dark:text-white">Filtros</h2>
             </div>
             <div className="flex gap-2">
               <button
@@ -115,25 +115,25 @@ export default function AdocaoPageEnhanced() {
                   onClick={clearFilters}
                   className="text-red-500 dark:text-red-400 font-semibold text-sm flex items-center gap-1"
                 >
-                  <X size={16} />
+                  <X size={14} />
                   Limpar
                 </button>
               )}
             </div>
           </div>
 
-          <div className={`space-y-4 ${showFilters ? 'block' : 'hidden md:block'}`}>
+          <div className={`flex flex-col md:flex-row md:items-end gap-4 ${showFilters ? 'flex' : 'hidden md:flex'}`}>
             {/* Type Filter */}
-            <div>
-              <label className="text-sm font-semibold text-maya-brown/70 dark:text-gray-300 mb-2 block">
-                Tipo de Animal
+            <div className="flex-1">
+              <label className="text-xs font-semibold text-maya-brown/60 dark:text-gray-400 mb-1.5 block">
+                Tipo
               </label>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-1.5">
                 <button
                   onClick={() => setActiveFilter('all')}
-                  className={`px-4 py-2 rounded-xl font-semibold transition-all ${
+                  className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition-all ${
                     activeFilter === 'all'
-                      ? 'bg-maya-green text-white shadow-lg'
+                      ? 'bg-maya-green text-white shadow'
                       : 'bg-maya-beige text-maya-brown hover:bg-maya-green/20'
                   }`}
                 >
@@ -141,51 +141,51 @@ export default function AdocaoPageEnhanced() {
                 </button>
                 <button
                   onClick={() => setActiveFilter('dog')}
-                  className={`px-4 py-2 rounded-xl font-semibold transition-all inline-flex items-center gap-2 ${
+                  className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition-all inline-flex items-center gap-1 ${
                     activeFilter === 'dog'
-                      ? 'bg-maya-green text-white shadow-lg'
+                      ? 'bg-maya-green text-white shadow'
                       : 'bg-maya-beige text-maya-brown hover:bg-maya-green/20'
                   }`}
                 >
-                  <Dog size={18} />
+                  <Dog size={14} />
                   Cães
                 </button>
                 <button
                   onClick={() => setActiveFilter('cat')}
-                  className={`px-4 py-2 rounded-xl font-semibold transition-all inline-flex items-center gap-2 ${
+                  className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition-all inline-flex items-center gap-1 ${
                     activeFilter === 'cat'
-                      ? 'bg-maya-green text-white shadow-lg'
+                      ? 'bg-maya-green text-white shadow'
                       : 'bg-maya-beige text-maya-brown hover:bg-maya-green/20'
                   }`}
                 >
-                  <Cat size={18} />
+                  <Cat size={14} />
                   Gatos
                 </button>
                 <button
                   onClick={() => setActiveFilter('puppy')}
-                  className={`px-4 py-2 rounded-xl font-semibold transition-all inline-flex items-center gap-2 ${
+                  className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition-all inline-flex items-center gap-1 ${
                     activeFilter === 'puppy'
-                      ? 'bg-maya-green text-white shadow-lg'
+                      ? 'bg-maya-green text-white shadow'
                       : 'bg-maya-beige text-maya-brown hover:bg-maya-green/20'
                   }`}
                 >
-                  <Sparkles size={18} />
+                  <Sparkles size={14} />
                   Filhotes
                 </button>
               </div>
             </div>
 
             {/* Size Filter */}
-            <div>
-              <label className="text-sm font-semibold text-maya-brown/70 dark:text-gray-300 mb-2 block">
+            <div className="flex-1">
+              <label className="text-xs font-semibold text-maya-brown/60 dark:text-gray-400 mb-1.5 block">
                 Porte
               </label>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-1.5">
                 <button
                   onClick={() => setSizeFilter('all')}
-                  className={`px-4 py-2 rounded-xl font-semibold transition-all ${
+                  className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition-all ${
                     sizeFilter === 'all'
-                      ? 'bg-maya-blue text-white shadow-lg'
+                      ? 'bg-maya-blue text-white shadow'
                       : 'bg-maya-beige text-maya-brown hover:bg-maya-blue/20'
                   }`}
                 >
@@ -193,9 +193,9 @@ export default function AdocaoPageEnhanced() {
                 </button>
                 <button
                   onClick={() => setSizeFilter('small')}
-                  className={`px-4 py-2 rounded-xl font-semibold transition-all ${
+                  className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition-all ${
                     sizeFilter === 'small'
-                      ? 'bg-maya-blue text-white shadow-lg'
+                      ? 'bg-maya-blue text-white shadow'
                       : 'bg-maya-beige text-maya-brown hover:bg-maya-blue/20'
                   }`}
                 >
@@ -203,9 +203,9 @@ export default function AdocaoPageEnhanced() {
                 </button>
                 <button
                   onClick={() => setSizeFilter('medium')}
-                  className={`px-4 py-2 rounded-xl font-semibold transition-all ${
+                  className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition-all ${
                     sizeFilter === 'medium'
-                      ? 'bg-maya-blue text-white shadow-lg'
+                      ? 'bg-maya-blue text-white shadow'
                       : 'bg-maya-beige text-maya-brown hover:bg-maya-blue/20'
                   }`}
                 >
@@ -213,9 +213,9 @@ export default function AdocaoPageEnhanced() {
                 </button>
                 <button
                   onClick={() => setSizeFilter('large')}
-                  className={`px-4 py-2 rounded-xl font-semibold transition-all ${
+                  className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition-all ${
                     sizeFilter === 'large'
-                      ? 'bg-maya-blue text-white shadow-lg'
+                      ? 'bg-maya-blue text-white shadow'
                       : 'bg-maya-beige text-maya-brown hover:bg-maya-blue/20'
                   }`}
                 >
@@ -225,16 +225,16 @@ export default function AdocaoPageEnhanced() {
             </div>
 
             {/* Gender Filter */}
-            <div>
-              <label className="text-sm font-semibold text-maya-brown/70 dark:text-gray-300 mb-2 block">
+            <div className="flex-1">
+              <label className="text-xs font-semibold text-maya-brown/60 dark:text-gray-400 mb-1.5 block">
                 Gênero
               </label>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-1.5">
                 <button
                   onClick={() => setGenderFilter('all')}
-                  className={`px-4 py-2 rounded-xl font-semibold transition-all ${
+                  className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition-all ${
                     genderFilter === 'all'
-                      ? 'bg-maya-green text-white shadow-lg'
+                      ? 'bg-maya-green text-white shadow'
                       : 'bg-maya-beige text-maya-brown hover:bg-maya-green/20'
                   }`}
                 >
@@ -242,9 +242,9 @@ export default function AdocaoPageEnhanced() {
                 </button>
                 <button
                   onClick={() => setGenderFilter('male')}
-                  className={`px-4 py-2 rounded-xl font-semibold transition-all inline-flex items-center gap-2 ${
+                  className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition-all inline-flex items-center gap-1 ${
                     genderFilter === 'male'
-                      ? 'bg-maya-green text-white shadow-lg'
+                      ? 'bg-maya-green text-white shadow'
                       : 'bg-maya-beige text-maya-brown hover:bg-maya-green/20'
                   }`}
                 >
@@ -253,9 +253,9 @@ export default function AdocaoPageEnhanced() {
                 </button>
                 <button
                   onClick={() => setGenderFilter('female')}
-                  className={`px-4 py-2 rounded-xl font-semibold transition-all inline-flex items-center gap-2 ${
+                  className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition-all inline-flex items-center gap-1 ${
                     genderFilter === 'female'
-                      ? 'bg-maya-green text-white shadow-lg'
+                      ? 'bg-maya-green text-white shadow'
                       : 'bg-maya-beige text-maya-brown hover:bg-maya-green/20'
                   }`}
                 >
@@ -266,7 +266,7 @@ export default function AdocaoPageEnhanced() {
             </div>
           </div>
 
-          <div className="mt-4 text-maya-brown/60 dark:text-gray-400 text-sm">
+          <div className="mt-3 text-maya-brown/60 dark:text-gray-400 text-sm">
             {filteredAnimals.length} {filteredAnimals.length === 1 ? 'animal encontrado' : 'animais encontrados'}
           </div>
         </div>
