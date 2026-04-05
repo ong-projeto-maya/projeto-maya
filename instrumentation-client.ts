@@ -21,3 +21,6 @@ Sentry.init({
 
   enabled: !!process.env.NEXT_PUBLIC_SENTRY_DSN,
 })
+
+// Required by Sentry to instrument client-side navigations in Next.js App Router
+export const onRouterTransitionStart = Sentry.captureRouterTransitionStart
