@@ -36,6 +36,9 @@ jobs:
           STRIPE_WEBHOOK_SECRET: whsec_ci_placeholder
           NEXT_PUBLIC_SUPABASE_URL: https://placeholder.supabase.co
           NEXT_PUBLIC_SUPABASE_ANON_KEY: placeholder_anon_key
+          # Sentry disabled in CI (no DSN = init is skipped)
+          NEXT_PUBLIC_SENTRY_DSN: ""
+          SENTRY_DSN: ""
 
       - name: Build
         run: npm run build
@@ -45,3 +48,6 @@ jobs:
           NEXT_PUBLIC_SUPABASE_URL: https://placeholder.supabase.co
           NEXT_PUBLIC_SUPABASE_ANON_KEY: placeholder_anon_key
           NEXT_PUBLIC_SITE_URL: https://placeholder.example.com
+          NEXT_PUBLIC_SENTRY_DSN: ""
+          SENTRY_DSN: ""
+          # No SENTRY_AUTH_TOKEN → source map upload is skipped gracefully
