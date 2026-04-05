@@ -2,23 +2,37 @@
 
 import { useState } from 'react'
 import { Mail, Check } from 'lucide-react'
+import { createClient } from '@/lib/supabase'
 
 export default function NewsletterSignup() {
   const [email, setEmail] = useState('')
   const [subscribed, setSubscribed] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
+    setError('')
 
-    // TODO: Integrar com serviço de newsletter (Mailchimp, SendGrid, etc)
-    await new Promise(resolve => setTimeout(resolve, 1000))
+    const supabase = createClient()
+    const { error: dbError } = await supabase
+      .from('newsletter_subscribers')
+      .insert({ email })
+
+    setLoading(false)
+
+    if (dbError) {
+      if (dbError.code === '23505') {
+        setError('Este email já está inscrito.')
+      } else {
+        setError('Erro ao inscrever. Tente novamente.')
+      }
+      return
+    }
 
     setSubscribed(true)
-    setLoading(false)
     setEmail('')
-
     setTimeout(() => setSubscribed(false), 5000)
   }
 
@@ -40,23 +54,30 @@ export default function NewsletterSignup() {
               <span className="font-semibold">Inscrição realizada com sucesso!</span>
             </div>
           ) : (
-            <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-4 max-w-lg mx-auto">
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Seu melhor email"
-                required
-                className="flex-1 px-6 py-4 rounded-xl text-maya-brown focus:outline-none focus:ring-4 focus:ring-white/50"
-              />
-              <button
-                type="submit"
-                disabled={loading}
-                className="bg-white text-maya-green hover:bg-maya-beige font-semibold px-8 py-4 rounded-xl transition-all shadow-lg hover:shadow-xl disabled:opacity-50"
-              >
-                {loading ? 'Inscrevendo...' : 'Inscrever'}
-              </button>
-            </form>
+            <>
+              <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-4 max-w-lg mx-auto">
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Seu melhor email"
+                  required
+                  className="flex-1 px-6 py-4 rounded-xl text-maya-brown focus:outline-none focus:ring-4 focus:ring-white/50"
+                />
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="bg-white text-maya-green hover:bg-maya-beige font-semibold px-8 py-4 rounded-xl transition-all shadow-lg hover:shadow-xl disabled:opacity-50"
+                >
+                  {loading ? 'Inscrevendo...' : 'Inscrever'}
+                </button>
+              </form>
+              {error && (
+                <p className="mt-3 text-white/90 bg-white/20 rounded-lg px-4 py-2 text-sm font-medium">
+                  {error}
+                </p>
+              )}
+            </>
           )}
 
           <p className="text-sm opacity-75 mt-4">

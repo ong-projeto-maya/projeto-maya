@@ -6,10 +6,11 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { PawPrint, ArrowLeft, Heart, CheckCircle, Calendar, HeartPulse, Activity, UtensilsCrossed, Home, Sparkles } from 'lucide-react'
 import { useDoador } from '@/hooks/useDoador'
-import { animals } from '@/data/animals'
+import { useAnimals } from '@/hooks/useAnimals'
 
 export default function AnimaisAjudadosPage() {
   const { doador, isLoading } = useDoador()
+  const { animals } = useAnimals()
   const router = useRouter()
 
   useEffect(() => {

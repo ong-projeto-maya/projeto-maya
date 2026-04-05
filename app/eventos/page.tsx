@@ -1,43 +1,27 @@
+﻿'use client'
+
 import { Calendar, MapPin, Clock, Users } from 'lucide-react'
 import Link from 'next/link'
+import { useEvents } from '@/hooks/useEvents'
 
-const events = [
-  {
-    id: '1',
-    title: 'Feira de Adoção - Shopping Center',
-    date: '2026-03-15',
-    time: '10:00 - 18:00',
-    location: 'Shopping Iguatemi - São Paulo',
-    description: 'Venha conhecer nossos animais disponíveis para adoção! Teremos diversos cães e gatos esperando por você.',
-    spots: 50,
-    spotsAvailable: 32,
-    image: 'https://images.unsplash.com/photo-1548199973-03cce0bbc87b?w=600',
-  },
-  {
-    id: '2',
-    title: 'Palestra: Adoção Responsável',
-    date: '2026-03-22',
-    time: '19:00 - 21:00',
-    location: 'Centro Cultural - Online e Presencial',
-    description: 'Aprenda tudo sobre adoção responsável, cuidados básicos e como preparar sua casa para um novo pet.',
-    spots: 100,
-    spotsAvailable: 67,
-    image: 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=600',
-  },
-  {
-    id: '3',
-    title: 'Caminhada Pet Solidária',
-    date: '2026-04-05',
-    time: '08:00 - 12:00',
-    location: 'Parque Ibirapuera - São Paulo',
-    description: 'Caminhada beneficente com seus pets! Inscrições revertem para o Projeto Maya. Traga água e coleira!',
-    spots: 200,
-    spotsAvailable: 145,
-    image: 'https://images.unsplash.com/photo-1601758228041-f3b2795255f1?w=600',
-  },
-]
+const typeLabels: Record<string, string> = {
+  adoption: 'Adoção',
+  fundraising: 'Arrecadação',
+  educational: 'Educativo',
+  other: 'Evento',
+}
+
+const typeColors: Record<string, string> = {
+  adoption: 'bg-maya-green',
+  fundraising: 'bg-maya-orange',
+  educational: 'bg-maya-blue',
+  other: 'bg-gray-500',
+}
 
 export default function EventosPage() {
+  const { events, isLoading } = useEvents()
+  const upcomingEvents = events.filter(e => new Date(e.date) >= new Date())
+
   return (
     <div className="min-h-screen bg-maya-beige dark:bg-gray-900 py-12">
       <div className="container mx-auto px-4">
@@ -54,65 +38,99 @@ export default function EventosPage() {
 
         {/* Events List */}
         <div className="max-w-4xl mx-auto space-y-8">
-          {events.map((event) => (
-            <div key={event.id} className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl overflow-hidden hover:shadow-2xl transition-shadow">
-              <div className="grid grid-cols-1 md:grid-cols-3">
-                {/* Image */}
-                <div className="relative h-64 md:h-auto">
-                  <img
-                    src={event.image}
-                    alt={event.title}
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute top-4 right-4 bg-maya-green text-white px-4 py-2 rounded-full font-bold text-sm">
-                    {event.spotsAvailable} vagas
+          {isLoading ? (
+            Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl overflow-hidden animate-pulse">
+                <div className="grid grid-cols-1 md:grid-cols-3">
+                  <div className="h-64 bg-gray-200 dark:bg-gray-700" />
+                  <div className="md:col-span-2 p-8 space-y-4">
+                    <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-3/4" />
+                    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2" />
+                    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-2/3" />
                   </div>
-                </div>
-
-                {/* Content */}
-                <div className="md:col-span-2 p-8">
-                  <h2 className="font-display text-3xl text-maya-brown dark:text-white mb-4">
-                    {event.title}
-                  </h2>
-
-                  <div className="space-y-3 mb-6">
-                    <div className="flex items-center gap-3 text-maya-brown/70 dark:text-gray-300">
-                      <Calendar className="w-5 h-5 text-maya-green" />
-                      <span>{new Date(event.date).toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>
-                    </div>
-
-                    <div className="flex items-center gap-3 text-maya-brown/70 dark:text-gray-300">
-                      <Clock className="w-5 h-5 text-maya-green" />
-                      <span>{event.time}</span>
-                    </div>
-
-                    <div className="flex items-center gap-3 text-maya-brown/70 dark:text-gray-300">
-                      <MapPin className="w-5 h-5 text-maya-green" />
-                      <span>{event.location}</span>
-                    </div>
-
-                    <div className="flex items-center gap-3 text-maya-brown/70 dark:text-gray-300">
-                      <Users className="w-5 h-5 text-maya-green" />
-                      <span>{event.spotsAvailable} de {event.spots} vagas disponíveis</span>
-                    </div>
-                  </div>
-
-                  <p className="text-maya-brown/80 dark:text-gray-300 mb-6 leading-relaxed">
-                    {event.description}
-                  </p>
-
-                  <a
-                    href={`https://wa.me/5511999999999?text=Olá!%20Gostaria%20de%20me%20inscrever%20no%20evento:%20${encodeURIComponent(event.title)}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="btn-primary inline-block"
-                  >
-                    Inscrever-se Agora
-                  </a>
                 </div>
               </div>
+            ))
+          ) : upcomingEvents.length === 0 ? (
+            <div className="bg-white dark:bg-gray-800 rounded-3xl p-12 text-center shadow-lg">
+              <Calendar className="w-16 h-16 text-maya-brown/30 dark:text-gray-600 mx-auto mb-4" />
+              <h3 className="font-display text-2xl text-maya-brown dark:text-white mb-2">
+                Nenhum evento futuro
+              </h3>
+              <p className="text-maya-brown/70 dark:text-gray-300">
+                Fique de olho — novos eventos são anunciados regularmente!
+              </p>
             </div>
-          ))}
+          ) : upcomingEvents.map((event) => {
+            const spotsAvailable = event.capacity != null ? event.capacity - (event.registered ?? 0) : null
+            return (
+              <div key={event.id} className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl overflow-hidden hover:shadow-2xl transition-shadow">
+                <div className="grid grid-cols-1 md:grid-cols-3">
+                  {/* Image */}
+                  <div className="relative h-64 md:h-auto">
+                    {event.image ? (
+                      <img
+                        src={event.image}
+                        alt={event.title}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-maya-green/10 flex items-center justify-center">
+                        <Calendar className="w-16 h-16 text-maya-green/40" />
+                      </div>
+                    )}
+                    <div className={`absolute top-4 right-4 ${typeColors[event.type] ?? 'bg-gray-500'} text-white px-4 py-2 rounded-full font-bold text-sm`}>
+                      {typeLabels[event.type] ?? event.type}
+                    </div>
+                  </div>
+
+                  {/* Content */}
+                  <div className="md:col-span-2 p-8">
+                    <h2 className="font-display text-3xl text-maya-brown dark:text-white mb-4">
+                      {event.title}
+                    </h2>
+
+                    <div className="space-y-3 mb-6">
+                      <div className="flex items-center gap-3 text-maya-brown/70 dark:text-gray-300">
+                        <Calendar className="w-5 h-5 text-maya-green flex-shrink-0" />
+                        <span>{new Date(event.date + 'T00:00:00').toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>
+                      </div>
+
+                      <div className="flex items-center gap-3 text-maya-brown/70 dark:text-gray-300">
+                        <Clock className="w-5 h-5 text-maya-green flex-shrink-0" />
+                        <span>{event.time}</span>
+                      </div>
+
+                      <div className="flex items-center gap-3 text-maya-brown/70 dark:text-gray-300">
+                        <MapPin className="w-5 h-5 text-maya-green flex-shrink-0" />
+                        <span>{event.location}</span>
+                      </div>
+
+                      {event.capacity != null && (
+                        <div className="flex items-center gap-3 text-maya-brown/70 dark:text-gray-300">
+                          <Users className="w-5 h-5 text-maya-green flex-shrink-0" />
+                          <span>{spotsAvailable} de {event.capacity} vagas disponíveis</span>
+                        </div>
+                      )}
+                    </div>
+
+                    <p className="text-maya-brown/80 dark:text-gray-300 mb-6 leading-relaxed">
+                      {event.description}
+                    </p>
+
+                    <a
+                      href={`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? '5519994224336'}?text=Ol%C3%A1!%20Gostaria%20de%20me%20inscrever%20no%20evento:%20${encodeURIComponent(event.title)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn-primary inline-block"
+                    >
+                      Inscrever-se Agora
+                    </a>
+                  </div>
+                </div>
+              </div>
+            )
+          })}
         </div>
 
         {/* CTA */}

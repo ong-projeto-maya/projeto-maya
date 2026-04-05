@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { 
@@ -8,22 +8,22 @@ import {
   Settings,
   CreditCard,
   Target,
-  LogOut
+  LogOut,
+  X
 } from 'lucide-react'
 import { useDoador } from '@/hooks/useDoador'
-import { campaigns } from '@/data/campaigns'
-import { getDonationsByDoador } from '@/data/campaignDonations'
+import { useCampaigns } from '@/hooks/useCampaigns'
 import Image from 'next/image'
 
 export default function DoadorDashboard() {
   const { doador, isLoading, logout } = useDoador()
+  const { getCampaignById } = useCampaigns()
   const router = useRouter()
+  const [showLogoutModal, setShowLogoutModal] = useState(false)
   
-  const handleLogout = () => {
-    if (confirm('Tem certeza que deseja sair?')) {
-      logout()
-      router.push('/doador/login')
-    }
+  const handleLogout = async () => {
+    await logout()
+    router.push('/doador/login')
   }
 
   useEffect(() => {
@@ -47,21 +47,38 @@ export default function DoadorDashboard() {
     return null
   }
 
-  // Buscar campanhas do doador
-  const doadorCampaigns = getDonationsByDoador(doador.email)
-  const activeCampaigns = doadorCampaigns.filter(d => d.status === 'active')
+  // Use real Supabase donations — filter those linked to a campaign
+  const doadorCampaigns = doador.donations.filter(d => d.campaignId)
   const campaignsData = doadorCampaigns.map(donation => {
-    const campaign = campaigns.find(c => c.id === donation.campaignId)
+    const campaign = getCampaignById(donation.campaignId ?? '')
     return { donation, campaign }
   }).filter(item => item.campaign)
   
-  // Debug
-  console.log('Email do doador:', doador.email)
-  console.log('Doações encontradas:', doadorCampaigns)
-  console.log('Campanhas com dados:', campaignsData)
 
   return (
     <div className="min-h-screen bg-maya-beige dark:bg-gray-900 py-12">
+      {/* Logout Confirmation Modal */}
+      {showLogoutModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-2xl max-w-sm w-full mx-4">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-display text-xl text-maya-brown dark:text-white">Sair da conta</h3>
+              <button onClick={() => setShowLogoutModal(false)} className="text-maya-brown/40 hover:text-maya-brown dark:text-gray-400 dark:hover:text-white">
+                <X size={20} />
+              </button>
+            </div>
+            <p className="text-maya-brown/70 dark:text-gray-300 mb-6">Tem certeza que deseja sair?</p>
+            <div className="flex gap-3">
+              <button onClick={() => setShowLogoutModal(false)} className="flex-1 py-2 rounded-xl border-2 border-gray-200 dark:border-gray-600 text-maya-brown dark:text-white font-semibold hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                Cancelar
+              </button>
+              <button onClick={handleLogout} className="flex-1 py-2 rounded-xl bg-red-500 hover:bg-red-600 text-white font-semibold transition-colors">
+                Sair
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       <div className="container mx-auto px-4">
         {/* Header */}
         <div className="mb-8 flex items-start justify-between">
@@ -74,7 +91,7 @@ export default function DoadorDashboard() {
             </p>
           </div>
           <button
-            onClick={handleLogout}
+            onClick={() => setShowLogoutModal(true)}
             className="flex items-center gap-2 px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-xl transition-colors font-semibold shadow-lg"
             title="Sair"
           >
@@ -222,7 +239,7 @@ export default function DoadorDashboard() {
                                 }`}>
                                   {donation.type === 'monthly' ? 'Mensal' : 'Única'}
                                 </span>
-                                {donation.status === 'active' && (
+                                {donation.type === 'monthly' && donation.status === 'completed' && (
                                   <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400">
                                     Ativa
                                   </span>
@@ -260,11 +277,11 @@ export default function DoadorDashboard() {
                           {/* Donation Info */}
                           <div className="flex items-center justify-between text-xs text-maya-brown/60 dark:text-gray-400">
                             <span>
-                              Total doado: <span className="font-semibold text-maya-brown dark:text-white">R$ {donation.totalDonated.toLocaleString('pt-BR')}</span>
+                              Total doado: <span className="font-semibold text-maya-brown dark:text-white">R$ {donation.amount.toLocaleString('pt-BR')}</span>
                             </span>
-                            {donation.nextPaymentDate && (
+                            {donation.nextBillingDate && (
                               <span>
-                                Próximo: {new Date(donation.nextPaymentDate).toLocaleDateString('pt-BR')}
+                                Próximo: {new Date(donation.nextBillingDate).toLocaleDateString('pt-BR')}
                               </span>
                             )}
                           </div>
@@ -287,13 +304,13 @@ export default function DoadorDashboard() {
                   <div>
                     <p className="text-sm text-maya-brown/60 dark:text-gray-400 mb-1">Doações Ativas</p>
                     <p className="text-2xl font-bold text-maya-green">
-                      {activeCampaigns.length}
+                      {doadorCampaigns.filter(d => d.type === 'monthly' && d.status === 'completed').length}
                     </p>
                   </div>
                   <div>
                     <p className="text-sm text-maya-brown/60 dark:text-gray-400 mb-1">Total em Campanhas</p>
                     <p className="text-2xl font-bold text-maya-brown dark:text-white">
-                      R$ {doadorCampaigns.reduce((sum, d) => sum + d.totalDonated, 0).toLocaleString('pt-BR')}
+                      R$ {doadorCampaigns.reduce((sum, d) => sum + d.amount, 0).toLocaleString('pt-BR')}
                     </p>
                   </div>
                 </div>

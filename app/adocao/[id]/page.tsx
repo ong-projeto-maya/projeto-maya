@@ -1,26 +1,58 @@
 import { notFound } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
-import { animals } from '@/data/animals'
+import { createServiceClient } from '@/lib/supabase-server'
 import { ArrowLeft, Heart, MessageCircle, Share2, Dog, Cat, Ruler, Cake } from 'lucide-react'
 
-export async function generateStaticParams() {
-  return animals.map((animal) => ({
-    id: animal.id,
-  }))
+export const dynamic = 'force-dynamic'
+
+function mapAnimal(row: Record<string, unknown>) {
+  return {
+    id: row.id as string,
+    name: row.name as string,
+    type: row.type as 'dog' | 'cat',
+    age: row.age as string,
+    gender: row.gender as 'male' | 'female',
+    size: row.size as 'small' | 'medium' | 'large',
+    temperament: (row.temperament as string[]) ?? [],
+    story: row.story as string,
+    image: row.image as string,
+    images: (row.images as string[]) ?? [],
+    isAdopted: row.is_adopted as boolean,
+    isPuppy: row.is_puppy as boolean,
+    isRescued: row.is_rescued as boolean,
+    isMixed: row.is_mixed as boolean,
+  }
 }
 
-export default function AnimalDetailPage({ params }: { params: { id: string } }) {
-  const animal = animals.find((a) => a.id === params.id)
+export default async function AnimalDetailPage({ params }: { params: { id: string } }) {
+  const supabase = createServiceClient()
+  const { data: row } = await supabase
+    .from('animais')
+    .select('*')
+    .eq('id', params.id)
+    .single()
 
-  if (!animal) {
+  if (!row) {
     notFound()
   }
+
+  const animal = mapAnimal(row)
+
+  const { data: otherRows } = await supabase
+    .from('animais')
+    .select('*')
+    .neq('id', params.id)
+    .eq('is_adopted', false)
+    .order('sort_order', { ascending: true })
+    .limit(3)
+
+  const otherAnimals = (otherRows ?? []).map(mapAnimal)
 
   const whatsappMessage = encodeURIComponent(
     `Olá! Tenho interesse em conhecer o(a) ${animal.name}. Gostaria de mais informações sobre adoção.`
   )
-  const whatsappLink = `https://wa.me/5511999999999?text=${whatsappMessage}`
+  const whatsappLink = `https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? '5519994224336'}?text=${whatsappMessage}`
 
   return (
     <div className="min-h-screen bg-maya-beige py-12">
@@ -191,10 +223,7 @@ export default function AnimalDetailPage({ params }: { params: { id: string } })
         <div className="mt-20">
           <h2 className="section-title text-center mb-12">Conheça Outros Amiguinhos</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {animals
-              .filter((a) => a.id !== animal.id)
-              .slice(0, 3)
-              .map((otherAnimal) => (
+            {otherAnimals.map((otherAnimal) => (
                 <Link
                   key={otherAnimal.id}
                   href={`/adocao/${otherAnimal.id}`}

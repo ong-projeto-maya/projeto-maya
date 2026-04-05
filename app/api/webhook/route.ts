@@ -1,8 +1,18 @@
 import { NextResponse } from 'next/server'
 import { headers } from 'next/headers'
+import type Stripe from 'stripe'
+import { stripe, getWebhookSecret } from '@/lib/stripe'
+import { createRouteLogger } from '@/lib/logger'
+import {
+  saveDonation,
+  updateDonationStatus,
+  updateDonationStatusBySubscription,
+  cancelSubscriptionByStripeId,
+  syncSubscriptionStatus,
+  updateNextBillingDate,
+} from '@/lib/donationStorage'
 
-// Note: Install Stripe server-side SDK: npm install stripe
-// Uncomment after installing: const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY)
+const log = createRouteLogger('webhook')
 
 export async function POST(request: Request) {
   try {
@@ -10,106 +20,139 @@ export async function POST(request: Request) {
     const signature = headers().get('stripe-signature')
 
     if (!signature) {
-      return NextResponse.json(
-        { error: 'No signature' },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: 'No signature' }, { status: 400 })
     }
 
-    // IMPORTANT: Uncomment this section after setting up Stripe
-    /*
-    let event
+    let event: Stripe.Event
 
     try {
-      event = stripe.webhooks.constructEvent(
-        body,
-        signature,
-        process.env.STRIPE_WEBHOOK_SECRET
-      )
-    } catch (err: any) {
-      console.error('Webhook signature verification failed:', err.message)
-      return NextResponse.json(
-        { error: `Webhook Error: ${err.message}` },
-        { status: 400 }
-      )
+      event = stripe.webhooks.constructEvent(body, signature, getWebhookSecret())
+    } catch (err: unknown) {
+      log.error({ error: err }, 'webhook signature verification failed')
+      return NextResponse.json({ error: 'Webhook signature invalid' }, { status: 400 })
     }
 
-    // Handle the event
     switch (event.type) {
-      case 'checkout.session.completed':
-        const session = event.data.object
-        
-        // Save donation to database
-        console.log('Donation completed:', {
-          amount: session.amount_total / 100,
-          donationType: session.metadata.donationType,
-          customerEmail: session.customer_email,
-          sessionId: session.id,
+      case 'checkout.session.completed': {
+        const session = event.data.object as Stripe.Checkout.Session
+        const donationType = (session.metadata?.donationType ?? 'single') as 'single' | 'monthly'
+        const subscriptionId = typeof session.subscription === 'string'
+          ? session.subscription
+          : session.subscription?.id
+
+        await saveDonation({
+          stripeSessionId: session.id,
+          stripeSubscriptionId: subscriptionId,
+          email: session.customer_email ?? '',
+          amount: (session.amount_total ?? 0) / 100,
+          type: donationType,
+          status: 'completed',
+          campaignId: session.metadata?.campaignId,
+          campaignName: session.metadata?.campaignName,
+          createdAt: new Date().toISOString(),
         })
 
-        // TODO: Save to your database
-        // Example:
-        // await saveDonationToDatabase({
-        //   amount: session.amount_total / 100,
-        //   type: session.metadata.donationType,
-        //   email: session.customer_email,
-        //   stripeSessionId: session.id,
-        //   createdAt: new Date(),
-        // })
-
-        // Send thank you email
-        // await sendThankYouEmail(session.customer_email)
-
+        log.info({ sessionId: session.id }, 'donation saved')
         break
+      }
 
-      case 'customer.subscription.created':
-        // Handle new monthly subscription
-        const subscription = event.data.object
-        console.log('New subscription created:', subscription.id)
-        
-        // TODO: Save subscription to database
+      case 'customer.subscription.created': {
+        const subscription = event.data.object as Stripe.Subscription
+        log.info({ subscriptionId: subscription.id }, 'new subscription created')
         break
+      }
 
-      case 'customer.subscription.deleted':
-        // Handle subscription cancellation
-        const cancelledSubscription = event.data.object
-        console.log('Subscription cancelled:', cancelledSubscription.id)
-        
-        // TODO: Update database
+      case 'customer.subscription.updated': {
+        const subscription = event.data.object as Stripe.Subscription
+        await syncSubscriptionStatus({
+          id: subscription.id,
+          status: subscription.status,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          current_period_end: (subscription as any).current_period_end as number,
+        })
+        log.info({ subscriptionId: subscription.id }, 'subscription updated')
         break
+      }
 
-      case 'invoice.payment_succeeded':
-        // Handle successful monthly payment
-        const invoice = event.data.object
-        console.log('Invoice paid:', invoice.id)
-        
-        // TODO: Record payment in database
+      case 'customer.subscription.deleted': {
+        const subscription = event.data.object as Stripe.Subscription
+        await cancelSubscriptionByStripeId(subscription.id)
+        log.info({ subscriptionId: subscription.id }, 'subscription cancelled')
         break
+      }
 
-      case 'invoice.payment_failed':
-        // Handle failed payment
-        const failedInvoice = event.data.object
-        console.log('Payment failed:', failedInvoice.id)
-        
-        // TODO: Send notification email
+      case 'invoice.payment_succeeded': {
+        type InvoiceExpanded = Stripe.Invoice & {
+          subscription?: string | { id: string } | null
+          customer_email?: string | null
+        }
+        const invoice = event.data.object as InvoiceExpanded
+        // Skip the first invoice — checkout.session.completed already recorded it.
+        // billing_reason 'subscription_create' means first charge of a new subscription.
+        if (invoice.billing_reason === 'subscription_create') {
+          // Still sync nextBillingDate on the subscription record
+          const subId = typeof invoice.subscription === 'string'
+            ? invoice.subscription
+            : (invoice.subscription as { id: string } | null | undefined)?.id
+          if (subId) {
+            const nextBilling = invoice.lines.data[0]?.period?.end
+              ? new Date(invoice.lines.data[0].period.end * 1000).toISOString().split('T')[0]
+              : undefined
+            if (nextBilling) {
+              await updateNextBillingDate(subId, nextBilling)
+            }
+          }
+          break
+        }
+        // Subsequent monthly charges — save as new donation entry
+        const subId = typeof invoice.subscription === 'string'
+          ? invoice.subscription
+          : (invoice.subscription as { id: string } | null | undefined)?.id
+        const customerEmail = invoice.customer_email
+        if (subId && customerEmail) {
+          const nextBilling = invoice.lines.data[0]?.period?.end
+            ? new Date(invoice.lines.data[0].period.end * 1000).toISOString().split('T')[0]
+            : undefined
+          await saveDonation({
+            stripeSessionId: invoice.id,
+            stripeSubscriptionId: subId,
+            email: customerEmail,
+            amount: (invoice.amount_paid ?? 0) / 100,
+            type: 'monthly',
+            status: 'completed',
+            createdAt: new Date().toISOString(),
+            nextBillingDate: nextBilling,
+          })
+          log.info({ invoiceId: invoice.id }, 'monthly invoice saved')
+        }
         break
+      }
+
+      case 'invoice.payment_failed': {
+        type InvoiceExpanded = Stripe.Invoice & {
+          subscription?: string | { id: string } | null
+        }
+        const invoice = event.data.object as InvoiceExpanded
+        const subId = typeof invoice.subscription === 'string'
+          ? invoice.subscription
+          : (invoice.subscription as { id: string } | null | undefined)?.id
+        if (subId) {
+          await updateDonationStatusBySubscription(subId, 'failed')
+        } else {
+          await updateDonationStatus(invoice.id, 'failed')
+        }
+        log.warn({ invoiceId: invoice.id }, 'payment failed')
+        break
+      }
 
       default:
-        console.log(`Unhandled event type: ${event.type}`)
+        log.debug({ eventType: event.type }, 'unhandled webhook event')
     }
 
     return NextResponse.json({ received: true })
-    */
 
-    // TEMPORARY: For demo purposes
-    console.log('Webhook received (Stripe not configured yet)')
-    return NextResponse.json({ received: true })
-
-  } catch (error: any) {
-    console.error('Webhook error:', error)
-    return NextResponse.json(
-      { error: error.message },
-      { status: 500 }
-    )
+  } catch (error) {
+    log.error({ error }, 'webhook handler error')
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

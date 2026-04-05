@@ -1,7 +1,31 @@
+'use client'
+
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { Heart, TrendingUp, Award, BarChart, DollarSign, PawPrint, CheckCircle } from 'lucide-react'
+import { createClient } from '@/lib/supabase'
 
 export default function DoadorCTA() {
+  const [stats, setStats] = useState({ total_donors: 0, total_raised: 0, animals_helped: 0 })
+
+  useEffect(() => {
+    const supabase = createClient()
+    supabase
+      .from('site_stats')
+      .select('key, value')
+      .then(({ data }) => {
+        if (data) {
+          const map: Record<string, number> = {}
+          data.forEach(r => { map[r.key] = r.value })
+          setStats({
+            total_donors: map['total_donors'] ?? 0,
+            total_raised: map['total_raised'] ?? 0,
+            animals_helped: map['animals_helped'] ?? 0,
+          })
+        }
+      })
+  }, [])
+
   return (
     <section className="py-20 bg-gradient-to-br from-maya-green to-maya-blue text-white">
       <div className="container mx-auto px-4">
@@ -63,21 +87,21 @@ export default function DoadorCTA() {
                 <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center mx-auto mb-3">
                   <Heart className="w-6 h-6 fill-white" />
                 </div>
-                <p className="text-4xl font-bold mb-2">850+</p>
+                <p className="text-4xl font-bold mb-2">{stats.total_donors > 0 ? `${stats.total_donors}+` : '—'}</p>
                 <p className="text-white/80 text-sm">Doadores Ativos</p>
               </div>
               <div className="text-center">
                 <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center mx-auto mb-3">
                   <DollarSign className="w-6 h-6" />
                 </div>
-                <p className="text-4xl font-bold mb-2">R$ 125k</p>
+                <p className="text-4xl font-bold mb-2">{stats.total_raised > 0 ? `R$ ${(stats.total_raised / 1000).toFixed(0)}k` : '—'}</p>
                 <p className="text-white/80 text-sm">Doado em 2026</p>
               </div>
               <div className="text-center">
                 <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center mx-auto mb-3">
                   <PawPrint className="w-6 h-6" />
                 </div>
-                <p className="text-4xl font-bold mb-2">450+</p>
+                <p className="text-4xl font-bold mb-2">{stats.animals_helped > 0 ? `${stats.animals_helped}+` : '—'}</p>
                 <p className="text-white/80 text-sm">Animais Ajudados</p>
               </div>
               <div className="text-center">

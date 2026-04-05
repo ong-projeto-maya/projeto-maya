@@ -5,16 +5,17 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { Heart, Trash2, Share2, PawPrint, Dog, Cat, ArrowRight } from 'lucide-react'
 import { useFavorites } from '@/hooks/useFavorites'
-import { animals } from '@/data/animals'
+import { useAnimals } from '@/hooks/useAnimals'
 import FavoriteButton from '@/components/FavoriteButton'
 import ShareButton from '@/components/ShareButton'
 
 export default function FavoritosPage() {
   const { favorites, removeFavorite, clearFavorites } = useFavorites()
+  const { animals } = useAnimals()
 
   const favoriteAnimals = useMemo(() => {
     return animals.filter((animal) => favorites.includes(animal.id))
-  }, [favorites])
+  }, [animals, favorites])
 
   return (
     <div className="min-h-screen bg-maya-beige dark:bg-gray-900 py-12">

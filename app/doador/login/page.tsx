@@ -33,9 +33,10 @@ export default function DoadorLoginPage() {
       return
     }
 
-    const success = login(email, password)
+    const success = await login(email, password)
     
     if (success) {
+      setIsLoading(false)
       router.push('/doador/dashboard')
     } else {
       setError('Email ou senha inválidos')

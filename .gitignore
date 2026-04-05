@@ -31,6 +31,9 @@ yarn-error.log*
 # vercel
 .vercel
 
+# scripts with hard-coded credentials — do NOT commit
+scripts/migrate-content-tables.mjs
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

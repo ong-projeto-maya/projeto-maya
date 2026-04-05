@@ -54,24 +54,6 @@ export default function Footer() {
               Dedicados ao resgate, cuidado e adoção responsável de animais. 
               Cada vida importa, cada doação transforma.
             </p>
-            <div className="flex space-x-3">
-              <a 
-                href="https://instagram.com" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center hover:bg-maya-green hover:text-white transition-all"
-                aria-label="Instagram"
-              >
-                <Instagram size={20} />
-              </a>
-              <a 
-                href="mailto:contato@projetomaya.org" 
-                className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center hover:bg-maya-green hover:text-white transition-all"
-                aria-label="Email"
-              >
-                <Mail size={20} />
-              </a>
-            </div>
           </div>
 
           {/* Links Rápidos */}
@@ -119,17 +101,25 @@ export default function Footer() {
                 <div className="w-8 h-8 bg-white/10 rounded-lg flex items-center justify-center flex-shrink-0">
                   <Phone size={16} />
                 </div>
-                <span className="text-white/60 text-sm">
-                  (11) 9 9999-9999
-                </span>
+                <a href={`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? '5519994224336'}`} className="text-white/60 hover:text-maya-green text-sm transition-colors">
+                  (19) 99422-4336
+                </a>
               </li>
               <li className="flex items-center space-x-3">
                 <div className="w-8 h-8 bg-white/10 rounded-lg flex items-center justify-center flex-shrink-0">
                   <Mail size={16} />
                 </div>
-                <span className="text-white/60 text-sm">
-                  contato@projetomaya.org
-                </span>
+                <a href="mailto:projetomaya@outlook.com" className="text-white/60 hover:text-maya-green text-sm transition-colors">
+                  projetomaya@outlook.com
+                </a>
+              </li>
+              <li className="flex items-center space-x-3">
+                <div className="w-8 h-8 bg-white/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <Instagram size={16} />
+                </div>
+                <a href="https://instagram.com/projeto.maya" target="_blank" rel="noopener noreferrer" className="text-white/60 hover:text-maya-green text-sm transition-colors">
+                  @projeto.maya
+                </a>
               </li>
               <li className="mt-4">
                 <Link

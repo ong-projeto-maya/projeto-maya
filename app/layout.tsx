@@ -56,6 +56,7 @@ export default function RootLayout({
   return (
     <html lang="pt-BR">
       <head>
+        {/* Dark mode initialization script — pure JS, no user input, XSS-safe */}
         <script
           dangerouslySetInnerHTML={{
             __html: `

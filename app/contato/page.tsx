@@ -2,6 +2,9 @@
 
 import { useState } from 'react'
 import { Mail, Phone, Send, Check, MessageSquare, AlertTriangle } from 'lucide-react'
+import { createClient } from '@/lib/supabase'
+
+const WHATSAPP = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? '5519994224336'
 
 export default function ContatoPage() {
   const [formData, setFormData] = useState({
@@ -13,19 +16,31 @@ export default function ContatoPage() {
   })
   const [submitted, setSubmitted] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
+    setError('')
 
-    // TODO: Integrar com backend ou serviço de email
-    // Por enquanto, simula envio
-    await new Promise(resolve => setTimeout(resolve, 1000))
+    const supabase = createClient()
+    const { error: dbError } = await supabase.from('mensagens').insert({
+      nome: formData.name,
+      email: formData.email,
+      telefone: formData.phone || null,
+      assunto: formData.subject,
+      mensagem: formData.message,
+    })
+
+    if (dbError) {
+      setError('Erro ao enviar mensagem. Tente novamente.')
+      setLoading(false)
+      return
+    }
 
     setSubmitted(true)
     setLoading(false)
     setFormData({ name: '', email: '', phone: '', subject: 'adocao', message: '' })
-
     setTimeout(() => setSubmitted(false), 5000)
   }
 
@@ -58,8 +73,8 @@ export default function ContatoPage() {
               <h3 className="font-display text-xl text-maya-brown dark:text-white mb-2">
                 Email
               </h3>
-              <a href="mailto:contato@projetomaya.org" className="text-maya-brown/70 dark:text-gray-300 hover:text-maya-green">
-                contato@projetomaya.org
+              <a href="mailto:contato@projetomaya.org.br" className="text-maya-brown/70 dark:text-gray-300 hover:text-maya-green">
+                contato@projetomaya.org.br
               </a>
             </div>
 
@@ -68,8 +83,8 @@ export default function ContatoPage() {
               <h3 className="font-display text-xl text-maya-brown dark:text-white mb-2">
                 Telefone/WhatsApp
               </h3>
-              <a href="tel:+5511999999999" className="text-maya-brown/70 dark:text-gray-300 hover:text-maya-green">
-                (11) 9 9999-9999
+              <a href={`tel:+${WHATSAPP}`} className="text-maya-brown/70 dark:text-gray-300 hover:text-maya-green">
+                (19) 9 9422-4336
               </a>
             </div>
 
@@ -114,6 +129,12 @@ export default function ContatoPage() {
                       <p className="text-sm text-green-700">Responderemos em breve.</p>
                     </div>
                   </div>
+                </div>
+              )}
+
+              {error && (
+                <div className="bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 p-4 mb-6 rounded-lg">
+                  <p className="text-red-700 dark:text-red-400 font-semibold">{error}</p>
                 </div>
               )}
 

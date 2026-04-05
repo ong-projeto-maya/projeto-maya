@@ -4,7 +4,9 @@ import { useState } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
-import { getCampaignById, getCampaignProgress, getCampaignDaysLeft } from '@/data/campaigns'
+import { getCampaignDaysLeft } from '@/data/campaigns'
+import { useCampaigns } from '@/hooks/useCampaigns'
+import { createClient } from '@/lib/supabase'
 import { 
   ArrowLeft,
   Heart,
@@ -35,12 +37,14 @@ const presetAmounts = [25, 50, 100, 250, 500]
 export default function CampanhaDetailPage() {
   const params = useParams()
   const campaignId = params.id as string
+  const { getCampaignById, isLoading } = useCampaigns()
   const campaign = getCampaignById(campaignId)
 
   const [donationType, setDonationType] = useState<DonationType>('single')
   const [selectedAmount, setSelectedAmount] = useState<number>(50)
   const [customAmount, setCustomAmount] = useState<string>('')
-  const [isLoading, setIsLoading] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [donationError, setDonationError] = useState('')
   const [activeTab, setActiveTab] = useState<ActiveTab>('donate')
 
   // Registration form state
@@ -56,12 +60,33 @@ export default function CampanhaDetailPage() {
   })
   const [regSubmitted, setRegSubmitted] = useState(false)
   const [regLoading, setRegLoading] = useState(false)
+  const [regError, setRegError] = useState('')
 
   const handleRegistration = async (e: React.FormEvent) => {
     e.preventDefault()
     setRegLoading(true)
-    // Simula envio (futuramente integrar com backend)
-    await new Promise(resolve => setTimeout(resolve, 1500))
+    setRegError('')
+
+    const supabase = createClient()
+    const { error } = await supabase.from('camp_registrations').insert({
+      campaign_id: campaignId,
+      campaign_title: campaign?.title ?? '',
+      nome: regForm.name,
+      email: regForm.email,
+      telefone: regForm.phone,
+      cpf: regForm.cpf || null,
+      endereco: regForm.address || null,
+      nome_pet: regForm.petName || null,
+      tipo_pet: regForm.petType || null,
+      motivo: regForm.reason,
+    })
+
+    if (error) {
+      setRegError('Erro ao enviar inscrição. Tente novamente.')
+      setRegLoading(false)
+      return
+    }
+
     setRegSubmitted(true)
     setRegLoading(false)
   }
@@ -85,26 +110,24 @@ export default function CampanhaDetailPage() {
   const daysLeft = getCampaignDaysLeft(campaign)
 
   const handleDonation = async () => {
-    setIsLoading(true)
+    setIsSubmitting(true)
+    setDonationError('')
 
     try {
       const amount = customAmount ? parseFloat(customAmount) : selectedAmount
 
       if (isNaN(amount) || amount < 5) {
-        alert('Por favor, insira um valor válido (mínimo R$ 5)')
-        setIsLoading(false)
+        setDonationError('Por favor, insira um valor válido (mínimo R$ 5)')
+        setIsSubmitting(false)
         return
       }
 
-      // Call API to create Stripe checkout session
       const response = await fetch('/api/create-checkout-session', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          amount: amount,
-          donationType: donationType,
+          amount,
+          donationType,
           campaignId: campaign.id,
           campaignName: campaign.title
         }),
@@ -113,37 +136,33 @@ export default function CampanhaDetailPage() {
       const { sessionId, error } = await response.json()
 
       if (error) {
-        alert(error)
-        setIsLoading(false)
+        setDonationError(error)
+        setIsSubmitting(false)
         return
       }
 
-      // Redirect to Stripe Checkout
       const stripe = await stripePromise
       if (stripe) {
         const { error } = await stripe.redirectToCheckout({ sessionId })
         if (error) {
-          alert(error.message)
+          setDonationError(error.message ?? 'Erro ao redirecionar para pagamento.')
         }
       }
-    } catch (error) {
-      console.error('Error:', error)
-      alert('Erro ao processar doação. Tente novamente.')
+    } catch {
+      setDonationError('Erro ao processar doação. Tente novamente.')
     }
 
-    setIsLoading(false)
+    setIsSubmitting(false)
   }
 
+  const [linkCopied, setLinkCopied] = useState(false)
   const handleShare = () => {
     if (navigator.share) {
-      navigator.share({
-        title: campaign.title,
-        text: campaign.description,
-        url: window.location.href
-      })
+      navigator.share({ title: campaign.title, text: campaign.description, url: window.location.href })
     } else {
       navigator.clipboard.writeText(window.location.href)
-      alert('Link copiado!')
+      setLinkCopied(true)
+      setTimeout(() => setLinkCopied(false), 2000)
     }
   }
 
@@ -395,6 +414,12 @@ export default function CampanhaDetailPage() {
                         </>
                       )}
                     </button>
+
+                    {regError && (
+                      <div className="mt-3 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl text-red-600 dark:text-red-400 text-sm">
+                        {regError}
+                      </div>
+                    )}
                   </form>
                 )}
               </div>
@@ -471,11 +496,17 @@ export default function CampanhaDetailPage() {
                 {/* Donate Button */}
                 <button
                   onClick={handleDonation}
-                  disabled={isLoading}
+                  disabled={isSubmitting}
                   className="btn-primary w-full mb-3 disabled:opacity-50"
                 >
-                  {isLoading ? 'Processando...' : 'Contribuir Agora'}
+                  {isSubmitting ? 'Processando...' : 'Contribuir Agora'}
                 </button>
+
+                {donationError && (
+                  <div className="mb-3 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl text-red-600 dark:text-red-400 text-sm">
+                    {donationError}
+                  </div>
+                )}
 
                 {/* Share Button */}
                 <button
@@ -483,7 +514,7 @@ export default function CampanhaDetailPage() {
                   className="w-full px-6 py-3 rounded-xl border-2 border-maya-green text-maya-green hover:bg-maya-green hover:text-white transition-all font-semibold flex items-center justify-center gap-2"
                 >
                   <Share2 size={20} />
-                  Compartilhar Campanha
+                  {linkCopied ? 'Link copiado!' : 'Compartilhar Campanha'}
                 </button>
               </div>
 

@@ -1,10 +1,12 @@
 import { MetadataRoute } from 'next'
-import { animals } from '@/data/animals'
+import { createServiceClient } from '@/lib/supabase-server'
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://projetomaya.org'
+  const supabase = createServiceClient()
+  const { data } = await supabase.from('animais').select('id')
 
-  const animalPages = animals.map((animal) => ({
+  const animalPages = (data ?? []).map((animal) => ({
     url: `${baseUrl}/adocao/${animal.id}`,
     lastModified: new Date(),
     changeFrequency: 'weekly' as const,

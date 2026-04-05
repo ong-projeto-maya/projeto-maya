@@ -2,28 +2,118 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { PawPrint, Heart, Users, DollarSign, TrendingUp, Plus, Edit, Trash2, AlertTriangle, Dog, Cat, LogOut, Target } from 'lucide-react'
-import { animals, stats } from '@/data/animals'
+import { PawPrint, Heart, Users, DollarSign, TrendingUp, Plus, Edit, Trash2, AlertTriangle, Dog, Cat, LogOut, Target, X } from 'lucide-react'
+import { useAnimals } from '@/hooks/useAnimals'
 import { useAuth } from '@/hooks/useAuth'
+import { createAdminClient } from '@/lib/supabase-admin'
 import Link from 'next/link'
+
+interface RecentActivity {
+  id: string
+  type: 'donation' | 'adoption'
+  description: string
+  sub: string
+  created_at: string
+}
+
+interface DonacaoRow {
+  id: string
+  doador_email: string
+  valor: number
+  tipo: string
+  status: string
+  created_at: string
+  campaign_name: string | null
+}
 
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState<'overview' | 'animals' | 'donations'>('overview')
+  const [showLogoutModal, setShowLogoutModal] = useState(false)
+  const [dbStats, setDbStats] = useState({ rescued: 0, adopted: 0, volunteers: 0, monthlyGoal: 0 })
+  const [currentDonations, setCurrentDonations] = useState(0)
+  const [recentActivity, setRecentActivity] = useState<RecentActivity[]>([])
+  const [recentDonations, setRecentDonations] = useState<DonacaoRow[]>([])
+  const stats = { ...dbStats, currentDonations }
   const router = useRouter()
   const { user, loading, isAuthenticated, logout } = useAuth()
+  const { animals } = useAnimals()
 
   useEffect(() => {
-    // Redirecionar para login se não autenticado
     if (!loading && !isAuthenticated) {
       router.push('/admin/login')
     }
   }, [isAuthenticated, loading, router])
 
-  const handleLogout = () => {
-    if (confirm('Tem certeza que deseja sair?')) {
-      logout()
-      router.push('/admin/login')
-    }
+  useEffect(() => {
+    // Load real donation total from Supabase
+    const supabase = createAdminClient()
+    supabase
+      .from('doacoes')
+      .select('valor')
+      .eq('status', 'completed')
+      .then(({ data }) => {
+        if (data && data.length > 0) {
+          const total = data.reduce((sum, row) => sum + (row.valor ?? 0), 0)
+          setCurrentDonations(total)
+        }
+      })
+    // Load site stats from Supabase
+    supabase
+      .from('site_stats')
+      .select('key, value')
+      .then(({ data }) => {
+        if (data) {
+          const map: Record<string, number> = {}
+          data.forEach(r => { map[r.key] = r.value })
+          setDbStats({
+            rescued: map['rescued'] ?? 0,
+            adopted: map['adopted'] ?? 0,
+            volunteers: map['volunteers'] ?? 0,
+            monthlyGoal: map['monthly_goal'] ?? 0,
+          })
+        }
+      })
+    // Load recent activities: latest 3 donations + recently adopted animals
+    Promise.all([
+      supabase.from('doacoes').select('id, doador_email, valor, tipo, created_at').order('created_at', { ascending: false }).limit(3),
+      supabase.from('animais').select('id, name, updated_at').eq('is_adopted', true).order('updated_at', { ascending: false }).limit(2),
+    ]).then(([{ data: donations }, { data: adopted }]) => {
+      const activities: RecentActivity[] = []
+      for (const d of donations ?? []) {
+        activities.push({
+          id: `d-${d.id}`,
+          type: 'donation',
+          description: `Doação de R$ ${(d.valor ?? 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
+          sub: `${d.tipo === 'monthly' ? 'Mensal' : 'Única'} · ${d.doador_email}`,
+          created_at: d.created_at,
+        })
+      }
+      for (const a of adopted ?? []) {
+        activities.push({
+          id: `a-${a.id}`,
+          type: 'adoption',
+          description: `${a.name} foi adotado(a)`,
+          sub: 'Adoção confirmada',
+          created_at: a.updated_at,
+        })
+      }
+      activities.sort((x, y) => new Date(y.created_at).getTime() - new Date(x.created_at).getTime())
+      setRecentActivity(activities.slice(0, 4))
+    })
+    // Load recent donations for donations tab
+    supabase
+      .from('doacoes')
+      .select('id, doador_email, valor, tipo, status, created_at, campaign_name')
+      .order('created_at', { ascending: false })
+      .limit(20)
+      .then(({ data }) => {
+        if (data) setRecentDonations(data as DonacaoRow[])
+      })
+  }, [])
+
+  const handleLogout = async () => {
+    await logout()
+    router.push('/admin/login')
   }
 
   // Mostrar loading enquanto verifica autenticação
@@ -45,6 +135,28 @@ export default function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-100 to-white dark:from-gray-900 dark:to-gray-800 py-12">
+      {/* Logout Confirmation Modal */}
+      {showLogoutModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-2xl max-w-sm w-full mx-4">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-display text-xl text-maya-brown dark:text-white">Sair da conta</h3>
+              <button onClick={() => setShowLogoutModal(false)} className="text-maya-brown/40 hover:text-maya-brown dark:text-gray-400 dark:hover:text-white">
+                <X size={20} />
+              </button>
+            </div>
+            <p className="text-maya-brown/70 dark:text-gray-300 mb-6">Tem certeza que deseja sair do painel administrativo?</p>
+            <div className="flex gap-3">
+              <button onClick={() => setShowLogoutModal(false)} className="flex-1 py-2 rounded-xl border-2 border-gray-200 dark:border-gray-600 text-maya-brown dark:text-white font-semibold hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                Cancelar
+              </button>
+              <button onClick={handleLogout} className="flex-1 py-2 rounded-xl bg-red-500 hover:bg-red-600 text-white font-semibold transition-colors">
+                Sair
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       <div className="container mx-auto px-4">
         {/* Header */}
         <div className="mb-8 flex items-center justify-between">
@@ -75,7 +187,7 @@ export default function AdminDashboard() {
               </p>
             </div>
             <button
-              onClick={handleLogout}
+              onClick={() => setShowLogoutModal(true)}
               className="flex items-center gap-2 px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-xl transition-colors font-semibold"
               title="Sair"
             >
@@ -94,7 +206,7 @@ export default function AdminDashboard() {
                 Dashboard em Desenvolvimento
               </p>
               <p className="text-sm text-yellow-700 dark:text-yellow-300">
-                Esta é uma versão de demonstração. Para funcionalidade completa, é necessário conectar um banco de dados (Supabase, Firebase, etc) e implementar autenticação.
+                Esta é uma versão de demonstração. As doações são carregadas do Supabase em tempo real. Animais, adoções e voluntários serão integrados em breve.
               </p>
             </div>
           </div>
@@ -147,7 +259,7 @@ export default function AdminDashboard() {
                 <DollarSign className="w-6 h-6 text-maya-blue" />
               </div>
               <span className="text-xs font-semibold text-maya-green bg-maya-green/10 px-2 py-1 rounded-full">
-                {Math.round((stats.currentDonations / stats.monthlyGoal) * 100)}%
+                {stats.monthlyGoal > 0 ? Math.round((stats.currentDonations / stats.monthlyGoal) * 100) : 0}%
               </span>
             </div>
             <h3 className="text-3xl font-bold text-maya-brown dark:text-white mb-1">
@@ -204,39 +316,22 @@ export default function AdminDashboard() {
                 Atividades Recentes
               </h2>
               <div className="space-y-4">
-                <div className="flex items-start gap-3 p-3 bg-maya-beige dark:bg-gray-700 rounded-lg">
-                  <Heart className="w-5 h-5 text-green-500 mt-0.5" />
-                  <div>
-                    <p className="text-sm font-semibold text-maya-brown dark:text-white">
-                      Nova adoção realizada
-                    </p>
-                    <p className="text-xs text-maya-brown/60 dark:text-gray-400">
-                      Mel foi adotada - Há 2 horas
-                    </p>
+                {recentActivity.length === 0 ? (
+                  <p className="text-maya-brown/50 dark:text-gray-500 text-sm text-center py-4">Nenhuma atividade recente.</p>
+                ) : recentActivity.map(act => (
+                  <div key={act.id} className="flex items-start gap-3 p-3 bg-maya-beige dark:bg-gray-700 rounded-lg">
+                    {act.type === 'donation'
+                      ? <DollarSign className="w-5 h-5 text-maya-blue mt-0.5 flex-shrink-0" />
+                      : <Heart className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />}
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold text-maya-brown dark:text-white truncate">{act.description}</p>
+                      <p className="text-xs text-maya-brown/60 dark:text-gray-400 truncate">{act.sub}</p>
+                    </div>
+                    <span className="text-xs text-maya-brown/40 dark:text-gray-500 flex-shrink-0 ml-auto">
+                      {new Date(act.created_at).toLocaleDateString('pt-BR')}
+                    </span>
                   </div>
-                </div>
-                <div className="flex items-start gap-3 p-3 bg-maya-beige dark:bg-gray-700 rounded-lg">
-                  <DollarSign className="w-5 h-5 text-maya-blue mt-0.5" />
-                  <div>
-                    <p className="text-sm font-semibold text-maya-brown dark:text-white">
-                      Doação recebida: R$ 100
-                    </p>
-                    <p className="text-xs text-maya-brown/60 dark:text-gray-400">
-                      Doação mensal - Há 3 horas
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3 p-3 bg-maya-beige dark:bg-gray-700 rounded-lg">
-                  <PawPrint className="w-5 h-5 text-maya-green mt-0.5" />
-                  <div>
-                    <p className="text-sm font-semibold text-maya-brown dark:text-white">
-                      Novo resgate realizado
-                    </p>
-                    <p className="text-xs text-maya-brown/60 dark:text-gray-400">
-                      Cachorro encontrado - Há 5 horas
-                    </p>
-                  </div>
-                </div>
+                ))}
               </div>
             </div>
 
@@ -386,31 +481,67 @@ export default function AdminDashboard() {
               <div className="flex justify-between text-sm mb-2">
                 <span className="font-semibold text-maya-brown dark:text-white">Meta Mensal</span>
                 <span className="text-maya-green font-bold">
-                  {Math.round((stats.currentDonations / stats.monthlyGoal) * 100)}%
+                  {Math.round((stats.currentDonations / (stats.monthlyGoal || 1)) * 100)}%
                 </span>
               </div>
               <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 overflow-hidden">
                 <div
                   className="bg-gradient-to-r from-maya-green to-maya-green h-full transition-all duration-500"
-                  style={{ width: `${(stats.currentDonations / stats.monthlyGoal) * 100}%` }}
+                  style={{ width: `${Math.min((stats.currentDonations / (stats.monthlyGoal || 1)) * 100, 100)}%` }}
                 />
               </div>
               <div className="flex justify-between text-sm mt-2 text-maya-brown/60 dark:text-gray-400">
-                <span>R$ {stats.currentDonations.toLocaleString()}</span>
-                <span>R$ {stats.monthlyGoal.toLocaleString()}</span>
+                <span>R$ {stats.currentDonations.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                <span>R$ {stats.monthlyGoal.toLocaleString('pt-BR')}</span>
               </div>
             </div>
 
-            {/* Mock Donations Table */}
-            <div className="bg-maya-beige dark:bg-gray-700 rounded-xl p-6 text-center">
-              <DollarSign className="w-12 h-12 text-maya-green mx-auto mb-3" />
-              <p className="text-maya-brown/70 dark:text-gray-300 mb-4">
-                Conecte um banco de dados para ver o histórico completo de doações
-              </p>
-              <Link href="/doacoes" className="btn-primary inline-block">
-                Ir para Página de Doações
-              </Link>
-            </div>
+            {/* Donations Table */}
+            {recentDonations.length === 0 ? (
+              <div className="bg-maya-beige dark:bg-gray-700 rounded-xl p-6 text-center">
+                <DollarSign className="w-12 h-12 text-maya-green mx-auto mb-3" />
+                <p className="text-maya-brown/70 dark:text-gray-300">
+                  Nenhuma doação registrada ainda.
+                </p>
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-gray-200 dark:border-gray-700">
+                      <th className="text-left py-3 px-3 font-semibold text-maya-brown dark:text-white">Doador</th>
+                      <th className="text-left py-3 px-3 font-semibold text-maya-brown dark:text-white">Campanha</th>
+                      <th className="text-left py-3 px-3 font-semibold text-maya-brown dark:text-white">Valor</th>
+                      <th className="text-left py-3 px-3 font-semibold text-maya-brown dark:text-white">Tipo</th>
+                      <th className="text-left py-3 px-3 font-semibold text-maya-brown dark:text-white">Status</th>
+                      <th className="text-left py-3 px-3 font-semibold text-maya-brown dark:text-white">Data</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {recentDonations.map(d => (
+                      <tr key={d.id} className="border-b border-gray-100 dark:border-gray-700 hover:bg-maya-beige/50 dark:hover:bg-gray-700">
+                        <td className="py-3 px-3 text-maya-brown dark:text-white truncate max-w-[160px]">{d.doador_email}</td>
+                        <td className="py-3 px-3 text-maya-brown/70 dark:text-gray-300">{d.campaign_name ?? '—'}</td>
+                        <td className="py-3 px-3 font-semibold text-maya-green">R$ {(d.valor ?? 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td>
+                        <td className="py-3 px-3 text-maya-brown/70 dark:text-gray-300">{d.tipo === 'monthly' ? 'Mensal' : 'Única'}</td>
+                        <td className="py-3 px-3">
+                          <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                            d.status === 'completed' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                            : d.status === 'pending' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400'
+                            : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+                          }`}>
+                            {d.status === 'completed' ? 'Confirmada' : d.status === 'pending' ? 'Pendente' : 'Falhou'}
+                          </span>
+                        </td>
+                        <td className="py-3 px-3 text-maya-brown/60 dark:text-gray-400">
+                          {new Date(d.created_at).toLocaleDateString('pt-BR')}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
         )}
       </div>
