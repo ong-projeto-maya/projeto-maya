@@ -16,15 +16,17 @@ export default function DoacoesPage() {
   const [selectedAmount, setSelectedAmount] = useState<number>(50)
   const [customAmount, setCustomAmount] = useState<string>('')
   const [isLoading, setIsLoading] = useState(false)
+  const [donationError, setDonationError] = useState('')
 
   const handleDonation = async () => {
     setIsLoading(true)
+    setDonationError('')
 
     try {
       const amount = customAmount ? parseFloat(customAmount) : selectedAmount
 
       if (isNaN(amount) || amount < 5) {
-        alert('Por favor, insira um valor válido (mínimo R$ 5)')
+        setDonationError('Por favor, insira um valor válido (mínimo R$ 5)')
         setIsLoading(false)
         return
       }
@@ -44,7 +46,7 @@ export default function DoacoesPage() {
       const { sessionId, error } = await response.json()
 
       if (error) {
-        alert(error)
+        setDonationError(error)
         setIsLoading(false)
         return
       }
@@ -54,12 +56,12 @@ export default function DoacoesPage() {
       if (stripe) {
         const { error } = await stripe.redirectToCheckout({ sessionId })
         if (error) {
-          alert(error.message)
+          setDonationError(error.message ?? 'Erro ao redirecionar para o pagamento.')
         }
       }
     } catch (error) {
       console.error('Error:', error)
-      alert('Erro ao processar doação. Tente novamente.')
+      setDonationError('Erro ao processar doação. Tente novamente.')
     }
 
     setIsLoading(false)
@@ -227,6 +229,12 @@ export default function DoacoesPage() {
                 </>
               )}
             </button>
+
+            {donationError && (
+              <div className="mt-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 rounded-xl px-4 py-3 text-red-600 dark:text-red-400 text-sm">
+                {donationError}
+              </div>
+            )}
 
             <p className="text-xs text-maya-brown/60 dark:text-gray-400 text-center mt-4 flex items-center justify-center gap-1">
               <Lock className="w-3 h-3" />

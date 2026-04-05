@@ -1,34 +1,48 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import { Heart, Star } from 'lucide-react'
 import { useScrollAnimation } from '@/hooks/useScrollAnimation'
+import { createClient } from '@/lib/supabase'
 
-const testimonials = [
-  {
-    id: 1,
-    name: 'Maria Silva',
-    animal: 'Luna',
-    text: 'Adotar a Luna foi a melhor decisão que tomamos! O Projeto Maya nos acompanhou em todo o processo e hoje temos uma família completa. Gratidão eterna!',
-    rating: 5
-  },
-  {
-    id: 2,
-    name: 'João Santos',
-    animal: 'Thor',
-    text: 'O trabalho da ONG é incrível! Resgataram o Thor das ruas e cuidaram dele com tanto carinho. Hoje ele é meu melhor amigo e companheiro de aventuras.',
-    rating: 5
-  },
-  {
-    id: 3,
-    name: 'Ana Oliveira',
-    animal: 'Bob',
-    text: 'Mesmo sendo um cãozinho mais velho, o Bob trouxe tanta alegria para nossa casa. O projeto nos ajudou a entender que amor não tem idade. Recomendo muito!',
-    rating: 5
-  }
+interface Testimonial {
+  id: number | string
+  name: string
+  animal: string
+  text: string
+  rating: number
+}
+
+const fallbackTestimonials: Testimonial[] = [
+  { id: 1, name: 'Maria Silva', animal: 'Luna', text: 'Adotar a Luna foi a melhor decisão que tomamos! O Projeto Maya nos acompanhou em todo o processo e hoje temos uma família completa. Gratidão eterna!', rating: 5 },
+  { id: 2, name: 'João Santos', animal: 'Thor', text: 'O trabalho da ONG é incrível! Resgataram o Thor das ruas e cuidaram dele com tanto carinho. Hoje ele é meu melhor amigo e companheiro de aventuras.', rating: 5 },
+  { id: 3, name: 'Ana Oliveira', animal: 'Bob', text: 'Mesmo sendo um cãozinho mais velho, o Bob trouxe tanta alegria para nossa casa. O projeto nos ajudou a entender que amor não tem idade. Recomendo muito!', rating: 5 },
 ]
 
 export default function Testimonials() {
   const { ref: gridRef, isVisible: gridVisible } = useScrollAnimation({ threshold: 0.1 })
+  const [testimonials, setTestimonials] = useState<Testimonial[]>(fallbackTestimonials)
+
+  useEffect(() => {
+    const supabase = createClient()
+    supabase
+      .from('depoimentos')
+      .select('id, nome, animal, texto, avaliacao')
+      .eq('aprovado', true)
+      .order('created_at', { ascending: false })
+      .limit(3)
+      .then(({ data }) => {
+        if (data && data.length > 0) {
+          setTestimonials(data.map(r => ({
+            id: r.id,
+            name: r.nome,
+            animal: r.animal,
+            text: r.texto,
+            rating: r.avaliacao ?? 5,
+          })))
+        }
+      })
+  }, [])
 
   return (
     <section className="py-20 bg-gradient-to-b from-maya-beige to-white">

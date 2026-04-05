@@ -3,7 +3,8 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { campaigns, getActiveCampaigns, getCampaignProgress, getCampaignDaysLeft } from '@/data/campaigns'
+import { getCampaignProgress, getCampaignDaysLeft } from '@/data/campaigns'
+import { useCampaigns } from '@/hooks/useCampaigns'
 import { 
   Target, 
   Calendar, 
@@ -52,6 +53,7 @@ const urgencyNames = {
 }
 
 export default function CampanhasPage() {
+  const { campaigns, isLoading, getActiveCampaigns } = useCampaigns()
   const activeCampaigns = getActiveCampaigns()
 
   return (

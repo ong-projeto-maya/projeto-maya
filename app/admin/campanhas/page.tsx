@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/hooks/useAuth'
 import Link from 'next/link'
@@ -16,10 +16,12 @@ import {
   AlertCircle,
   CheckCircle,
   Target,
-  Home,
-  Users as UsersIcon
+  X,
+  Save,
 } from 'lucide-react'
-import { campaigns, getCampaignProgress, getCampaignDaysLeft } from '@/data/campaigns'
+import { getCampaignProgress, getCampaignDaysLeft } from '@/data/campaigns'
+import type { Campaign } from '@/data/campaigns'
+import { useCampaigns } from '@/hooks/useCampaigns'
 
 const categoryNames = {
   'saude': 'Saúde',
@@ -46,22 +48,124 @@ export default function AdminCampanhasPage() {
   const { user, loading } = useAuth()
   const router = useRouter()
   const [selectedFilter, setSelectedFilter] = useState<'all' | 'active' | 'inactive'>('all')
+  const { campaigns, isLoading: campanhasLoading, addCampaign, updateCampaign, deleteCampaign } = useCampaigns()
+  const [showModal, setShowModal] = useState(false)
+  const [editingCampaign, setEditingCampaign] = useState<Campaign | null>(null)
+  const [successMessage, setSuccessMessage] = useState('')
 
-  // Redirect if not authenticated
-  if (!loading && !user) {
-    router.push('/admin/login')
-    return null
+  const emptyForm = {
+    title: '',
+    slug: '',
+    description: '',
+    longDescription: '',
+    goal: '',
+    raised: '0',
+    startDate: new Date().toISOString().split('T')[0],
+    endDate: '',
+    isActive: true,
+    image: '',
+    icon: '🐾',
+    category: 'resgate' as Campaign['category'],
+    urgency: 'media' as Campaign['urgency'],
+    benefits: '',
+    impactStory: '',
+    allowsRegistration: false,
   }
+  const [formData, setFormData] = useState(emptyForm)
 
-  if (loading) {
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push('/admin/login')
+    }
+  }, [loading, user, router])
+
+  if (loading || !user) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-maya-green mx-auto mb-4"></div>
-          <p className="text-maya-brown/60">Carregando...</p>
         </div>
       </div>
     )
+  }
+
+  const handleOpenModal = (campaign?: Campaign) => {
+    if (campaign) {
+      setEditingCampaign(campaign)
+      setFormData({
+        title: campaign.title,
+        slug: campaign.slug,
+        description: campaign.description,
+        longDescription: campaign.longDescription,
+        goal: campaign.goal.toString(),
+        raised: campaign.raised.toString(),
+        startDate: campaign.startDate,
+        endDate: campaign.endDate,
+        isActive: campaign.isActive,
+        image: campaign.image,
+        icon: campaign.icon,
+        category: campaign.category,
+        urgency: campaign.urgency,
+        benefits: campaign.benefits.join(', '),
+        impactStory: campaign.impactStory,
+        allowsRegistration: campaign.allowsRegistration,
+      })
+    } else {
+      setEditingCampaign(null)
+      setFormData(emptyForm)
+    }
+    setShowModal(true)
+  }
+
+  const handleCloseModal = () => {
+    setShowModal(false)
+    setEditingCampaign(null)
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    const campaignData: Omit<Campaign, 'id'> = {
+      title: formData.title,
+      slug: formData.slug || formData.title.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
+      description: formData.description,
+      longDescription: formData.longDescription,
+      goal: parseFloat(formData.goal) || 0,
+      raised: parseFloat(formData.raised) || 0,
+      startDate: formData.startDate,
+      endDate: formData.endDate,
+      isActive: formData.isActive,
+      image: formData.image,
+      icon: formData.icon,
+      category: formData.category,
+      urgency: formData.urgency,
+      benefits: formData.benefits.split(',').map(b => b.trim()).filter(Boolean),
+      impactStory: formData.impactStory,
+      allowsRegistration: formData.allowsRegistration,
+    }
+
+    if (editingCampaign) {
+      await updateCampaign(editingCampaign.id, campaignData)
+      setSuccessMessage(`"${formData.title}" atualizada com sucesso!`)
+    } else {
+      await addCampaign(campaignData)
+      setSuccessMessage(`"${formData.title}" criada com sucesso!`)
+    }
+    handleCloseModal()
+    setTimeout(() => setSuccessMessage(''), 3000)
+  }
+
+  const handleDelete = async (campaign: Campaign) => {
+    if (confirm(`Tem certeza que deseja excluir "${campaign.title}"?`)) {
+      await deleteCampaign(campaign.id)
+      setSuccessMessage(`"${campaign.title}" removida com sucesso!`)
+      setTimeout(() => setSuccessMessage(''), 3000)
+    }
+  }
+
+  const handleToggleActive = async (campaign: Campaign) => {
+    await updateCampaign(campaign.id, { isActive: !campaign.isActive })
+    setSuccessMessage(`"${campaign.title}" ${!campaign.isActive ? 'ativada' : 'desativada'}!`)
+    setTimeout(() => setSuccessMessage(''), 3000)
   }
 
   // Filter campaigns
@@ -96,13 +200,21 @@ export default function AdminCampanhasPage() {
             </h1>
           </div>
           <button
-            onClick={() => alert('Funcionalidade de criar campanha será implementada com banco de dados')}
+            onClick={() => handleOpenModal()}
             className="btn-primary inline-flex items-center gap-2"
           >
             <Plus size={20} />
             Nova Campanha
           </button>
         </div>
+
+        {/* Success Message */}
+        {successMessage && (
+          <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 text-green-600 dark:text-green-400 px-4 py-3 rounded-xl mb-6 flex items-center gap-2">
+            <CheckCircle size={20} />
+            <span className="font-medium">{successMessage}</span>
+          </div>
+        )}
 
         {/* Statistics Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
@@ -324,18 +436,14 @@ export default function AdminCampanhasPage() {
                             <Eye size={18} />
                           </Link>
                           <button
-                            onClick={() => alert('Edição será implementada com banco de dados')}
+                            onClick={() => handleOpenModal(campaign)}
                             className="p-2 text-maya-green hover:bg-maya-green/10 rounded-lg transition-colors"
                             title="Editar"
                           >
                             <Edit2 size={18} />
                           </button>
                           <button
-                            onClick={() => {
-                              if (confirm('Tem certeza que deseja excluir esta campanha?')) {
-                                alert('Exclusão será implementada com banco de dados')
-                              }
-                            }}
+                            onClick={() => handleDelete(campaign)}
                             className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
                             title="Excluir"
                           >
@@ -352,7 +460,7 @@ export default function AdminCampanhasPage() {
         </div>
 
         {/* Empty State */}
-        {filteredCampaigns.length === 0 && (
+        {filteredCampaigns.length === 0 && !campanhasLoading && (
           <div className="text-center py-12 bg-white dark:bg-gray-800 rounded-2xl">
             <AlertCircle className="w-16 h-16 text-maya-brown/30 dark:text-gray-600 mx-auto mb-4" />
             <p className="text-maya-brown/60 dark:text-gray-400 text-lg">
@@ -360,25 +468,217 @@ export default function AdminCampanhasPage() {
             </p>
           </div>
         )}
+      </div>
 
-        {/* Info Box */}
-        <div className="mt-8 bg-maya-blue/10 dark:bg-maya-blue/20 rounded-2xl p-6">
-          <div className="flex items-start gap-3">
-            <AlertCircle className="w-6 h-6 text-maya-blue flex-shrink-0 mt-0.5" />
-            <div>
-              <h3 className="font-bold text-maya-brown dark:text-white mb-2">
-                Sobre o Gerenciamento de Campanhas
-              </h3>
-              <p className="text-sm text-maya-brown/70 dark:text-gray-300 mb-2">
-                Atualmente as campanhas são gerenciadas no arquivo <code className="px-2 py-1 bg-white dark:bg-gray-800 rounded">data/campaigns.ts</code>.
-              </p>
-              <p className="text-sm text-maya-brown/70 dark:text-gray-300">
-                <strong>Próximos passos:</strong> Criar, editar e excluir campanhas será implementado quando conectarmos um banco de dados (Supabase, Firebase, etc).
-              </p>
+      {/* Create/Edit Modal */}
+      {showModal && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+              <h2 className="text-2xl font-display text-maya-brown dark:text-white">
+                {editingCampaign ? 'Editar Campanha' : 'Nova Campanha'}
+              </h2>
+              <button onClick={handleCloseModal} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full">
+                <X size={24} className="text-maya-brown dark:text-white" />
+              </button>
             </div>
+
+            <form onSubmit={handleSubmit} className="p-6 space-y-5">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-semibold text-maya-brown dark:text-white mb-2">Título *</label>
+                  <input
+                    type="text"
+                    required
+                    value={formData.title}
+                    onChange={e => setFormData(f => ({ ...f, title: e.target.value }))}
+                    className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:border-maya-green focus:outline-none bg-white dark:bg-gray-700 text-maya-brown dark:text-white"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-maya-brown dark:text-white mb-2">Slug (URL)</label>
+                  <input
+                    type="text"
+                    value={formData.slug}
+                    onChange={e => setFormData(f => ({ ...f, slug: e.target.value }))}
+                    placeholder="gerado automaticamente"
+                    className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:border-maya-green focus:outline-none bg-white dark:bg-gray-700 text-maya-brown dark:text-white placeholder-gray-400"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-maya-brown dark:text-white mb-2">Ícone</label>
+                  <input
+                    type="text"
+                    value={formData.icon}
+                    onChange={e => setFormData(f => ({ ...f, icon: e.target.value }))}
+                    className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:border-maya-green focus:outline-none bg-white dark:bg-gray-700 text-maya-brown dark:text-white"
+                  />
+                </div>
+
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-semibold text-maya-brown dark:text-white mb-2">Descrição *</label>
+                  <textarea
+                    required
+                    rows={2}
+                    value={formData.description}
+                    onChange={e => setFormData(f => ({ ...f, description: e.target.value }))}
+                    className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:border-maya-green focus:outline-none bg-white dark:bg-gray-700 text-maya-brown dark:text-white resize-none"
+                  />
+                </div>
+
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-semibold text-maya-brown dark:text-white mb-2">Descrição Longa</label>
+                  <textarea
+                    rows={3}
+                    value={formData.longDescription}
+                    onChange={e => setFormData(f => ({ ...f, longDescription: e.target.value }))}
+                    className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:border-maya-green focus:outline-none bg-white dark:bg-gray-700 text-maya-brown dark:text-white resize-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-maya-brown dark:text-white mb-2">Meta (R$) *</label>
+                  <input
+                    type="number"
+                    required
+                    min="1"
+                    value={formData.goal}
+                    onChange={e => setFormData(f => ({ ...f, goal: e.target.value }))}
+                    className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:border-maya-green focus:outline-none bg-white dark:bg-gray-700 text-maya-brown dark:text-white"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-maya-brown dark:text-white mb-2">Arrecadado (R$)</label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={formData.raised}
+                    onChange={e => setFormData(f => ({ ...f, raised: e.target.value }))}
+                    className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:border-maya-green focus:outline-none bg-white dark:bg-gray-700 text-maya-brown dark:text-white"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-maya-brown dark:text-white mb-2">Data Início *</label>
+                  <input
+                    type="date"
+                    required
+                    value={formData.startDate}
+                    onChange={e => setFormData(f => ({ ...f, startDate: e.target.value }))}
+                    className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:border-maya-green focus:outline-none bg-white dark:bg-gray-700 text-maya-brown dark:text-white"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-maya-brown dark:text-white mb-2">Data Fim *</label>
+                  <input
+                    type="date"
+                    required
+                    value={formData.endDate}
+                    onChange={e => setFormData(f => ({ ...f, endDate: e.target.value }))}
+                    className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:border-maya-green focus:outline-none bg-white dark:bg-gray-700 text-maya-brown dark:text-white"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-maya-brown dark:text-white mb-2">Categoria</label>
+                  <select
+                    value={formData.category}
+                    onChange={e => setFormData(f => ({ ...f, category: e.target.value as Campaign['category'] }))}
+                    className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:border-maya-green focus:outline-none bg-white dark:bg-gray-700 text-maya-brown dark:text-white"
+                  >
+                    <option value="saude">Saúde</option>
+                    <option value="resgate">Resgate</option>
+                    <option value="infraestrutura">Infraestrutura</option>
+                    <option value="alimentacao">Alimentação</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-maya-brown dark:text-white mb-2">Urgência</label>
+                  <select
+                    value={formData.urgency}
+                    onChange={e => setFormData(f => ({ ...f, urgency: e.target.value as Campaign['urgency'] }))}
+                    className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:border-maya-green focus:outline-none bg-white dark:bg-gray-700 text-maya-brown dark:text-white"
+                  >
+                    <option value="baixa">Baixa</option>
+                    <option value="media">Média</option>
+                    <option value="alta">Alta</option>
+                    <option value="urgente">Urgente</option>
+                  </select>
+                </div>
+
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-semibold text-maya-brown dark:text-white mb-2">URL da Imagem</label>
+                  <input
+                    type="text"
+                    value={formData.image}
+                    onChange={e => setFormData(f => ({ ...f, image: e.target.value }))}
+                    placeholder="https://..."
+                    className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:border-maya-green focus:outline-none bg-white dark:bg-gray-700 text-maya-brown dark:text-white placeholder-gray-400"
+                  />
+                </div>
+
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-semibold text-maya-brown dark:text-white mb-2">Benefícios (separados por vírgula)</label>
+                  <input
+                    type="text"
+                    value={formData.benefits}
+                    onChange={e => setFormData(f => ({ ...f, benefits: e.target.value }))}
+                    placeholder="Benefício 1, Benefício 2"
+                    className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:border-maya-green focus:outline-none bg-white dark:bg-gray-700 text-maya-brown dark:text-white placeholder-gray-400"
+                  />
+                </div>
+
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-semibold text-maya-brown dark:text-white mb-2">História de Impacto</label>
+                  <textarea
+                    rows={2}
+                    value={formData.impactStory}
+                    onChange={e => setFormData(f => ({ ...f, impactStory: e.target.value }))}
+                    className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:border-maya-green focus:outline-none bg-white dark:bg-gray-700 text-maya-brown dark:text-white resize-none"
+                  />
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <input
+                    type="checkbox"
+                    id="isActive"
+                    checked={formData.isActive}
+                    onChange={e => setFormData(f => ({ ...f, isActive: e.target.checked }))}
+                    className="w-5 h-5 accent-maya-green"
+                  />
+                  <label htmlFor="isActive" className="text-sm font-semibold text-maya-brown dark:text-white">Campanha Ativa</label>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <input
+                    type="checkbox"
+                    id="allowsRegistration"
+                    checked={formData.allowsRegistration}
+                    onChange={e => setFormData(f => ({ ...f, allowsRegistration: e.target.checked }))}
+                    className="w-5 h-5 accent-maya-green"
+                  />
+                  <label htmlFor="allowsRegistration" className="text-sm font-semibold text-maya-brown dark:text-white">Permite Inscrições</label>
+                </div>
+              </div>
+
+              <div className="flex gap-4 pt-2">
+                <button type="submit" className="btn-primary flex-1 inline-flex items-center justify-center gap-2">
+                  <Save size={18} />
+                  {editingCampaign ? 'Salvar Alterações' : 'Criar Campanha'}
+                </button>
+                <button type="button" onClick={handleCloseModal} className="btn-outline flex-1">
+                  Cancelar
+                </button>
+              </div>
+            </form>
           </div>
         </div>
-      </div>
+      )}
     </div>
   )
 }

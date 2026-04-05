@@ -67,7 +67,7 @@ export default function ReportarResgatePage() {
 
   const isFormValid = formData.name && formData.phone && formData.location && formData.description
 
-  const whatsappLink = `https://wa.me/5511999999999?text=${buildWhatsAppMessage()}`
+  const whatsappLink = `https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? '5519994224336'}?text=${buildWhatsAppMessage()}`
   const emailLink = `mailto:resgate@projetomaya.org?subject=${encodeURIComponent(`Reportar Resgate - ${formData.urgency === 'critica' ? 'URGENTE' : formData.urgency === 'alta' ? 'URGENTE' : 'Novo Caso'}`)}&body=${buildEmailBody()}`
 
   return (
@@ -106,8 +106,8 @@ export default function ReportarResgatePage() {
               <h3 className="font-display text-lg text-maya-brown dark:text-white mb-2">
                 Ligue Direto
               </h3>
-              <a href="tel:+5511999999999" className="text-maya-green font-semibold hover:text-maya-green/80 transition-colors">
-                (11) 9 9999-9999
+              <a href={`tel:+${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? '5519994224336'}`} className="text-maya-green font-semibold hover:text-maya-green/80 transition-colors">
+                (19) 9 9422-4336
               </a>
             </div>
 

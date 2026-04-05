@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { animals } from '@/data/animals'
+import { useAnimals } from '@/hooks/useAnimals'
 import { Heart, Filter, Search, X, Dog, Cat, Sparkles, PawPrint } from 'lucide-react'
 import FavoriteButton from '@/components/FavoriteButton'
 
@@ -17,6 +17,8 @@ export default function AdocaoPageEnhanced() {
   const [genderFilter, setGenderFilter] = useState<GenderFilter>('all')
   const [searchQuery, setSearchQuery] = useState('')
   const [showFilters, setShowFilters] = useState(false)
+
+  const { animals, isLoading } = useAnimals()
 
   const filteredAnimals = useMemo(() => {
     return animals.filter((animal) => {
@@ -45,7 +47,7 @@ export default function AdocaoPageEnhanced() {
 
       return true
     })
-  }, [activeFilter, sizeFilter, genderFilter, searchQuery])
+  }, [animals, activeFilter, sizeFilter, genderFilter, searchQuery])
 
   const clearFilters = () => {
     setActiveFilter('all')
@@ -273,7 +275,15 @@ export default function AdocaoPageEnhanced() {
 
         {/* Animals Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {filteredAnimals.map((animal) => (
+          {isLoading ? (
+            Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="card animate-pulse">
+                <div className="h-64 rounded-xl bg-gray-200 dark:bg-gray-700 mb-4" />
+                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2 mb-2" />
+                <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-3/4" />
+              </div>
+            ))
+          ) : filteredAnimals.map((animal) => (
             <div key={animal.id} className="card group hover:scale-105 transition-transform duration-300">
               {/* Image */}
               <div className="relative h-64 mb-4 rounded-xl overflow-hidden bg-gray-200 dark:bg-gray-700">

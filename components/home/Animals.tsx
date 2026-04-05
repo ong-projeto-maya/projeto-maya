@@ -2,12 +2,13 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
-import { animals } from '@/data/animals'
+import { useAnimals } from '@/hooks/useAnimals'
 import { ArrowRight, Heart, Dog, Cat } from 'lucide-react'
 import { useScrollAnimation } from '@/hooks/useScrollAnimation'
 
 export default function Animals() {
   const { ref: gridRef, isVisible: gridVisible } = useScrollAnimation({ threshold: 0.1 })
+  const { animals, isLoading } = useAnimals()
   // Show only first 6 animals on home page
   const featuredAnimals = animals.slice(0, 6)
 
@@ -24,7 +25,15 @@ export default function Animals() {
 
         {/* Animals Grid */}
         <div ref={gridRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-          {featuredAnimals.map((animal, index) => (
+          {isLoading ? (
+            Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="card animate-pulse">
+                <div className="h-64 rounded-xl bg-gray-200 dark:bg-gray-700 mb-4" />
+                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2 mb-2" />
+                <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-3/4" />
+              </div>
+            ))
+          ) : featuredAnimals.map((animal, index) => (
             <div key={animal.id} className={`card group card-hover-lift card-hover-glow scroll-hidden scroll-up ${gridVisible ? 'scroll-visible' : ''} stagger-${index + 1}`}>
               {/* Image */}
               <div className="relative h-64 mb-4 rounded-xl overflow-hidden bg-gray-200">
@@ -133,8 +142,6 @@ export default function Animals() {
             </div>
           ))}
         </div>
-
-        {/* View All Button */}
         <div className="text-center">
           <Link href="/adocao" className="btn-primary inline-flex items-center gap-2">
             Ver Todos os Animais

@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
+import { createClient } from '@/lib/supabase'
 
 export interface Donation {
   id: string
@@ -9,6 +10,11 @@ export interface Donation {
   type: 'single' | 'monthly'
   status: 'completed' | 'pending' | 'failed'
   receipt?: string
+  campaignId?: string
+  campaignName?: string
+  stripeSessionId?: string
+  subscriptionId?: string
+  nextBillingDate?: string
 }
 
 export interface Subscription {
@@ -35,167 +41,236 @@ export interface Doador {
   donations: Donation[]
 }
 
-// Mock data - em produção viria do backend/Stripe
-const mockDoador: Doador = {
-  id: '1',
-  name: 'João Silva',
-  email: 'joao@email.com',
-  phone: '(11) 98765-4321',
-  cpf: '123.456.789-00',
-  totalDonated: 1250,
-  donationCount: 18,
-  firstDonation: '2024-01-15',
-  level: 'gold',
-  animalsHelped: 15,
-  subscription: {
-    id: 'sub_123',
-    amount: 50,
-    status: 'active',
-    nextBillingDate: '2026-03-15',
-    startDate: '2024-01-15',
-    paymentMethod: '**** 4242',
-  },
-  donations: [
-    {
-      id: 'don_1',
-      date: '2026-02-15',
-      amount: 50,
-      type: 'monthly',
-      status: 'completed',
-      receipt: '/recibos/don_1.pdf',
-    },
-    {
-      id: 'don_2',
-      date: '2026-01-15',
-      amount: 50,
-      type: 'monthly',
-      status: 'completed',
-      receipt: '/recibos/don_2.pdf',
-    },
-    {
-      id: 'don_3',
-      date: '2025-12-25',
-      amount: 100,
-      type: 'single',
-      status: 'completed',
-      receipt: '/recibos/don_3.pdf',
-    },
-    {
-      id: 'don_4',
-      date: '2025-12-15',
-      amount: 50,
-      type: 'monthly',
-      status: 'completed',
-      receipt: '/recibos/don_4.pdf',
-    },
-    {
-      id: 'don_5',
-      date: '2025-11-15',
-      amount: 50,
-      type: 'monthly',
-      status: 'completed',
-      receipt: '/recibos/don_5.pdf',
-    },
-  ],
-}
-
 export function useDoador() {
   const [doador, setDoador] = useState<Doador | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const supabase = useMemo(() => createClient(), [])
+
+  const loadDoadorData = useCallback(
+    async (userId: string) => {
+      const { data: profile } = await supabase
+        .from('doadores')
+        .select('*')
+        .eq('id', userId)
+        .single()
+
+      if (!profile) return
+
+      const [{ data: donations }, { data: subscription }] = await Promise.all([
+        supabase
+          .from('doacoes')
+          .select('*')
+          .eq('doador_email', profile.email)
+          .order('created_at', { ascending: false }),
+        supabase
+          .from('assinaturas')
+          .select('*')
+          .eq('doador_email', profile.email)
+          .in('status', ['active', 'paused'])
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .maybeSingle(),
+      ])
+
+      const mappedDonations: Donation[] = (donations ?? []).map(d => ({
+        id: d.id,
+        date: (d.created_at ?? '').split('T')[0],
+        amount: d.valor,
+        type: d.tipo as 'single' | 'monthly',
+        status: d.status as 'completed' | 'pending' | 'failed',
+        campaignId: d.campaign_id ?? undefined,
+        campaignName: d.campaign_name ?? undefined,
+        stripeSessionId: d.stripe_session_id ?? undefined,
+        subscriptionId: d.stripe_subscription_id ?? undefined,
+        nextBillingDate: d.proximo_pagamento ?? undefined,
+      }))
+
+      const mappedSubscription: Subscription | undefined = subscription
+        ? {
+            id: subscription.id,
+            amount: subscription.valor,
+            status: subscription.status as 'active' | 'paused' | 'cancelled',
+            nextBillingDate: subscription.proximo_pagamento ?? '',
+            startDate: subscription.data_inicio ?? '',
+            paymentMethod: subscription.metodo_pagamento ?? 'Cartão',
+          }
+        : undefined
+
+      setDoador({
+        id: profile.id,
+        name: profile.nome,
+        email: profile.email,
+        phone: profile.telefone ?? undefined,
+        cpf: profile.cpf ?? undefined,
+        totalDonated: profile.total_doado ?? 0,
+        donationCount: profile.contagem_doacoes ?? 0,
+        firstDonation: profile.primeira_doacao ?? new Date().toISOString().split('T')[0],
+        level: (profile.nivel ?? 'bronze') as Doador['level'],
+        animalsHelped: profile.animais_ajudados ?? 0,
+        subscription: mappedSubscription,
+        donations: mappedDonations,
+      })
+    },
+    [supabase]
+  )
 
   useEffect(() => {
-    // Verificar se há doador logado no localStorage
-    const storedDoador = localStorage.getItem('maya_doador')
-    if (storedDoador) {
-      try {
-        const parsed = JSON.parse(storedDoador)
-        setDoador(parsed)
-      } catch (error) {
-        console.error('Error parsing stored doador:', error)
+    let mounted = true
+
+    const init = async () => {
+      // getUser() validates JWT server-side; getSession() only reads localStorage
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
+      if (user && mounted) {
+        await loadDoadorData(user.id)
       }
+      if (mounted) setIsLoading(false)
     }
-    setIsLoading(false)
-  }, [])
 
-  const login = (email: string, password: string): boolean => {
-    // Mock login - em produção seria uma chamada à API
-    if (email && password.length >= 6) {
-      const doadorData = { ...mockDoador, email }
-      setDoador(doadorData)
-      localStorage.setItem('maya_doador', JSON.stringify(doadorData))
-      return true
-    }
-    return false
-  }
+    init()
 
-  const register = (name: string, email: string, password: string): boolean => {
-    // Mock registro - em produção seria uma chamada à API
-    if (name && email && password.length >= 6) {
-      const newDoador: Doador = {
-        id: Date.now().toString(),
-        name,
-        email,
-        totalDonated: 0,
-        donationCount: 0,
-        firstDonation: new Date().toISOString().split('T')[0],
-        level: 'bronze',
-        animalsHelped: 0,
-        donations: [],
+    const {
+      data: { subscription: authSub },
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (session?.user) {
+        await loadDoadorData(session.user.id)
+      } else {
+        setDoador(null)
       }
-      setDoador(newDoador)
-      localStorage.setItem('maya_doador', JSON.stringify(newDoador))
-      return true
+      if (mounted) setIsLoading(false)
+    })
+
+    return () => {
+      mounted = false
+      authSub.unsubscribe()
     }
-    return false
+  }, [supabase, loadDoadorData])
+
+  const login = async (email: string, password: string): Promise<boolean> => {
+    const { error } = await supabase.auth.signInWithPassword({ email, password })
+    return !error
   }
 
-  const logout = () => {
-    setDoador(null)
-    localStorage.removeItem('maya_doador')
-  }
-
-  const updateProfile = (updates: Partial<Doador>) => {
-    if (doador) {
-      const updated = { ...doador, ...updates }
-      setDoador(updated)
-      localStorage.setItem('maya_doador', JSON.stringify(updated))
+  /**
+   * Returns null on success, or an error string on failure.
+   * Distinguishes "email already registered" from generic errors.
+   */
+  const register = async (
+    name: string,
+    email: string,
+    password: string
+  ): Promise<string | null> => {
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: { data: { nome: name } },
+    })
+    if (!error) return null
+    const msg = error.message.toLowerCase()
+    if (msg.includes('already registered') || msg.includes('already in use') || msg.includes('already been registered')) {
+      return 'Este email já está cadastrado. Tente fazer login.'
     }
+    return 'Erro ao criar conta. Verifique os dados e tente novamente.'
   }
 
-  const pauseSubscription = () => {
-    if (doador?.subscription) {
-      const updated = {
-        ...doador,
-        subscription: { ...doador.subscription, status: 'paused' as const },
-      }
-      setDoador(updated)
-      localStorage.setItem('maya_doador', JSON.stringify(updated))
-    }
-  }
-
-  const resumeSubscription = () => {
-    if (doador?.subscription) {
-      const updated = {
-        ...doador,
-        subscription: { ...doador.subscription, status: 'active' as const },
-      }
-      setDoador(updated)
-      localStorage.setItem('maya_doador', JSON.stringify(updated))
-    }
-  }
-
-  const cancelSubscription = () => {
-    if (doador?.subscription) {
-      const updated = {
-        ...doador,
-        subscription: { ...doador.subscription, status: 'cancelled' as const },
-      }
-      setDoador(updated)
-      localStorage.setItem('maya_doador', JSON.stringify(updated))
+  const logout = async () => {
+    try {
+      await supabase.auth.signOut()
+    } finally {
+      setDoador(null)
     }
   }
 
-  // Calcular nível baseado no total doado
+  const updateProfile = async (updates: Partial<Doador>) => {
+    if (!doador) return
+
+    const dbUpdates: Record<string, unknown> = { updated_at: new Date().toISOString() }
+    if (updates.name !== undefined) dbUpdates.nome = updates.name
+    if (updates.phone !== undefined) dbUpdates.telefone = updates.phone
+    if (updates.cpf !== undefined) dbUpdates.cpf = updates.cpf
+
+    const { error } = await supabase.from('doadores').update(dbUpdates).eq('id', doador.id)
+    if (error) throw error
+    setDoador({ ...doador, ...updates })
+  }
+
+  const pauseSubscription = async () => {
+    if (!doador?.subscription) return
+    const { data: { user } } = await supabase.auth.getUser()
+    const session = (await supabase.auth.getSession()).data.session
+    if (!user || !session) throw new Error('Sessão expirada')
+    const res = await fetch('/api/subscription/pause', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${session.access_token}` },
+    })
+    const body = await res.json()
+    if (!res.ok) throw new Error(body.error ?? 'Erro ao pausar assinatura')
+    setDoador({
+      ...doador,
+      subscription: { ...doador.subscription, status: 'paused' },
+    })
+  }
+
+  const resumeSubscription = async () => {
+    if (!doador?.subscription) return
+    const { data: { user } } = await supabase.auth.getUser()
+    const session = (await supabase.auth.getSession()).data.session
+    if (!user || !session) throw new Error('Sessão expirada')
+    const res = await fetch('/api/subscription/resume', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${session.access_token}` },
+    })
+    const body = await res.json()
+    if (!res.ok) throw new Error(body.error ?? 'Erro ao reativar assinatura')
+    setDoador({
+      ...doador,
+      subscription: { ...doador.subscription, status: 'active' },
+    })
+  }
+
+  const cancelSubscription = async () => {
+    if (!doador?.subscription) return
+    const { data: { user } } = await supabase.auth.getUser()
+    const session = (await supabase.auth.getSession()).data.session
+    if (!user || !session) throw new Error('Sessão expirada')
+    const res = await fetch('/api/subscription/cancel', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${session.access_token}` },
+    })
+    const body = await res.json()
+    if (!res.ok) throw new Error(body.error ?? 'Erro ao cancelar assinatura')
+    setDoador({
+      ...doador,
+      subscription: { ...doador.subscription, status: 'cancelled' },
+    })
+  }
+
+  // After a successful payment, the webhook writes to the DB.
+  // This function waits briefly then reloads the donor data so
+  // the success page reflects the new donation immediately.
+  const addDonation = async (data: {
+    stripeSessionId: string
+    amount: number
+    type: 'single' | 'monthly'
+    status: 'completed' | 'pending' | 'failed'
+    campaignId?: string
+    campaignName?: string
+    subscriptionId?: string
+    nextBillingDate?: string
+  }) => {
+    if (!doador) return
+    // Give the webhook a moment to persist the record
+    await new Promise(resolve => setTimeout(resolve, 1500))
+    const {
+      data: { session },
+    } = await supabase.auth.getSession()
+    if (session?.user) {
+      await loadDoadorData(session.user.id)
+    }
+  }
+
+  // Pure helpers — no DB needed
   const getLevel = (totalDonated: number): Doador['level'] => {
     if (totalDonated >= 5000) return 'diamond'
     if (totalDonated >= 2000) return 'gold'
@@ -203,24 +278,21 @@ export function useDoador() {
     return 'bronze'
   }
 
-  // Calcular progresso para o próximo nível
-  const getLevelProgress = (totalDonated: number): { current: number; next: number; percentage: number } => {
+  const getLevelProgress = (
+    totalDonated: number
+  ): { current: number; next: number; percentage: number } => {
     const levels = [
-      { name: 'bronze', min: 0, max: 500 },
-      { name: 'silver', min: 500, max: 2000 },
-      { name: 'gold', min: 2000, max: 5000 },
-      { name: 'diamond', min: 5000, max: 10000 },
+      { min: 0, max: 500 },
+      { min: 500, max: 2000 },
+      { min: 2000, max: 5000 },
+      { min: 5000, max: 10000 },
     ]
-
     for (const level of levels) {
       if (totalDonated < level.max) {
-        const progress = totalDonated - level.min
-        const range = level.max - level.min
-        const percentage = (progress / range) * 100
+        const percentage = ((totalDonated - level.min) / (level.max - level.min)) * 100
         return { current: level.min, next: level.max, percentage: Math.round(percentage) }
       }
     }
-
     return { current: 5000, next: 10000, percentage: 100 }
   }
 
@@ -231,6 +303,7 @@ export function useDoador() {
     register,
     logout,
     updateProfile,
+    addDonation,
     pauseSubscription,
     resumeSubscription,
     cancelSubscription,

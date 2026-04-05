@@ -1,30 +1,62 @@
 import { NextResponse } from 'next/server'
+import { stripe } from '@/lib/stripe'
+import { createRouteLogger } from '@/lib/logger'
 
-// Note: Install Stripe server-side SDK: npm install stripe
-// Uncomment the following lines after installing Stripe
-// const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY)
+const log = createRouteLogger('create-checkout-session')
+
+const VALID_DONATION_TYPES = ['single', 'monthly'] as const
+type DonationType = typeof VALID_DONATION_TYPES[number]
+
+const MAX_AMOUNT = 50000 // R$ 50,000 — hard upper bound
+const MIN_AMOUNT = 5
 
 export async function POST(request: Request) {
   try {
-    const { amount, donationType, campaignId, campaignName } = await request.json()
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL
+    if (!siteUrl) {
+      log.error('NEXT_PUBLIC_SITE_URL is not configured')
+      return NextResponse.json({ error: 'Configuração inválida do servidor' }, { status: 500 })
+    }
+
+    const body = await request.json()
+    const { amount, donationType, campaignId, campaignName } = body
 
     // Validate amount
-    if (!amount || amount < 5) {
+    if (!Number.isFinite(amount) || amount < MIN_AMOUNT) {
       return NextResponse.json(
-        { error: 'Valor mínimo de R$ 5,00' },
+        { error: `Valor mínimo de R$ ${MIN_AMOUNT},00` },
+        { status: 400 }
+      )
+    }
+    if (amount > MAX_AMOUNT) {
+      return NextResponse.json(
+        { error: `Valor máximo de R$ ${MAX_AMOUNT.toLocaleString('pt-BR')},00` },
         { status: 400 }
       )
     }
 
-    // IMPORTANT: Uncomment this section after setting up Stripe keys
-    /*
-    // Determine product name and description
+    // Validate donationType
+    if (!VALID_DONATION_TYPES.includes(donationType as DonationType)) {
+      return NextResponse.json(
+        { error: 'Tipo de doação inválido' },
+        { status: 400 }
+      )
+    }
+
+    // Sanitize campaignName to prevent metadata injection
+    const safeCampaignName = typeof campaignName === 'string'
+      ? campaignName.slice(0, 200).replace(/[\x00-\x1F]/g, '')
+      : undefined
+    const safeCampaignId = typeof campaignId === 'string' && /^[a-zA-Z0-9_-]{1,100}$/.test(campaignId)
+      ? campaignId
+      : undefined
+
     let productName = donationType === 'monthly' ? 'Doação Mensal - Projeto Maya' : 'Doação - Projeto Maya'
     let productDescription = 'Sua contribuição ajuda animais resgatados a encontrarem um lar'
-    
-    if (campaignId && campaignName) {
-      productName = `${donationType === 'monthly' ? 'Doação Mensal' : 'Doação'} - ${campaignName}`
-      productDescription = `Sua contribuição para a campanha: ${campaignName}`
+
+    if (safeCampaignId && safeCampaignName) {
+      productName = `${donationType === 'monthly' ? 'Doação Mensal' : 'Doação'} - ${safeCampaignName}`
+      productDescription = `Sua contribuição para a campanha: ${safeCampaignName}`
     }
 
     const session = await stripe.checkout.sessions.create({
@@ -36,45 +68,36 @@ export async function POST(request: Request) {
             product_data: {
               name: productName,
               description: productDescription,
-              images: ['https://your-logo-url.com/logo.png'],
             },
-            unit_amount: Math.round(amount * 100), // Stripe uses cents
+            unit_amount: Math.round(amount * 100),
             ...(donationType === 'monthly' && {
-              recurring: {
-                interval: 'month',
-              },
+              recurring: { interval: 'month' },
             }),
           },
           quantity: 1,
         },
       ],
       mode: donationType === 'monthly' ? 'subscription' : 'payment',
-      success_url: `${process.env.NEXT_PUBLIC_SITE_URL}/doacoes/sucesso?session_id={CHECKOUT_SESSION_ID}${campaignId ? `&campaign=${campaignId}` : ''}`,
-      cancel_url: campaignId 
-        ? `${process.env.NEXT_PUBLIC_SITE_URL}/campanhas/${campaignId}`
-        : `${process.env.NEXT_PUBLIC_SITE_URL}/doacoes`,
+      success_url: `${siteUrl}/doacoes/sucesso?session_id={CHECKOUT_SESSION_ID}${safeCampaignId ? `&campaign=${safeCampaignId}` : ''}`,
+      cancel_url: safeCampaignId
+        ? `${siteUrl}/campanhas/${safeCampaignId}`
+        : `${siteUrl}/doacoes`,
       metadata: {
         donationType,
         amount: amount.toString(),
-        ...(campaignId && { campaignId }),
-        ...(campaignName && { campaignName }),
+        ...(safeCampaignId && { campaignId: safeCampaignId }),
+        ...(safeCampaignName && { campaignName: safeCampaignName }),
       },
     })
 
     return NextResponse.json({ sessionId: session.id })
-    */
 
-    // TEMPORARY: For demo purposes, return a mock response
-    // Remove this after setting up Stripe
-    return NextResponse.json({
-      error: 'Configuração do Stripe pendente. Por favor, configure suas chaves de API no arquivo .env.local'
-    }, { status: 400 })
-
-  } catch (error: any) {
-    console.error('Error creating checkout session:', error)
+  } catch (error: unknown) {
+    log.error({ error }, 'error creating checkout session')
     return NextResponse.json(
-      { error: error.message || 'Erro ao processar doação' },
+      { error: 'Erro ao processar doação. Tente novamente.' },
       { status: 500 }
     )
   }
 }
+

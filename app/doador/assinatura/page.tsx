@@ -1,15 +1,34 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { CreditCard, ArrowLeft, Pause, Play, X, Calendar, DollarSign, CheckCircle, PawPrint, Activity, HeartPulse, Home, Heart } from 'lucide-react'
 import { useDoador } from '@/hooks/useDoador'
+import { createClient } from '@/lib/supabase'
 
 export default function AssinaturaPage() {
   const { doador, isLoading, pauseSubscription, resumeSubscription, cancelSubscription } = useDoador()
   const router = useRouter()
+  const supabase = useMemo(() => createClient(), [])
   const [showCancelModal, setShowCancelModal] = useState(false)
+  const [portalLoading, setPortalLoading] = useState(false)
+  const [portalError, setPortalError] = useState('')
+
+  const openStripePortal = async () => {
+    setPortalLoading(true)
+    setPortalError('')
+    const { data: { user } } = await supabase.auth.getUser()
+    const { data: { session } } = await supabase.auth.getSession()
+    if (!user || !session) { setPortalError('Sessão expirada. Faça login novamente.'); setPortalLoading(false); return }
+    const res = await fetch('/api/create-portal-session', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${session.access_token}` },
+    })
+    const { url, error } = await res.json()
+    if (error || !url) { setPortalError(error ?? 'Erro ao abrir portal Stripe.'); setPortalLoading(false); return }
+    window.location.href = url
+  }
 
   useEffect(() => {
     if (!isLoading && !doador) {
@@ -62,17 +81,35 @@ export default function AssinaturaPage() {
   const isPaused = subscription.status === 'paused'
   const isCancelled = subscription.status === 'cancelled'
 
-  const handlePause = () => {
-    pauseSubscription()
+  const [actionError, setActionError] = useState('')
+
+  const handlePause = async () => {
+    setActionError('')
+    try {
+      await pauseSubscription()
+    } catch {
+      setActionError('Erro ao pausar assinatura. Tente novamente.')
+    }
   }
 
-  const handleResume = () => {
-    resumeSubscription()
+  const handleResume = async () => {
+    setActionError('')
+    try {
+      await resumeSubscription()
+    } catch {
+      setActionError('Erro ao reativar assinatura. Tente novamente.')
+    }
   }
 
-  const handleCancel = () => {
-    cancelSubscription()
-    setShowCancelModal(false)
+  const handleCancel = async () => {
+    setActionError('')
+    try {
+      await cancelSubscription()
+      setShowCancelModal(false)
+    } catch {
+      setActionError('Erro ao cancelar assinatura. Tente novamente.')
+      setShowCancelModal(false)
+    }
   }
 
   return (
@@ -96,6 +133,12 @@ export default function AssinaturaPage() {
         </div>
 
         <div className="max-w-4xl mx-auto">
+          {/* Action Error */}
+          {actionError && (
+            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 px-4 py-3 rounded-xl mb-6 text-sm font-medium">
+              {actionError}
+            </div>
+          )}
           {/* Status Banner */}
           <div className={`rounded-2xl p-6 mb-8 ${
             isActive ? 'bg-gradient-to-r from-green-500 to-green-600' :
@@ -202,18 +245,20 @@ export default function AssinaturaPage() {
                       Pausar Assinatura
                     </button>
                     <button
-                      onClick={() => alert('Funcionalidade de alterar valor será integrada com Stripe')}
-                      className="flex items-center justify-center gap-2 px-6 py-3 bg-maya-green/10 dark:bg-maya-green/20 text-maya-green dark:text-maya-green rounded-xl hover:bg-maya-green/20 dark:hover:bg-maya-green/30 transition-colors font-semibold"
+                      onClick={openStripePortal}
+                      disabled={portalLoading}
+                      className="flex items-center justify-center gap-2 px-6 py-3 bg-maya-green/10 dark:bg-maya-green/20 text-maya-green dark:text-maya-green rounded-xl hover:bg-maya-green/20 dark:hover:bg-maya-green/30 transition-colors font-semibold disabled:opacity-50"
                     >
                       <DollarSign size={20} />
-                      Alterar Valor
+                      {portalLoading ? 'Abrindo...' : 'Alterar Valor'}
                     </button>
                     <button
-                      onClick={() => alert('Funcionalidade de atualizar cartão será integrada com Stripe')}
-                      className="flex items-center justify-center gap-2 px-6 py-3 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors font-semibold"
+                      onClick={openStripePortal}
+                      disabled={portalLoading}
+                      className="flex items-center justify-center gap-2 px-6 py-3 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors font-semibold disabled:opacity-50"
                     >
                       <CreditCard size={20} />
-                      Atualizar Cartão
+                      {portalLoading ? 'Abrindo...' : 'Atualizar Cartão'}
                     </button>
                   </>
                 )}
@@ -238,6 +283,12 @@ export default function AssinaturaPage() {
                   </button>
                 )}
               </div>
+
+              {portalError && (
+                <div className="mt-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 rounded-xl px-4 py-3 text-red-600 dark:text-red-400 text-sm">
+                  {portalError}
+                </div>
+              )}
             </div>
           </div>
 

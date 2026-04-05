@@ -27,10 +27,7 @@ export default function AdminLoginPage() {
     setError('')
     setIsLoading(true)
 
-    // Simular delay de rede
-    await new Promise(resolve => setTimeout(resolve, 800))
-
-    const success = login(username, password)
+    const success = await login(username, password)
 
     if (success) {
       router.push('/admin')
@@ -159,21 +156,7 @@ export default function AdminLoginPage() {
             </button>
           </form>
 
-          {/* Informação de Credenciais (Apenas para demonstração) */}
-          <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
-            <div className="bg-maya-green/10 dark:bg-maya-green/20 rounded-lg p-4">
-              <p className="text-xs font-semibold text-maya-brown dark:text-white mb-2">
-                🔒 Credenciais de Demonstração:
-              </p>
-              <div className="text-xs text-maya-brown/70 dark:text-gray-300 space-y-1">
-                <p>Usuário: <code className="bg-white dark:bg-gray-700 px-2 py-1 rounded">admin</code></p>
-                <p>Senha: <code className="bg-white dark:bg-gray-700 px-2 py-1 rounded">maya2024</code></p>
-              </div>
-              <p className="text-xs text-maya-brown/60 dark:text-gray-400 mt-2">
-                ⚠️ Em produção, remova estas informações e implemente autenticação real via backend.
-              </p>
-            </div>
-          </div>
+
         </div>
 
         {/* Link para Home */}

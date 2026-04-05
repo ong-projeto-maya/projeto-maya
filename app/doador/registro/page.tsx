@@ -47,12 +47,12 @@ export default function DoadorRegistroPage() {
       return
     }
 
-    const success = register(name, email, password)
-    
-    if (success) {
+    const error = await register(name, email, password)
+
+    if (!error) {
       router.push('/doador/dashboard')
     } else {
-      setError('Erro ao criar conta. Tente novamente.')
+      setError(error)
       setIsLoading(false)
     }
   }

@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { ChevronRight, Award, Home as HomeIcon, Clock, Users, Activity, Dog, Cat, ClipboardList } from 'lucide-react'
-import { animals } from '@/data/animals'
+import { useAnimals, type Animal } from '@/hooks/useAnimals'
 
 const questions = [
   {
@@ -65,8 +65,9 @@ const questions = [
 export default function QuizPage() {
   const [currentQuestion, setCurrentQuestion] = useState(0)
   const [answers, setAnswers] = useState<Record<string, string>>({})
-  const [result, setResult] = useState<typeof animals[0] | null>(null)
+  const [result, setResult] = useState<Animal | null>(null)
   const [showResult, setShowResult] = useState(false)
+  const { animals } = useAnimals()
 
   const handleAnswer = (questionId: string, value: string) => {
     const newAnswers = { ...answers, [questionId]: value }
@@ -80,6 +81,7 @@ export default function QuizPage() {
   }
 
   const calculateResult = (finalAnswers: Record<string, string>) => {
+    if (animals.length === 0) return
     // Simple matching algorithm based on pet characteristics
     const scores = animals.map(animal => {
       let score = 0
@@ -120,9 +122,11 @@ export default function QuizPage() {
       return { animal, score }
     })
 
-    const bestMatch = scores.sort((a, b) => b.score - a.score)[0].animal
-    setResult(bestMatch)
-    setShowResult(true)
+    const bestMatch = scores.sort((a, b) => b.score - a.score)[0]?.animal
+    if (bestMatch) {
+      setResult(bestMatch)
+      setShowResult(true)
+    }
   }
 
   const restart = () => {

@@ -1,20 +1,36 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { User, ArrowLeft, Mail, Phone, FileText, Save, LogOut } from 'lucide-react'
+import { User, ArrowLeft, Mail, Phone, FileText, Save, LogOut, Lock, Download, Trash2, Eye, EyeOff, AlertTriangle } from 'lucide-react'
 import { useDoador } from '@/hooks/useDoador'
+import { createClient } from '@/lib/supabase'
 
 export default function PerfilPage() {
   const { doador, isLoading, updateProfile, logout } = useDoador()
   const router = useRouter()
-  
+  const supabase = useMemo(() => createClient(), [])
+
   const [name, setName] = useState('')
   const [phone, setPhone] = useState('')
   const [cpf, setCpf] = useState('')
   const [isSaving, setIsSaving] = useState(false)
   const [successMessage, setSuccessMessage] = useState('')
+  const [errorMessage, setErrorMessage] = useState('')
+
+  // Password change
+  const [showPasswordForm, setShowPasswordForm] = useState(false)
+  const [newPassword, setNewPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
+  const [showPw, setShowPw] = useState(false)
+  const [pwSaving, setPwSaving] = useState(false)
+  const [pwMessage, setPwMessage] = useState('')
+
+  // Delete account
+  const [deleteLoading, setDeleteLoading] = useState(false)
+  const [deleteError, setDeleteError] = useState('')
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
 
   useEffect(() => {
     if (!isLoading && !doador) {
@@ -41,22 +57,95 @@ export default function PerfilPage() {
     return null
   }
 
-  const handleSave = (e: React.FormEvent) => {
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSaving(true)
     setSuccessMessage('')
-
-    updateProfile({ name, phone, cpf })
-
-    setTimeout(() => {
-      setIsSaving(false)
+    setErrorMessage('')
+    try {
+      await updateProfile({ name, phone, cpf })
       setSuccessMessage('Perfil atualizado com sucesso!')
       setTimeout(() => setSuccessMessage(''), 3000)
-    }, 500)
+    } catch {
+      setErrorMessage('Erro ao atualizar perfil. Tente novamente.')
+    } finally {
+      setIsSaving(false)
+    }
   }
 
-  const handleLogout = () => {
-    logout()
+  const handleChangePassword = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (newPassword !== confirmPassword) {
+      setPwMessage('As senhas não coincidem.')
+      return
+    }
+    if (newPassword.length < 6) {
+      setPwMessage('A senha deve ter no mínimo 6 caracteres.')
+      return
+    }
+    setPwSaving(true)
+    setPwMessage('')
+    const { error } = await supabase.auth.updateUser({ password: newPassword })
+    setPwSaving(false)
+    if (error) {
+      setPwMessage('Erro ao alterar senha. Tente novamente.')
+    } else {
+      setPwMessage('Senha alterada com sucesso!')
+      setNewPassword('')
+      setConfirmPassword('')
+      setTimeout(() => { setPwMessage(''); setShowPasswordForm(false) }, 2500)
+    }
+  }
+
+  const handleExportData = () => {
+    const data = {
+      perfil: {
+        nome: doador.name,
+        email: doador.email,
+        telefone: doador.phone ?? null,
+        cpf: doador.cpf ?? null,
+        nivel: doador.level,
+        total_doado: doador.totalDonated,
+        contagem_doacoes: doador.donationCount,
+        primeira_doacao: doador.firstDonation,
+      },
+      doacoes: doador.donations.map(d => ({
+        id: d.id,
+        data: d.date,
+        valor: d.amount,
+        tipo: d.type,
+        status: d.status,
+        campanha: d.campaignName ?? null,
+      })),
+      exportado_em: new Date().toISOString(),
+    }
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `maya-meus-dados-${new Date().toISOString().split('T')[0]}.json`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  const handleDeleteAccount = async () => {
+    setDeleteLoading(true)
+    setDeleteError('')
+    const { data: { user } } = await supabase.auth.getUser()
+    const { data: { session } } = await supabase.auth.getSession()
+    if (!user || !session) { setDeleteError('Sessão expirada. Faça login novamente.'); setDeleteLoading(false); return }
+    const res = await fetch('/api/delete-account', {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${session.access_token}` },
+    })
+    const { error } = await res.json()
+    if (error) { setDeleteError('Erro ao excluir conta. Entre em contato conosco.'); setDeleteLoading(false); return }
+    await logout()
+    router.push('/?conta=excluida')
+  }
+
+  const handleLogout = async () => {
+    await logout()
     router.push('/')
   }
 
@@ -81,10 +170,15 @@ export default function PerfilPage() {
         </div>
 
         <div className="max-w-3xl mx-auto">
-          {/* Success Message */}
+          {/* Success / Error Messages */}
           {successMessage && (
             <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 text-green-600 dark:text-green-400 px-4 py-3 rounded-xl mb-6 flex items-center gap-2">
               <div className="text-sm font-medium">{successMessage}</div>
+            </div>
+          )}
+          {errorMessage && (
+            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 px-4 py-3 rounded-xl mb-6 flex items-center gap-2">
+              <div className="text-sm font-medium">{errorMessage}</div>
             </div>
           )}
 
@@ -197,20 +291,64 @@ export default function PerfilPage() {
             </h2>
 
             <div className="space-y-4">
-              <button
-                onClick={() => alert('Funcionalidade de alterar senha será implementada')}
-                className="w-full px-6 py-4 bg-maya-beige dark:bg-gray-700 text-maya-brown dark:text-white rounded-xl hover:bg-maya-green/10 dark:hover:bg-gray-600 transition-colors font-semibold text-left"
-              >
-                Alterar Senha
-              </button>
+              {/* Change Password */}
+              <div>
+                <button
+                  onClick={() => { setShowPasswordForm(p => !p); setPwMessage('') }}
+                  className="w-full px-6 py-4 bg-maya-beige dark:bg-gray-700 text-maya-brown dark:text-white rounded-xl hover:bg-maya-green/10 dark:hover:bg-gray-600 transition-colors font-semibold text-left inline-flex items-center gap-2"
+                >
+                  <Lock size={20} />
+                  Alterar Senha
+                </button>
+                {showPasswordForm && (
+                  <form onSubmit={handleChangePassword} className="mt-3 bg-maya-beige/50 dark:bg-gray-700/50 rounded-xl p-4 space-y-3">
+                    <div className="relative">
+                      <input
+                        type={showPw ? 'text' : 'password'}
+                        value={newPassword}
+                        onChange={e => setNewPassword(e.target.value)}
+                        placeholder="Nova senha (mín. 6 caracteres)"
+                        required
+                        className="w-full pr-10 pl-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:border-maya-green dark:focus:border-maya-green focus:outline-none bg-white dark:bg-gray-700 text-maya-brown dark:text-white text-sm"
+                      />
+                      <button type="button" onClick={() => setShowPw(p => !p)} className="absolute right-3 top-1/2 -translate-y-1/2 text-maya-brown/40 dark:text-gray-400">
+                        {showPw ? <EyeOff size={18} /> : <Eye size={18} />}
+                      </button>
+                    </div>
+                    <input
+                      type={showPw ? 'text' : 'password'}
+                      value={confirmPassword}
+                      onChange={e => setConfirmPassword(e.target.value)}
+                      placeholder="Confirmar nova senha"
+                      required
+                      className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:border-maya-green dark:focus:border-maya-green focus:outline-none bg-white dark:bg-gray-700 text-maya-brown dark:text-white text-sm"
+                    />
+                    {pwMessage && (
+                      <p className={`text-sm font-medium ${pwMessage.includes('sucesso') ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+                        {pwMessage}
+                      </p>
+                    )}
+                    <button
+                      type="submit"
+                      disabled={pwSaving}
+                      className="btn-primary w-full text-sm py-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {pwSaving ? 'Salvando...' : 'Salvar Nova Senha'}
+                    </button>
+                  </form>
+                )}
+              </div>
 
+              {/* Export Data */}
               <button
-                onClick={() => alert('Funcionalidade de exportar dados será implementada')}
-                className="w-full px-6 py-4 bg-maya-beige dark:bg-gray-700 text-maya-brown dark:text-white rounded-xl hover:bg-maya-green/10 dark:hover:bg-gray-600 transition-colors font-semibold text-left"
+                onClick={handleExportData}
+                className="w-full px-6 py-4 bg-maya-beige dark:bg-gray-700 text-maya-brown dark:text-white rounded-xl hover:bg-maya-green/10 dark:hover:bg-gray-600 transition-colors font-semibold text-left inline-flex items-center gap-2"
               >
+                <Download size={20} />
                 Exportar Meus Dados
               </button>
 
+              {/* Logout */}
               <button
                 onClick={handleLogout}
                 className="w-full px-6 py-4 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-xl hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors font-semibold text-left inline-flex items-center gap-2"
@@ -219,20 +357,65 @@ export default function PerfilPage() {
                 Sair da Conta
               </button>
 
-              <button
-                onClick={() => {
-                  if (confirm('Tem certeza que deseja excluir sua conta? Esta ação não pode ser desfeita.')) {
-                    alert('Funcionalidade de excluir conta será implementada')
-                  }
-                }}
-                className="w-full px-6 py-4 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-xl hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors font-semibold text-left"
-              >
-                Excluir Conta
-              </button>
+              {/* Delete Account */}
+              <div>
+                <button
+                  onClick={() => { setShowDeleteModal(true); setDeleteError('') }}
+                  disabled={deleteLoading}
+                  className="w-full px-6 py-4 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-xl hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors font-semibold text-left inline-flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <Trash2 size={20} />
+                  Excluir Conta
+                </button>
+                {deleteError && (
+                  <p className="mt-2 text-sm text-red-600 dark:text-red-400">{deleteError}</p>
+                )}
+              </div>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Delete Account Confirmation Modal */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-8 max-w-md w-full">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-12 h-12 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center flex-shrink-0">
+                <AlertTriangle className="text-red-600 dark:text-red-400" size={24} />
+              </div>
+              <h3 className="text-xl font-display font-bold text-maya-brown dark:text-white">
+                Excluir Conta
+              </h3>
+            </div>
+            <p className="text-maya-brown/70 dark:text-gray-300 mb-2">
+              Tem certeza que deseja excluir sua conta? Esta ação <strong>não pode ser desfeita</strong>.
+            </p>
+            <p className="text-sm text-maya-brown/60 dark:text-gray-400 mb-6">
+              Todos os seus dados, histórico de doações e informações de perfil serão removidos permanentemente.
+            </p>
+            {deleteError && (
+              <p className="mb-4 text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 px-3 py-2 rounded-lg">{deleteError}</p>
+            )}
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowDeleteModal(false)}
+                disabled={deleteLoading}
+                className="flex-1 px-4 py-3 bg-gray-100 dark:bg-gray-700 text-maya-brown dark:text-white rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors font-semibold disabled:opacity-50"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleDeleteAccount}
+                disabled={deleteLoading}
+                className="flex-1 px-4 py-3 bg-red-600 hover:bg-red-700 text-white rounded-xl transition-colors font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {deleteLoading ? 'Excluindo...' : 'Confirmar Exclusão'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
