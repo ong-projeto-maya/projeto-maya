@@ -8,9 +8,73 @@ const ADMIN_ROUTES = ['/admin']
 // Admin routes that are publicly accessible (login page)
 const ADMIN_PUBLIC = ['/admin/login']
 
+// ---------------------------------------------------------------------------
+// Simple sliding-window rate limiter (per-IP, per serverless instance).
+// Limits the mutation API endpoints that cost money or have abuse potential.
+// ---------------------------------------------------------------------------
+interface Window { count: number; resetAt: number }
+const rateLimitMap = new Map<string, Window>()
+
+/** Returns true when the request should be blocked. */
+function isRateLimited(ip: string, maxRequests: number, windowMs: number): boolean {
+  const now = Date.now()
+  const entry = rateLimitMap.get(ip)
+
+  if (!entry || now > entry.resetAt) {
+    rateLimitMap.set(ip, { count: 1, resetAt: now + windowMs })
+    return false
+  }
+
+  entry.count += 1
+  if (entry.count > maxRequests) return true
+  return false
+}
+
+// Periodically prune stale entries to avoid memory growth on long-lived instances
+let lastPrune = Date.now()
+function maybePrune() {
+  const now = Date.now()
+  if (now - lastPrune < 60_000) return
+  lastPrune = now
+  for (const [key, win] of rateLimitMap) {
+    if (now > win.resetAt) rateLimitMap.delete(key)
+  }
+}
+
+// Rate-limit rules: [path prefix, maxRequests per window, windowMs]
+const RATE_LIMIT_RULES: [string, number, number][] = [
+  ['/api/create-checkout-session', 10, 60_000],   // 10 checkouts / min per IP
+  ['/api/subscription/pause',      5,  60_000],
+  ['/api/subscription/resume',     5,  60_000],
+  ['/api/subscription/cancel',     5,  60_000],
+  ['/api/delete-account',          3,  60_000],
+  ['/doador/login',                10, 60_000],   // brute-force protection
+  ['/admin/login',                 10, 60_000],
+]
+
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
   const response = NextResponse.next()
+
+  // --- Rate limiting ---
+  maybePrune()
+  for (const [prefix, max, windowMs] of RATE_LIMIT_RULES) {
+    if (pathname.startsWith(prefix)) {
+      const ip =
+        request.headers.get('x-forwarded-for')?.split(',')[0].trim() ??
+        request.headers.get('x-real-ip') ??
+        '127.0.0.1'
+      if (isRateLimited(`${ip}:${prefix}`, max, windowMs)) {
+        return NextResponse.json(
+          { error: 'Muitas requisições. Tente novamente em instantes.' },
+          { status: 429, headers: { 'Retry-After': '60', 'Content-Type': 'application/json' } }
+        )
+      }
+      // API routes: no auth needed here — return after rate-limit check
+      if (pathname.startsWith('/api/')) return response
+      break
+    }
+  }
 
   // --- Admin route protection ---
   const isAdminRoute = ADMIN_ROUTES.some(r => pathname.startsWith(r))
@@ -89,6 +153,13 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
+    // API routes that need rate limiting
+    '/api/create-checkout-session',
+    '/api/subscription/pause',
+    '/api/subscription/resume',
+    '/api/subscription/cancel',
+    '/api/delete-account',
+    // Auth-protected page routes
     '/admin/:path*',
     '/doador/dashboard/:path*',
     '/doador/perfil/:path*',
