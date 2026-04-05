@@ -50,7 +50,12 @@ jobs:
           NEXT_PUBLIC_SITE_URL: https://placeholder.example.com
           NEXT_PUBLIC_SENTRY_DSN: ""
           SENTRY_DSN: ""
+          UPSTASH_REDIS_REST_URL: ""
+          UPSTASH_REDIS_REST_TOKEN: ""
           # No SENTRY_AUTH_TOKEN → source map upload is skipped gracefully
+          # No Upstash vars → rate limiter uses in-memory fallback
+          UPSTASH_REDIS_REST_URL: ""
+          UPSTASH_REDIS_REST_TOKEN: ""
 
   # ---------------------------------------------------------------------------
   # E2E tests — runs after the build job on a real Next.js server
