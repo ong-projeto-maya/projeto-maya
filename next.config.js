@@ -19,9 +19,9 @@ const securityHeaders = [
     value: [
       "default-src 'self'",
       "script-src 'self' 'unsafe-inline' https://js.stripe.com",
-      "style-src 'self' 'unsafe-inline'",
+      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       "img-src 'self' data: blob: https://images.unsplash.com https://*.supabase.co",
-      "font-src 'self'",
+      "font-src 'self' https://fonts.gstatic.com",
       "frame-src https://js.stripe.com https://hooks.stripe.com",
       "connect-src 'self' https://*.supabase.co https://api.stripe.com https://*.sentry.io https://sentry.io",
       "form-action 'self'",
