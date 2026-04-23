@@ -1,0 +1,227 @@
+name: "🗓️ Router Compliance Weekly Issue"
+
+on:
+  schedule:
+    - cron: "0 12 * * 1"
+  workflow_dispatch:
+
+jobs:
+  weekly-report:
+    name: Publish Weekly Compliance Issue
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+    env:
+      RETENTION_COUNT: ${{ vars.ROUTER_COMPLIANCE_RETENTION_COUNT || '8' }} # RETENTION_COUNT_ENV REPO_VAR_ROUTER_COMPLIANCE_RETENTION_COUNT
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Collect compliance status
+        id: status
+        run: |
+          has_team=0
+          has_lelouch=0
+          has_route_team=0
+          has_route_lelouch=0
+          has_operational_team=0
+          has_operational_lelouch=0
+          compliant=0
+
+          if [ -f ".claude/commands/team.md" ]; then
+            has_team=1
+            grep -q -- "route-agents.ps1" ".claude/commands/team.md" && has_route_team=1 || true
+            grep -q -- "-AsOperational" ".claude/commands/team.md" && has_operational_team=1 || true
+          fi
+
+          if [ -f ".claude/commands/lelouch.md" ]; then
+            has_lelouch=1
+            grep -q -- "route-agents.ps1" ".claude/commands/lelouch.md" && has_route_lelouch=1 || true
+            grep -q -- "-AsOperational" ".claude/commands/lelouch.md" && has_operational_lelouch=1 || true
+          fi
+
+          if [ "$has_team" = "1" ] && [ "$has_lelouch" = "1" ] && \
+             [ "$has_route_team" = "1" ] && [ "$has_route_lelouch" = "1" ] && \
+             [ "$has_operational_team" = "1" ] && [ "$has_operational_lelouch" = "1" ]; then
+            compliant=1
+          fi
+
+          echo "has_team=$has_team" >> "$GITHUB_OUTPUT"
+          echo "has_lelouch=$has_lelouch" >> "$GITHUB_OUTPUT"
+          echo "has_route_team=$has_route_team" >> "$GITHUB_OUTPUT"
+          echo "has_route_lelouch=$has_route_lelouch" >> "$GITHUB_OUTPUT"
+          echo "has_operational_team=$has_operational_team" >> "$GITHUB_OUTPUT"
+          echo "has_operational_lelouch=$has_operational_lelouch" >> "$GITHUB_OUTPUT"
+          echo "compliant=$compliant" >> "$GITHUB_OUTPUT"
+
+      - name: Publish or update weekly issue
+        uses: actions/github-script@v7
+        env:
+          COMPLIANT: ${{ steps.status.outputs.compliant }}
+          HAS_TEAM: ${{ steps.status.outputs.has_team }}
+          HAS_LELOUCH: ${{ steps.status.outputs.has_lelouch }}
+          HAS_ROUTE_TEAM: ${{ steps.status.outputs.has_route_team }}
+          HAS_ROUTE_LELOUCH: ${{ steps.status.outputs.has_route_lelouch }}
+          HAS_OP_TEAM: ${{ steps.status.outputs.has_operational_team }}
+          HAS_OP_LELOUCH: ${{ steps.status.outputs.has_operational_lelouch }}
+        with:
+          script: |
+            const now = new Date();
+            const yyyy = now.getUTCFullYear();
+            const mm = String(now.getUTCMonth() + 1).padStart(2, '0');
+            const dd = String(now.getUTCDate()).padStart(2, '0');
+            const runDate = `${yyyy}-${mm}-${dd}`;
+
+            const start = new Date(Date.UTC(now.getUTCFullYear(), 0, 1));
+            const days = Math.floor((now - start) / 86400000);
+            const week = Math.ceil((days + start.getUTCDay() + 1) / 7);
+            const weekSlug = `${yyyy}-W${String(week).padStart(2, '0')}`;
+
+            const title = `Router Compliance Weekly Report - ${weekSlug}`;
+            const labelName = 'router-compliance';
+            const parsedRetention = Number.parseInt(process.env.RETENTION_COUNT || '8', 10);
+            const RETENTION_COUNT = Number.isFinite(parsedRetention) && parsedRetention >= 0 ? parsedRetention : 8; // RETENTION_LABEL_CLEANUP
+
+            const compliant = process.env.COMPLIANT === '1';
+            const statusIcon = compliant ? '✅' : '❌';
+            const statusText = compliant ? 'Compliant' : 'Non-compliant';
+
+            const body = [
+              `# ${statusIcon} Router Compliance Weekly Report`,
+              '',
+              `- Week: ${weekSlug}`,
+              `- Run date (UTC): ${runDate}`,
+              `- Branch: ${context.ref.replace('refs/heads/', '')}`,
+              `- Commit: ${context.sha.substring(0, 7)}`,
+              `- Status: **${statusText}**`,
+              '',
+              '## Checks',
+              '',
+              `- .claude/commands/team.md present: ${process.env.HAS_TEAM}`,
+              `- .claude/commands/lelouch.md present: ${process.env.HAS_LELOUCH}`,
+              `- team has route-agents.ps1: ${process.env.HAS_ROUTE_TEAM}`,
+              `- lelouch has route-agents.ps1: ${process.env.HAS_ROUTE_LELOUCH}`,
+              `- team has -AsOperational: ${process.env.HAS_OP_TEAM}`,
+              `- lelouch has -AsOperational: ${process.env.HAS_OP_LELOUCH}`,
+              '',
+              '## Recommended Action',
+              '',
+              compliant
+                ? '- No action required this week.'
+                : '- Run sync scripts from the squad template and commit the updated .claude/commands files.',
+              '',
+              '_Automated report generated by router-compliance-weekly-issue workflow._'
+            ].join('\n');
+
+            const { owner, repo } = context.repo;
+
+            let labelExists = true;
+            try {
+              await github.rest.issues.getLabel({ owner, repo, name: labelName });
+            } catch (error) {
+              if (error.status === 404) {
+                labelExists = false;
+              } else {
+                throw error;
+              }
+            }
+
+            if (!labelExists) {
+              await github.rest.issues.createLabel({
+                owner,
+                repo,
+                name: labelName,
+                color: compliant ? '2da44e' : 'd1242f',
+                description: 'Automated weekly router compliance reports'
+              });
+            }
+
+            const { data: issues } = await github.rest.issues.listForRepo({
+              owner,
+              repo,
+              state: 'open',
+              labels: labelName,
+              per_page: 100
+            });
+
+            const existing = issues.find(issue => issue.title === title);
+            let activeIssueNumber;
+
+            if (existing) {
+              await github.rest.issues.update({
+                owner,
+                repo,
+                issue_number: existing.number,
+                title,
+                body,
+                labels: [labelName]
+              });
+              activeIssueNumber = existing.number;
+              core.info(`Updated existing weekly issue #${existing.number}`);
+            } else {
+              const created = await github.rest.issues.create({
+                owner,
+                repo,
+                title,
+                body,
+                labels: [labelName]
+              });
+              activeIssueNumber = created.data.number;
+              core.info(`Created weekly issue #${created.data.number}`);
+            }
+
+            const staleIssues = issues.filter(issue => issue.number !== activeIssueNumber);
+            for (const stale of staleIssues) {
+              await github.rest.issues.createComment({
+                owner,
+                repo,
+                issue_number: stale.number,
+                body: `Closing as part of weekly rollover. Active report: #${activeIssueNumber}`
+              });
+
+              await github.rest.issues.update({
+                owner,
+                repo,
+                issue_number: stale.number,
+                state: 'closed'
+              });
+
+              core.info(`Closed stale weekly issue #${stale.number}`);
+            }
+
+            // Keep label only on the active issue + latest N closed reports.
+            const { data: closedLabeledIssues } = await github.rest.issues.listForRepo({
+              owner,
+              repo,
+              state: 'closed',
+              labels: labelName,
+              sort: 'updated',
+              direction: 'desc',
+              per_page: 100
+            });
+
+            const closedToKeep = closedLabeledIssues.slice(0, RETENTION_COUNT);
+            const keepSet = new Set([activeIssueNumber, ...closedToKeep.map(issue => issue.number)]);
+
+            for (const oldIssue of closedLabeledIssues) {
+              if (keepSet.has(oldIssue.number)) {
+                continue;
+              }
+
+              const currentLabels = (oldIssue.labels || []).map(label =>
+                typeof label === 'string' ? label : label.name
+              );
+
+              const filteredLabels = currentLabels.filter(name => name !== labelName);
+
+              await github.rest.issues.update({
+                owner,
+                repo,
+                issue_number: oldIssue.number,
+                labels: filteredLabels
+              });
+
+              core.info(`Removed ${labelName} label from old issue #${oldIssue.number}`);
+            }

@@ -1,0 +1,138 @@
+name: "🧭 Router Compliance Audit"
+
+on:
+  schedule:
+    - cron: "30 11 * * 1-5"
+  workflow_dispatch:
+  push:
+    branches: [main, master, develop]
+    paths:
+      - ".claude/commands/team.md"
+      - ".claude/commands/lelouch.md"
+      - ".github/instructions/squad-automation.instructions.md"
+      - ".claude/dashboard/kanban-data.js"
+
+jobs:
+  audit:
+    name: Verify Router Integration
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate required files
+        id: files
+        run: |
+          REQUIRED=(
+            ".claude/commands/team.md"
+            ".claude/commands/lelouch.md"
+            ".github/instructions/squad-automation.instructions.md"
+            ".claude/dashboard/kanban-data.js"
+          )
+
+          missing=0
+          missing_list=""
+          for file in "${REQUIRED[@]}"; do
+            if [ ! -f "$file" ]; then
+              missing=$((missing + 1))
+              missing_list+="$file\n"
+            fi
+          done
+
+          echo "missing=$missing" >> "$GITHUB_OUTPUT"
+          {
+            echo "missing_list<<EOF"
+            printf "%b" "$missing_list"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Validate team/lelouch routing markers
+        id: routing
+        run: |
+          check_marker() {
+            local file="$1"
+            local marker="$2"
+            if grep -q -- "$marker" "$file"; then
+              echo "1"
+            else
+              echo "0"
+            fi
+          }
+
+          if [ ! -f ".claude/commands/team.md" ] || [ ! -f ".claude/commands/lelouch.md" ]; then
+            echo "route_team=0" >> "$GITHUB_OUTPUT"
+            echo "route_lelouch=0" >> "$GITHUB_OUTPUT"
+            echo "operational_team=0" >> "$GITHUB_OUTPUT"
+            echo "operational_lelouch=0" >> "$GITHUB_OUTPUT"
+            echo "compliant=0" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          route_team=$(check_marker ".claude/commands/team.md" "route-agents.ps1")
+          route_lelouch=$(check_marker ".claude/commands/lelouch.md" "route-agents.ps1")
+          operational_team=$(check_marker ".claude/commands/team.md" "-AsOperational")
+          operational_lelouch=$(check_marker ".claude/commands/lelouch.md" "-AsOperational")
+
+          compliant=0
+          if [ "$route_team" = "1" ] && [ "$route_lelouch" = "1" ] && [ "$operational_team" = "1" ] && [ "$operational_lelouch" = "1" ]; then
+            compliant=1
+          fi
+
+          echo "route_team=$route_team" >> "$GITHUB_OUTPUT"
+          echo "route_lelouch=$route_lelouch" >> "$GITHUB_OUTPUT"
+          echo "operational_team=$operational_team" >> "$GITHUB_OUTPUT"
+          echo "operational_lelouch=$operational_lelouch" >> "$GITHUB_OUTPUT"
+          echo "compliant=$compliant" >> "$GITHUB_OUTPUT"
+
+      - name: Build job summary
+        env:
+          MISSING: ${{ steps.files.outputs.missing }}
+          MISSING_LIST: ${{ steps.files.outputs.missing_list }}
+          ROUTE_TEAM: ${{ steps.routing.outputs.route_team }}
+          ROUTE_LELOUCH: ${{ steps.routing.outputs.route_lelouch }}
+          OP_TEAM: ${{ steps.routing.outputs.operational_team }}
+          OP_LELOUCH: ${{ steps.routing.outputs.operational_lelouch }}
+          COMPLIANT: ${{ steps.routing.outputs.compliant }}
+          REPO: ${{ github.repository }}
+          BRANCH: ${{ github.ref_name }}
+          SHA: ${{ github.sha }}
+        run: |
+          cat >> "$GITHUB_STEP_SUMMARY" << 'SUMMARY'
+          ## Router Compliance Audit
+          SUMMARY
+
+          echo "| Check | Result |" >> "$GITHUB_STEP_SUMMARY"
+          echo "|---|---|" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Repository | \`$REPO\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Branch | \`$BRANCH\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Commit | \`${SHA:0:7}\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Missing files | $MISSING |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| team has route-agents | $ROUTE_TEAM |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| lelouch has route-agents | $ROUTE_LELOUCH |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| team has -AsOperational | $OP_TEAM |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| lelouch has -AsOperational | $OP_LELOUCH |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Compliance | $COMPLIANT |" >> "$GITHUB_STEP_SUMMARY"
+
+          if [ "$MISSING" != "0" ]; then
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "### Missing files" >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            printf "%b" "$MISSING_LIST" | sed '/^$/d' | sed 's/^/- /' >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+          if [ "$COMPLIANT" = "1" ] && [ "$MISSING" = "0" ]; then
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "### ✅ Router integration is compliant" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "### ❌ Router integration is not compliant" >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "Run the sync from squad template and commit updated files." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Fail when non-compliant
+        if: steps.files.outputs.missing != '0' || steps.routing.outputs.compliant != '1'
+        run: |
+          echo "::error::Router compliance audit failed. Check job summary for details."
+          exit 1

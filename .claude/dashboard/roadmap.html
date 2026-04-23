@@ -1,0 +1,556 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Roteiro do Projeto — Controle de Missão</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --bg-base: #080b14;
+      --text-primary: #e2e8f0;
+      --text-secondary: #94a3b8;
+      --text-tertiary: #64748b;
+      --accent-indigo: #6366f1;
+      --accent-soft: #818cf8;
+      --accent-cyan: #22d3ee;
+      --state-success: #4ade80;
+      --state-warning: #facc15;
+      --state-danger: #f87171;
+      --motion-fast: 150ms;
+      --motion-medium: 240ms;
+      --motion-ease-out: cubic-bezier(.22,.61,.36,1);
+    }
+    body {
+      font-family: "Inter", "Segoe UI", system-ui, sans-serif;
+      background: var(--bg-base);
+      background-image:
+        radial-gradient(ellipse 90% 55% at 50% -5%, rgba(99,102,241,.14) 0%, transparent 65%),
+        radial-gradient(ellipse 40% 30% at 92% 85%, rgba(34,211,238,.07) 0%, transparent 55%);
+      color: var(--text-primary);
+      min-height: 100vh;
+    }
+    .top-accent { height: 1px; background: linear-gradient(90deg, transparent 0%, var(--accent-indigo) 30%, var(--accent-soft) 50%, var(--accent-cyan) 70%, transparent 100%); opacity: .6; }
+    .page-wrap { padding: 28px 30px 56px; }
+    .premium-nav {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 10px; margin-bottom: 16px; padding: 0 12px;
+      border-radius: 14px; height: 56px; border: 1px solid;
+      border-image: linear-gradient(90deg, rgba(99,102,241,0), rgba(99,102,241,.3), rgba(34,211,238,.2), rgba(99,102,241,0)) 1;
+      background: linear-gradient(135deg, rgba(99,102,241,.08), rgba(34,211,238,.05));
+      backdrop-filter: blur(20px) saturate(110%);
+      -webkit-backdrop-filter: blur(20px) saturate(110%);
+      box-shadow: 0 8px 32px rgba(0,0,0,.3), 0 1px 0 rgba(99,102,241,.1) inset;
+    }
+    .premium-nav-track { display: flex; gap: 4px; flex-wrap: wrap; align-items: center; }
+    .premium-nav-link {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 8px 13px; border-radius: 8px;
+      border: 1px solid rgba(99,102,241,.15);
+      color: #94a3b8; text-decoration: none;
+      font-size: 11px; font-weight: 700; letter-spacing: .05em;
+      background: rgba(255,255,255,.02);
+      transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1);
+      position: relative;
+    }
+    .premium-nav-link::after {
+      content: ""; position: absolute; bottom: 0; left: 0; width: 0; height: 2px;
+      background: linear-gradient(90deg, transparent, var(--accent-cyan), transparent);
+      border-radius: 99px; transition: width 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .premium-nav-link:hover { color: #cbd5e1; border-color: rgba(99,102,241,.35); background: rgba(99,102,241,.12); box-shadow: 0 8px 24px rgba(99,102,241,.15), inset 0 0 0 1px rgba(99,102,241,.2); transform: translateY(-2px); }
+    .premium-nav-link:hover::after { width: 100%; }
+    .premium-nav-link.active { color: #e2e8f0; border-color: rgba(34,211,238,.4); background: rgba(34,211,238,.15); box-shadow: 0 0 0 1px rgba(34,211,238,.2), 0 8px 32px rgba(34,211,238,.2), inset 0 0 0 1px rgba(34,211,238,.25); }
+    .premium-nav-link.active::after { width: 100%; }
+    .nav-icon { width: 14px; height: 14px; flex: 0 0 14px; opacity: .9; }
+    .nav-logo { display: flex; align-items: center; gap: 8px; }
+    .nav-logo img { height: 28px; width: auto; filter: brightness(0) invert(1) saturate(0); }
+    .nav-badge {
+      font-size: 9px; font-weight: 700; letter-spacing: .07em; padding: 2px 6px;
+      border-radius: 4px; background: rgba(99,102,241,.18); color: #818cf8;
+      border: 1px solid rgba(99,102,241,.25);
+    }
+    .page-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 28px; }
+    .headline {
+      font-size: clamp(18px, 1.2vw + 12px, 22px);
+      font-weight: 800;
+      letter-spacing: -.02em;
+      background: linear-gradient(135deg, #c4b5fd 0%, #818cf8 55%, #22d3ee 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 2px;
+    }
+    .brand-sub { font-size: 12px; color: var(--text-secondary); margin-top: 4px; }
+    .project-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 6px 14px; border-radius: 20px;
+      border: 1px solid rgba(99,102,241,.3);
+      background: rgba(99,102,241,.1);
+      font-size: 11px; font-weight: 700; color: #a5b4fc; letter-spacing: .05em;
+      text-transform: uppercase;
+    }
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 24px;
+    }
+    .summary-card {
+      border-radius: 12px;
+      border: 1px solid rgba(99,102,241,.18);
+      background: linear-gradient(140deg, rgba(99,102,241,.08), rgba(34,211,238,.04));
+      padding: 12px 14px;
+    }
+    .summary-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: var(--text-tertiary);
+      margin-bottom: 7px;
+      font-weight: 700;
+    }
+    .summary-value {
+      font-size: 20px;
+      line-height: 1;
+      font-weight: 800;
+      color: #e2e8f0;
+      letter-spacing: -.02em;
+    }
+    .summary-meta {
+      margin-top: 6px;
+      font-size: 11px;
+      color: var(--text-secondary);
+    }
+    .current-section { margin-bottom: 32px; }
+    .section-label {
+      font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
+      color: var(--text-tertiary); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;
+    }
+    .section-label::after { content: ""; flex: 1; height: 1px; background: rgba(99,102,241,.12); }
+    .current-card {
+      border-radius: 14px; border: 1px solid rgba(34,211,238,.2);
+      background: linear-gradient(135deg, rgba(34,211,238,.06), rgba(99,102,241,.06));
+      padding: 20px 24px; display: flex; flex-direction: column; gap: 12px;
+    }
+    .current-label { font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--accent-cyan); }
+    .current-feature { font-size: 18px; font-weight: 700; color: #e2e8f0; letter-spacing: -.01em; }
+    .current-phase {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 4px 12px; border-radius: 20px; border: 1px solid rgba(99,102,241,.25);
+      font-size: 11px; font-weight: 600; color: #a5b4fc; background: rgba(99,102,241,.12); width: fit-content;
+    }
+    .empty-state { font-size: 13px; color: var(--text-tertiary); font-style: italic; padding: 24px 0; }
+    .upcoming-section { margin-bottom: 30px; }
+    .upcoming-list { display: grid; grid-template-columns: 1fr; gap: 10px; }
+    .upcoming-item {
+      border-radius: 12px;
+      border: 1px solid rgba(99,102,241,.16);
+      background: rgba(15,20,35,.78);
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .upcoming-item:hover { border-color: rgba(99,102,241,.3); }
+    .upcoming-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+    .upcoming-source {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(34,211,238,.25);
+      background: rgba(34,211,238,.08);
+      color: #67e8f9;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+    }
+    .upcoming-text { font-size: 12px; color: var(--text-secondary); line-height: 1.55; }
+    .upcoming-priority {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      border: 1px solid;
+    }
+    .upcoming-priority.high { color: #fca5a5; border-color: rgba(248,113,113,.35); background: rgba(248,113,113,.08); }
+    .upcoming-priority.medium { color: #fde68a; border-color: rgba(250,204,21,.35); background: rgba(250,204,21,.08); }
+    .upcoming-priority.low { color: #bfdbfe; border-color: rgba(96,165,250,.35); background: rgba(96,165,250,.08); }
+    .upcoming-overflow {
+      border-style: dashed;
+      border-color: rgba(99,102,241,.28);
+      color: #a5b4fc;
+      font-weight: 600;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
+    @media (max-width: 900px) {
+      .summary-grid { grid-template-columns: 1fr; }
+    }
+    .timeline { position: relative; padding-left: 20px; display: flex; flex-direction: column; gap: 0; }
+    .timeline::before {
+      content: ""; position: absolute; left: 0; top: 10px; bottom: 10px; width: 2px;
+      background: linear-gradient(to bottom, rgba(99,102,241,.4), rgba(99,102,241,.08)); border-radius: 99px;
+    }
+    .wave-entry {
+      position: relative; padding: 0 0 24px 24px;
+      opacity: 0; transform: translateX(-8px);
+      animation: slideIn var(--motion-medium) var(--motion-ease-out) forwards;
+    }
+    .wave-entry::before {
+      content: ""; position: absolute; left: -5px; top: 8px;
+      width: 12px; height: 12px; border-radius: 50%;
+      background: var(--dot-color, var(--accent-indigo));
+      border: 2px solid var(--bg-base);
+      box-shadow: 0 0 0 3px rgba(99,102,241,.15);
+    }
+    @keyframes slideIn { to { opacity: 1; transform: translateX(0); } }
+    .wave-card {
+      border-radius: 12px; border: 1px solid rgba(99,102,241,.12);
+      background: rgba(15,20,35,.8); padding: 16px 20px;
+      transition: border-color var(--motion-fast) ease;
+    }
+    .wave-card:hover { border-color: rgba(99,102,241,.28); }
+    .wave-meta { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
+    .wave-id { font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--text-tertiary); }
+    .wave-date { font-size: 10px; color: var(--text-tertiary); }
+    .wave-title { font-size: 14px; font-weight: 700; color: #e2e8f0; margin-bottom: 8px; }
+    .wave-summary { font-size: 12px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 10px; }
+    .wave-outcomes { display: flex; flex-direction: column; gap: 4px; }
+    .wave-outcome { display: flex; align-items: flex-start; gap: 8px; font-size: 11px; color: var(--text-secondary); }
+    .wave-outcome::before { content: "↳"; color: var(--accent-indigo); font-size: 11px; flex-shrink: 0; margin-top: 1px; }
+    .badge-done { color: var(--state-success); border-color: rgba(74,222,128,.2); background: rgba(74,222,128,.08); }
+    .wave-badge { display: inline-flex; align-items: center; gap: 5px; padding: 2px 10px; border-radius: 20px; border: 1px solid; font-size: 10px; font-weight: 700; letter-spacing: .06em; }
+    .no-history { color: var(--text-tertiary); font-size: 13px; padding: 32px 0; text-align: center; font-style: italic; }
+    .agent-summary-section { margin-top: 32px; }
+    .agent-pills { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+    .agent-pill { display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 20px; border: 1px solid rgba(99,102,241,.18); background: rgba(99,102,241,.06); font-size: 11px; color: var(--text-secondary); }
+    .agent-pill .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--dot-col, #64748b); flex-shrink: 0; }
+  </style>
+</head>
+<body>
+<div class="top-accent"></div>
+<div class="page-wrap">
+  <nav class="premium-nav" role="navigation" aria-label="Navegação do Painel de Controle">
+    <div class="nav-logo">
+      <img src="./logo-axiom-labs.png" alt="Axiom Labs" />
+      <span class="nav-badge">PAINEL DE CONTROLE</span>
+    </div>
+    <div class="premium-nav-track">
+      <a class="premium-nav-link" href="./index.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8"></circle><circle cx="12" cy="12" r="3"></circle></svg>Controle de Missão</a>
+      <a class="premium-nav-link" data-squad-only href="./command-center.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="14" rx="2"></rect><line x1="8" y1="20" x2="16" y2="20"></line><line x1="10" y1="8" x2="10" y2="14"></line><line x1="14" y1="10" x2="14" y2="14"></line></svg>Central de Comando</a>
+      <a class="premium-nav-link" href="./agents.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3"></circle><circle cx="17" cy="9" r="2.5"></circle><path d="M3 19c0-3.1 2.7-5 6-5s6 1.9 6 5"></path><path d="M14 18c.3-1.8 1.8-3 3.8-3 2 0 3.5 1.2 3.8 3"></path></svg>Catálogo de Agentes</a>
+      <a class="premium-nav-link" data-squad-only href="./portfolio-executive.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="7" width="18" height="12" rx="2"></rect><path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"></path><line x1="3" y1="12" x2="21" y2="12"></line></svg>Portfólio</a>
+      <a class="premium-nav-link" data-squad-only href="./flow-analytics.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 18h16"></path><polyline points="5 14 9 10 13 13 19 7"></polyline><circle cx="9" cy="10" r="1"></circle><circle cx="13" cy="13" r="1"></circle><circle cx="19" cy="7" r="1"></circle></svg>Análise de Fluxo</a>
+      <a class="premium-nav-link" data-squad-only href="./delivery-governance.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>Governança</a>
+      <a class="premium-nav-link active" href="./roadmap.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6l9-3 9 3v3l-9 3-9-3V6z"/><path d="M3 12v3l9 3 9-3v-3"/><path d="M3 18v3l9 3 9-3v-3"/></svg>Roteiro</a>
+    </div>
+  </nav>
+
+  <header class="page-header">
+    <div>
+      <div class="headline">Roteiro do Projeto</div>
+      <div class="brand-sub" id="headerSub">Histórico de melhorias e feature em andamento</div>
+    </div>
+    <div class="project-badge" id="projectBadge">—</div>
+  </header>
+
+  <section class="summary-grid" aria-label="Resumo do roadmap">
+    <article class="summary-card">
+      <div class="summary-label">Waves concluídas</div>
+      <div class="summary-value" id="summaryHistory">0</div>
+      <div class="summary-meta" id="summaryHistoryMeta">Sem histórico ainda</div>
+    </article>
+    <article class="summary-card">
+      <div class="summary-label">Próximas atividades</div>
+      <div class="summary-value" id="summaryUpcoming">0</div>
+      <div class="summary-meta" id="summaryUpcomingMeta">Sem backlog mapeado</div>
+    </article>
+    <article class="summary-card">
+      <div class="summary-label">Agentes ativos</div>
+      <div class="summary-value" id="summaryActive">0</div>
+      <div class="summary-meta" id="summaryActiveMeta">Nenhum agente em execução</div>
+    </article>
+  </section>
+
+  <div class="current-section">
+    <div class="section-label">Feature atual</div>
+    <div id="currentFeatureContainer"></div>
+  </div>
+
+  <div class="upcoming-section" id="upcomingSection" style="display:none">
+    <div class="section-label">Próximas atividades do roadmap</div>
+    <div class="upcoming-list" id="upcomingList"></div>
+  </div>
+
+  <div class="section-label" style="margin-bottom:16px">Histórico de melhorias</div>
+  <div class="timeline" id="timeline"><div class="no-history">Carregando…</div></div>
+
+  <div class="agent-summary-section" id="agentSection" style="display:none">
+    <div class="section-label">Agentes envolvidos neste projeto</div>
+    <div class="agent-pills" id="agentPills"></div>
+  </div>
+</div>
+
+<script>
+  function esc(s) {
+    return String(s || "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+  }
+  function fmtDate(iso) {
+    if (!iso) return "";
+    try { return new Date(iso).toLocaleDateString("pt-BR", { year:"numeric", month:"short", day:"numeric" }); }
+    catch(e) { return iso; }
+  }
+
+  function asReadablePath(path) {
+    if (!path) return "roadmap";
+    return String(path).replace(/\[(\d+)\]/g, " $1").replace(/\./g, " ").trim();
+  }
+
+  function priorityRank(p) {
+    if (p === "high") return 0;
+    if (p === "medium") return 1;
+    return 2;
+  }
+
+  function pickLabel(item) {
+    if (!item || typeof item !== "object") return "";
+    return item.title || item.task || item.description || item.name || item.phase || item.id || "";
+  }
+
+  function pushUpcomingItem(bucket, seen, text, source, priority) {
+    var clean = String(text || "").trim();
+    if (!clean || clean === "—" || clean === "-") return;
+    if (clean.length < 5) return;
+    var key = clean.toLowerCase();
+    if (seen[key]) return;
+    seen[key] = true;
+    bucket.push({ text: clean, source: source || "roadmap", priority: priority || "medium" });
+  }
+
+  function collectFromValue(value, source, priority, bucket, seen) {
+    if (value == null) return;
+
+    if (typeof value === "string") {
+      pushUpcomingItem(bucket, seen, value, source, priority);
+      return;
+    }
+
+    if (Array.isArray(value)) {
+      value.forEach(function(item) {
+        if (typeof item === "string") {
+          pushUpcomingItem(bucket, seen, item, source, priority);
+          return;
+        }
+        if (item && typeof item === "object") {
+          var label = pickLabel(item);
+          if (label) pushUpcomingItem(bucket, seen, label, source, priority);
+          ["items", "tasks", "activities", "nextActivities", "pending", "now", "next", "later"].forEach(function(k) {
+            if (item[k]) collectFromValue(item[k], source, priority, bucket, seen);
+          });
+        }
+      });
+      return;
+    }
+
+    if (typeof value === "object") {
+      var label = pickLabel(value);
+      if (label) pushUpcomingItem(bucket, seen, label, source, priority);
+      ["items", "tasks", "activities", "nextActivities", "pending", "now", "next", "later"].forEach(function(k) {
+        if (value[k]) collectFromValue(value[k], source, priority, bucket, seen);
+      });
+    }
+  }
+
+  function collectUpcomingActivities(data) {
+    var bucket = [];
+    var seen = {};
+
+    if (data.roadmap) {
+      collectFromValue(data.roadmap.now, "roadmap/agora", "high", bucket, seen);
+      collectFromValue(data.roadmap.next, "roadmap/proximo", "medium", bucket, seen);
+      collectFromValue(data.roadmap.later, "roadmap/depois", "low", bucket, seen);
+      collectFromValue(data.roadmap.nextActivities, "roadmap/proximo", "medium", bucket, seen);
+      collectFromValue(data.roadmap.items, "roadmap", "medium", bucket, seen);
+    }
+    if (data.backlog) {
+      collectFromValue(data.backlog.now, "backlog/agora", "high", bucket, seen);
+      collectFromValue(data.backlog.next, "backlog/proximo", "medium", bucket, seen);
+      collectFromValue(data.backlog.later, "backlog/depois", "low", bucket, seen);
+      collectFromValue(data.backlog.items, "backlog", "medium", bucket, seen);
+    }
+    collectFromValue(data.nextActivities, "proximas atividades", "medium", bucket, seen);
+    collectFromValue(data.upcoming, "upcoming", "medium", bucket, seen);
+    collectFromValue(data.plan, "plano", "medium", bucket, seen);
+
+    var agents = Array.isArray(data.agents) ? data.agents : [];
+    agents.forEach(function(a) {
+      var status = String(a.status || "").toLowerCase();
+      var task = String(a.task || "").trim();
+      if ((status === "running" || status === "blocked" || status === "idle") && task && task !== "—" && task !== "-") {
+        var p = status === "blocked" ? "high" : (status === "running" ? "high" : "medium");
+        pushUpcomingItem(bucket, seen, task, "pipeline de agentes", p);
+      }
+      if (Array.isArray(a.output) && a.output.length) {
+        a.output.forEach(function(out) {
+          if (/plan\/|roadmap|backlog|next|later|todo/i.test(String(out))) {
+            pushUpcomingItem(bucket, seen, "Consultar artefato: " + out, "artefatos", "low");
+          }
+        });
+      }
+    });
+
+    return bucket.sort(function(a, b) {
+      var pa = priorityRank(a.priority);
+      var pb = priorityRank(b.priority);
+      if (pa !== pb) return pa - pb;
+      return String(a.source).localeCompare(String(b.source), "pt-BR");
+    });
+  }
+
+  function renderSummary(data, upcomingCount) {
+    var history = Array.isArray(data.history) ? data.history : [];
+    var agents = Array.isArray(data.agents) ? data.agents : [];
+    var running = agents.filter(function(a) { return a.status === "running"; }).length;
+    var blocked = agents.filter(function(a) { return a.status === "blocked"; }).length;
+
+    document.getElementById("summaryHistory").textContent = String(history.length);
+    document.getElementById("summaryHistoryMeta").textContent = history.length
+      ? ("Ultima wave: " + fmtDate(history[history.length - 1].completedAt))
+      : "Sem histórico ainda";
+
+    document.getElementById("summaryUpcoming").textContent = String(upcomingCount);
+    document.getElementById("summaryUpcomingMeta").textContent = upcomingCount
+      ? (upcomingCount + " atividade(s) priorizadas")
+      : "Sem backlog mapeado";
+
+    document.getElementById("summaryActive").textContent = String(running + blocked);
+    document.getElementById("summaryActiveMeta").textContent = (running + blocked)
+      ? (running + " rodando · " + blocked + " bloqueados")
+      : "Nenhum agente em execução";
+  }
+
+  function renderUpcoming(data) {
+    var section = document.getElementById("upcomingSection");
+    var list = document.getElementById("upcomingList");
+    var ctx = ((data.feature || "") + " " + (data.phase || "")).toLowerCase();
+    var roadmapRequested = /(roadmap|roteiro|evolu)/i.test(ctx);
+    var upcoming = collectUpcomingActivities(data);
+
+    if (!roadmapRequested && upcoming.length === 0) {
+      section.style.display = "none";
+      list.innerHTML = "";
+      return;
+    }
+
+    section.style.display = "";
+
+    if (upcoming.length === 0) {
+      list.innerHTML = "<div class='upcoming-item'><div class='upcoming-text'>Roadmap solicitado, mas nao ha backlog estruturado no kanban. Para preservar as proximas atividades, adicione campos como <strong>roadmap.nextActivities</strong>, <strong>backlog.now</strong>, <strong>backlog.next</strong> e <strong>backlog.later</strong>.</div></div>";
+      return 0;
+    }
+
+    var maxVisible = 18;
+    var visible = upcoming.slice(0, maxVisible);
+    var hiddenCount = Math.max(0, upcoming.length - maxVisible);
+
+    list.innerHTML = visible.map(function(item) {
+      var priorityLabel = item.priority === "high" ? "Agora" : (item.priority === "medium" ? "Próximo" : "Depois");
+      return "<div class='upcoming-item'>" +
+        "<div class='upcoming-head'><span class='upcoming-source'>" + esc(item.source) + "</span><span class='upcoming-priority " + esc(item.priority) + "'>" + esc(priorityLabel) + "</span></div>" +
+        "<div class='upcoming-text'>" + esc(item.text) + "</div>" +
+      "</div>";
+    }).join("") + (hiddenCount > 0 ? ("<div class='upcoming-item upcoming-overflow'>+" + hiddenCount + " atividade(s) adicional(is) no backlog</div>") : "");
+
+    return upcoming.length;
+  }
+
+  function render(data) {
+    var project = data.project || "projeto";
+    var isSquad = project === "squad";
+    document.querySelectorAll("[data-squad-only]").forEach(function(el) { el.style.display = isSquad ? "" : "none"; });
+
+    document.getElementById("projectBadge").textContent = project.toUpperCase().replace(/-/g, " ");
+    document.getElementById("headerSub").textContent = "Histórico de melhorias · " + project.replace(/-/g, " ");
+
+    var cc = document.getElementById("currentFeatureContainer");
+    var feature = data.feature || "";
+    var phase = data.phase || "";
+    var updatedAt = data.updatedAt || "";
+    if (feature && feature !== "Aguardando tarefa...") {
+      cc.innerHTML = "<div class='current-card'>" +
+        "<div class='current-label'>Em andamento</div>" +
+        "<div class='current-feature'>" + esc(feature) + "</div>" +
+        (phase ? "<div class='current-phase'>" + esc(phase) + "</div>" : "") +
+        (updatedAt ? "<div style='font-size:11px;color:var(--text-tertiary);margin-top:4px'>Atualizado: " + esc(fmtDate(updatedAt)) + "</div>" : "") +
+        "</div>";
+    } else {
+      cc.innerHTML = "<div class='empty-state'>Nenhuma feature ativa no momento.</div>";
+    }
+
+    var upcomingCount = renderUpcoming(data);
+    renderSummary(data, upcomingCount);
+
+    var history = Array.isArray(data.history) ? data.history : [];
+    var tl = document.getElementById("timeline");
+    if (history.length === 0) {
+      tl.innerHTML = "<div class='no-history'>Nenhuma wave concluída registrada ainda.</div>";
+    } else {
+      var rev = history.slice().reverse();
+      var html = "";
+      rev.forEach(function(wave, idx) {
+        var outHtml = "";
+        if (Array.isArray(wave.outcomes) && wave.outcomes.length) {
+          outHtml = "<div class='wave-outcomes'>" +
+            wave.outcomes.map(function(o) { return "<div class='wave-outcome'>" + esc(o) + "</div>"; }).join("") +
+          "</div>";
+        }
+        html += "<div class='wave-entry' style='--dot-color:#6366f1;animation-delay:" + (idx * 50) + "ms'>" +
+          "<div class='wave-card'>" +
+            "<div class='wave-meta'>" +
+              "<span class='wave-id'>" + esc(wave.id || ("Wave #" + (history.length - idx))) + "</span>" +
+              "<div style='display:flex;align-items:center;gap:8px'>" +
+                (wave.completedAt ? "<span class='wave-date'>" + esc(fmtDate(wave.completedAt)) + "</span>" : "") +
+                "<span class='wave-badge badge-done'>&#x2713; Conclu&iacute;da</span>" +
+              "</div>" +
+            "</div>" +
+            "<div class='wave-title'>" + esc(wave.phase || wave.id || "—") + "</div>" +
+            (wave.summary ? "<div class='wave-summary'>" + esc(wave.summary) + "</div>" : "") +
+            outHtml +
+          "</div>" +
+        "</div>";
+      });
+      tl.innerHTML = html;
+    }
+
+    var agents = Array.isArray(data.agents) ? data.agents : [];
+    if (agents.length > 0) {
+      document.getElementById("agentSection").style.display = "";
+      var statusColor = { done:"#4ade80", running:"#6366f1", blocked:"#f87171", idle:"#334155" };
+      document.getElementById("agentPills").innerHTML = agents.map(function(a) {
+        var col = a.color || statusColor[a.status] || "#64748b";
+        return "<div class='agent-pill'><span class='dot' style='--dot-col:" + col + "'></span>" + esc(a.name) + "</div>";
+      }).join("");
+    }
+  }
+
+  var s = document.createElement("script");
+  s.src = "./kanban-data.js?t=" + Date.now();
+  s.onload = function() { if (typeof window.KANBAN_DATA !== "undefined") render(window.KANBAN_DATA); };
+  s.onerror = function() { document.getElementById("timeline").innerHTML = "<div class='no-history'>kanban-data.js n&atilde;o encontrado.</div>"; };
+  document.body.appendChild(s);
+</script>
+</body>
+</html>

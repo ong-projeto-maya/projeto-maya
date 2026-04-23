@@ -1,0 +1,21 @@
+# Dependabot config — manter GitHub Actions atualizadas automaticamente
+# Copiar para: .github/dependabot.yml em cada projeto
+#
+# Documentacao: https://docs.github.com/en/code-security/dependabot/dependabot-version-updates
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "America/Sao_Paulo"
+    reviewers:
+      - "owner-username"  # Substituir pelo usuario do repo
+    commit-message:
+      prefix: "chore(ci)"
+    labels:
+      - "dependencies"
+      - "ci"
+    open-pull-requests-limit: 5

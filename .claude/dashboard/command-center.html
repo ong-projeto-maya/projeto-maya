@@ -1,0 +1,2156 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Axiom Labs Painel de Controle - Central de Comando</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg-base: #080b14;
+      --text-primary: #e2e8f0;
+      --motion-fast: 150ms;
+      --motion-medium: 240ms;
+      --motion-ease-out: cubic-bezier(.22,.61,.36,1);
+      --text-secondary: #94a3b8;
+      --text-tertiary: #64748b;
+      --accent-indigo: #6366f1;
+      --accent-soft: #818cf8;
+      --accent-cyan: #22d3ee;
+      --state-success: #4ade80;
+      --state-warning: #facc15;
+      --state-danger: #f87171;
+    }
+
+    body {
+      font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg-base);
+      background-image:
+        radial-gradient(ellipse 90% 55% at 50% -5%, rgba(99,102,241,.14) 0%, transparent 65%),
+        radial-gradient(ellipse 40% 30% at 92% 85%, rgba(34,211,238,.07) 0%, transparent 55%);
+      color: var(--text-primary);
+      min-height: 100vh;
+      padding: 0;
+    }
+
+    .top-accent {
+      height: 1px;
+      background: linear-gradient(90deg, transparent 0%, var(--accent-indigo) 30%, var(--accent-soft) 50%, var(--accent-cyan) 70%, transparent 100%);
+      opacity: .6;
+    }
+
+    .page-wrap { padding: 28px 30px 40px; }
+
+    .premium-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 16px;
+      padding: 0 12px;
+      border-radius: 14px;
+      height: 56px;
+      border: 1px solid;
+      border-image: linear-gradient(90deg, rgba(99, 102, 241, 0), rgba(99, 102, 241, 0.3), rgba(34, 211, 238, 0.2), rgba(99, 102, 241, 0)) 1;
+      background: linear-gradient(135deg, rgba(99,102,241,.08), rgba(34,211,238,.05));
+      backdrop-filter: blur(20px) saturate(110%);
+      -webkit-backdrop-filter: blur(20px) saturate(110%);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), 0 1px 0 rgba(99, 102, 241, 0.1) inset;
+    }
+    .premium-nav-track {
+      display: flex;
+      gap: 4px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .premium-nav-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 13px;
+      border-radius: 8px;
+      border: 1px solid rgba(99, 102, 241, 0.15);
+      color: #94a3b8;
+      text-decoration: none;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .05em;
+      background: rgba(255,255,255,.02);
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      position: relative;
+    }
+    .nav-icon {
+      width: 14px;
+      height: 14px;
+      flex: 0 0 14px;
+      opacity: .9;
+    }
+    .premium-nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--cyan, #22d3ee), transparent);
+      border-radius: 99px;
+      transition: width 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .premium-nav-link:hover {
+      color: #cbd5e1;
+      border-color: rgba(99,102,241,.35);
+      background: rgba(99,102,241,.12);
+      box-shadow: 0 8px 24px rgba(99, 102, 241, 0.15), inset 0 0 0 1px rgba(99, 102, 241, 0.2);
+      transform: translateY(-2px);
+    }
+    .premium-nav-link:hover::after { width: 100%; }
+    .premium-nav-link.active {
+      color: #e2e8f0;
+      border-color: rgba(34,211,238,.4);
+      background: rgba(34,211,238,.15);
+      box-shadow: 0 0 0 1px rgba(34, 211, 238, 0.2), 0 8px 32px rgba(34, 211, 238, 0.2), inset 0 0 0 1px rgba(34, 211, 238, 0.25);
+    }
+    .premium-nav-link.active::after { width: 100%; }
+    .premium-nav-link.hotkey-flash {
+      box-shadow: 0 0 0 2px rgba(34,211,238,.28), 0 0 18px rgba(34,211,238,.25);
+      border-color: rgba(34,211,238,.55);
+      color: #e2e8f0;
+    }
+    .nav-logo { display: flex; align-items: center; gap: 8px; }
+    .nav-logo img { height: 28px; width: auto; filter: brightness(0) invert(1) saturate(0); }
+    .nav-badge {
+      font-size: 9px; font-weight: 700; letter-spacing: .07em; padding: 2px 6px;
+      border-radius: 4px; background: rgba(99,102,241,.18); color: #818cf8;
+      border: 1px solid rgba(99,102,241,.25);
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 24px;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+    }
+
+    .brand { display: flex; align-items: center; gap: 14px; }
+    .brand-logo {
+      height: 38px; width: auto; display: block;
+      filter: brightness(0) invert(1) saturate(0);
+      animation: logo-breathe 4s ease-in-out infinite;
+    }
+    @keyframes logo-breathe {
+      0%,100% { filter: brightness(0) invert(1) saturate(0) drop-shadow(0 0 8px rgba(99,102,241,.45)); }
+      50%      { filter: brightness(0) invert(1) saturate(0) drop-shadow(0 0 18px rgba(99,102,241,.75)); }
+    }
+
+    .headline {
+      font-size: clamp(19px, 1vw + 16px, 24px);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, #c4b5fd 0%, #818cf8 55%, #22d3ee 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .brand-sub { color: #94a3b8; font-size: 12px; margin-top: 4px; font-weight: 500; line-height: 1.5; }
+    .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    .ops-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.04);
+      color: #94a3b8;
+      font-size: 10px;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border: 1px solid rgba(255,255,255,.09);
+      background: rgba(255,255,255,.04);
+      color: var(--text-secondary);
+      border-radius: 8px;
+      padding: 7px 16px;
+      font-size: 11.5px;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all .15s;
+      font-family: 'Inter', inherit;
+      letter-spacing: .01em;
+    }
+    .btn:hover { border-color: rgba(99,102,241,.4); color: #a5b4fc; background: rgba(99,102,241,.1); }
+    .btn.active { background: rgba(99,102,241,.15); color: #c4b5fd; border-color: rgba(99,102,241,.5); }
+    .preset-select {
+      border: 1px solid rgba(255,255,255,.1);
+      background: rgba(255,255,255,.03);
+      color: #cbd5e1;
+      border-radius: 8px;
+      padding: 7px 10px;
+      font-size: 11px;
+      font-weight: 700;
+      font-family: 'Inter', inherit;
+      letter-spacing: .02em;
+      cursor: pointer;
+      transition: all .15s;
+    }
+    .preset-select:hover {
+      border-color: rgba(99,102,241,.4);
+      color: #a5b4fc;
+      background: rgba(99,102,241,.1);
+    }
+    .preset-hint {
+      display: inline-flex;
+      align-items: center;
+      padding: 5px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.04);
+      color: #94a3b8;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .03em;
+    }
+    .btn:focus-visible,
+    .fpill:focus-visible,
+    .preset-select:focus-visible {
+      outline: 2px solid #22d3ee;
+      outline-offset: 2px;
+      box-shadow: 0 0 0 2px rgba(34,211,238,.18);
+    }
+
+    /* Semáforo */
+    .health-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 5px 14px; border-radius: 99px; font-size: 11px; font-weight: 700;
+      border: 1px solid; letter-spacing: .04em; text-transform: uppercase;
+      transition: all .3s;
+    }
+    .health-badge.green  { background: rgba(34,197,94,.12); color: #4ade80; border-color: rgba(34,197,94,.3); }
+    .health-badge.yellow { background: rgba(234,179,8,.12);  color: #facc15; border-color: rgba(234,179,8,.3); }
+    .health-badge.red    { background: rgba(239,68,68,.12);  color: #f87171; border-color: rgba(239,68,68,.3); }
+    .health-dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+
+    /* Filtros de status */
+    .filter-bar { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; align-items: center; }
+    .filter-bar span { color: var(--text-secondary); font-size: 11.5px; font-weight: 600; margin-right: 2px; }
+    .fpill {
+      padding: 4px 12px; border-radius: 99px; font-size: 11.5px; font-weight: 600;
+      border: 1px solid rgba(255,255,255,.09); background: rgba(255,255,255,.03);
+      color: var(--text-secondary); cursor: pointer; transition: all .15s; user-select: none;
+      font-family: inherit;
+    }
+    .fpill:hover { border-color: rgba(255,255,255,.17); color: #cbd5e1; }
+    .fpill.active { background: rgba(99,102,241,.15); color: #c4b5fd; border-color: rgba(99,102,241,.45); }
+
+    /* Drill-down */
+    .repo-detail {
+      display: none;
+      border-top: 1px solid rgba(255,255,255,.06);
+      padding: 8px 6px 4px;
+      font-size: 11.5px; color: #64748b;
+    }
+    .repo-detail.open { display: block; }
+    .detail-grid { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 6px; }
+    .detail-grid b { color: #94a3b8; }
+    tr.repo-row { cursor: pointer; }
+    tr.repo-row:hover td {
+      background: rgba(99,102,241,.09);
+      box-shadow: inset 0 1px 0 rgba(99,102,241,.18), inset 0 -1px 0 rgba(99,102,241,.12);
+    }
+    tr.repo-row:focus-visible td {
+      outline: 2px solid #22d3ee;
+      outline-offset: -2px;
+      background: rgba(34,211,238,.08);
+    }
+    tr.repo-row td { transition: background var(--motion-fast) ease, box-shadow var(--motion-fast) ease; }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    /* Inline sparkline on hover */
+    .row-spark {
+      display: inline-block;
+      vertical-align: middle;
+      margin-left: 6px;
+      opacity: 0;
+      transform: scaleX(.85);
+      transform-origin: left center;
+      transition: opacity var(--motion-medium) ease, transform var(--motion-medium) var(--motion-ease-out);
+      pointer-events: none;
+    }
+    tr.repo-row:hover .row-spark {
+      opacity: 1;
+      transform: scaleX(1);
+    }
+    .row-spark svg { display: block; }
+    @media (prefers-reduced-motion: reduce) {
+      .row-spark { transition: none; opacity: 1; transform: none; }
+      tr.repo-row td { transition: none; }
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .card {
+      background: rgba(13,20,38,.75);
+      border: 1px solid rgba(255,255,255,.07);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-radius: 14px;
+      padding: 12px;
+      min-height: 88px;
+    }
+    .card.motion-enter {
+      opacity: 0;
+      transform: translateY(8px) scale(.995);
+      animation: cc-enter var(--motion-medium) var(--motion-ease-out) forwards;
+      animation-delay: var(--enter-delay, 0ms);
+    }
+    @keyframes cc-enter {
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .card h3 { color: var(--text-secondary); font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; }
+    .card .value { font-size: 26px; font-weight: 700; margin-top: 4px; }
+    .card .value.delta-up {
+      animation: delta-up-flash 700ms var(--motion-ease-out);
+      text-shadow: 0 0 20px rgba(104,227,166,.35);
+    }
+    .card .value.delta-down {
+      animation: delta-down-flash 700ms var(--motion-ease-out);
+      text-shadow: 0 0 20px rgba(255,142,142,.35);
+    }
+    @keyframes delta-up-flash {
+      0% { color: #4ade80; transform: translateY(-1px) scale(1.01); }
+      100% { color: inherit; transform: translateY(0) scale(1); }
+    }
+    @keyframes delta-down-flash {
+      0% { color: #f87171; transform: translateY(-1px) scale(1.01); }
+      100% { color: inherit; transform: translateY(0) scale(1); }
+    }
+    .card .meta { color: var(--text-tertiary); font-size: 11.5px; margin-top: 4px; }
+
+    .ok { color: #4ade80; }
+    .warn { color: #facc15; }
+    .bad { color: #f87171; }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 1.3fr 1fr;
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    /* === Onda 15 — Maturity bar animated fill + threshold badges === */
+    .mat-bar-wrap {
+      height: 5px;
+      background: rgba(255,255,255,.06);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .mat-bar-fill {
+      height: 100%;
+      border-radius: 3px;
+      width: 0%;
+      transition: width 0ms linear; /* overridden by JS RAF */
+    }
+    .mat-bar-fill.animate {
+      transition: width 700ms var(--motion-ease-out);
+    }
+    .mat-badge {
+      display: inline-block;
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: .07em;
+      padding: 1px 6px;
+      border-radius: 999px;
+      border: 1px solid;
+      text-transform: uppercase;
+      vertical-align: middle;
+      margin-left: 5px;
+    }
+    .mat-badge.elite   { color: #a78bfa; border-color: rgba(167,139,250,.4); background: rgba(167,139,250,.1); }
+    .mat-badge.solid   { color: #4ade80; border-color: rgba(74,222,128,.35); background: rgba(74,222,128,.08); }
+    .mat-badge.growing { color: #facc15; border-color: rgba(250,204,21,.35); background: rgba(250,204,21,.08); }
+    .mat-badge.at-risk { color: #f87171; border-color: rgba(248,113,113,.35); background: rgba(248,113,113,.08); }
+    @media (prefers-reduced-motion: reduce) {
+      .mat-bar-fill, .mat-bar-fill.animate { transition: none; width: var(--mat-target, 0%); }
+    }
+
+    .panel {
+      background: rgba(13,20,38,.75);
+      border: 1px solid rgba(255,255,255,.07);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-radius: 14px;
+      padding: 12px;
+      min-height: 320px;
+    }
+    .panel h2 { font-size: 11.5px; margin-bottom: 10px; color: var(--text-secondary); letter-spacing: 0.08em; text-transform: uppercase; }
+
+    table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    th, td { padding: 7px 6px; border-bottom: 1px solid rgba(255,255,255,.06); text-align: left; vertical-align: top; }
+    th { color: var(--text-secondary); font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; }
+
+    .timeline {
+      max-height: 340px;
+      overflow: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .event {
+      border: 1px solid rgba(255,255,255,.08);
+      background: rgba(15,23,42,.6);
+      border-radius: 10px;
+      padding: 8px;
+      font-size: 12px;
+      transition: border-color var(--motion-fast) ease, box-shadow var(--motion-fast) ease, background var(--motion-fast) ease;
+    }
+    .event.state-start {
+      border-color: rgba(34,211,238,.35);
+      background: rgba(8,47,73,.25);
+    }
+    .event.state-handoff {
+      border-color: rgba(247,196,104,.35);
+      background: rgba(120,90,8,.15);
+    }
+    .event.state-done {
+      border-color: rgba(104,227,166,.35);
+      background: rgba(5,46,22,.2);
+    }
+    .event.state-blocked {
+      border-color: rgba(255,142,142,.4);
+      background: rgba(120,8,8,.2);
+    }
+    .event.new-event {
+      box-shadow: 0 0 0 1px rgba(99,102,241,.16), 0 0 12px rgba(99,102,241,.14);
+      animation: event-pop var(--motion-medium) var(--motion-ease-out);
+    }
+    @keyframes event-pop {
+      0% { transform: translateY(3px) scale(.995); opacity: .7; }
+      100% { transform: translateY(0) scale(1); opacity: 1; }
+    }
+    .event-head { display: flex; justify-content: space-between; gap: 8px; color: #94a3b8; }
+    .event-type {
+      font-size: 10px;
+      text-transform: uppercase;
+      border: 1px solid rgba(255,255,255,.16);
+      border-radius: 999px;
+      padding: 1px 8px;
+      color: #cbd5e1;
+      white-space: nowrap;
+    }
+
+    /* === Onda 16 — Skeleton shimmer === */
+    @keyframes shimmer {
+      0%   { background-position: -400px 0; }
+      100% { background-position:  400px 0; }
+    }
+    .skel {
+      display: block;
+      border-radius: 4px;
+      background: linear-gradient(90deg,
+        rgba(255,255,255,.05) 25%,
+        rgba(255,255,255,.10) 50%,
+        rgba(255,255,255,.05) 75%);
+      background-size: 800px 100%;
+      animation: shimmer 1.4s ease-in-out infinite;
+    }
+    .skel-line  { height: 10px; margin-bottom: 7px; }
+    .skel-line.wide  { width: 75%; }
+    .skel-line.mid   { width: 55%; }
+    .skel-line.short { width: 35%; }
+    .skel-block { height: 32px; margin-bottom: 8px; width: 100%; }
+    .skel-value { height: 26px; width: 60px; margin-top: 6px; border-radius: 4px; }
+    .skel-row   { height: 28px; margin-bottom: 6px; width: 100%; border-radius: 4px; }
+    @media (prefers-reduced-motion: reduce) {
+      .skel { animation: none; }
+    }
+
+    .alerts {
+      max-height: 250px;
+      overflow: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .alert {
+      border: 1px solid rgba(220,38,38,.3);
+      background: rgba(185,28,28,.2);
+      border-radius: 10px;
+      padding: 8px;
+      font-size: 12px;
+    }
+
+    .small { font-size: 11px; color: #64748b; }
+
+    .ia-block {
+      margin-top: 12px;
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 14px;
+      background: rgba(8,11,20,.42);
+      padding: 10px;
+    }
+    .ia-block-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin: 2px 2px 10px;
+    }
+    .ia-block-title {
+      font-size: 10.5px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      font-weight: 800;
+      color: #c4b5fd;
+    }
+    .ia-block-sub {
+      font-size: 11px;
+      color: #94a3b8;
+      text-align: right;
+    }
+    .ia-toggle {
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.05);
+      color: #cbd5e1;
+      border-radius: 999px;
+      padding: 3px 10px;
+      font-size: 10px;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all .15s;
+      font-family: inherit;
+    }
+    .ia-toggle:hover {
+      border-color: rgba(99,102,241,.45);
+      color: #c4b5fd;
+      background: rgba(99,102,241,.12);
+    }
+    .ia-toggle:focus-visible {
+      outline: 2px solid #22d3ee;
+      outline-offset: 2px;
+      box-shadow: 0 0 0 2px rgba(34,211,238,.18);
+    }
+    .ia-block-body {
+      display: block;
+    }
+    .ia-block.collapsed .ia-block-body {
+      display: none;
+    }
+
+    .icv-wrap {
+      margin: 0 0 12px;
+      border: 1px solid rgba(255,255,255,.09);
+      border-radius: 14px;
+      background: linear-gradient(140deg, rgba(99,102,241,.12), rgba(34,211,238,.05) 42%, rgba(8,11,20,.75));
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      overflow: hidden;
+    }
+    .icv-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 10px 12px;
+      border-bottom: 1px solid rgba(255,255,255,.06);
+      background: rgba(8,11,20,.5);
+    }
+    .icv-title {
+      font-size: 11px;
+      letter-spacing: .09em;
+      text-transform: uppercase;
+      color: #c4b5fd;
+      font-weight: 700;
+    }
+    .icv-pulse {
+      font-size: 10px;
+      color: #94a3b8;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 999px;
+      padding: 3px 9px;
+      background: rgba(255,255,255,.03);
+      font-weight: 700;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+    .icv-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 1fr 1fr;
+      gap: 10px;
+      padding: 10px;
+    }
+    .icv-card {
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 10px;
+      background: rgba(8,11,20,.62);
+      padding: 9px;
+      min-height: 140px;
+    }
+    .icv-card h3 {
+      font-size: 10px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: #94a3b8;
+      margin-bottom: 7px;
+    }
+    .icv-list { display: flex; flex-direction: column; gap: 6px; }
+    .icv-item {
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 8px;
+      padding: 7px 8px;
+      font-size: 11px;
+      background: rgba(15,23,42,.7);
+    }
+    .icv-item-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 2px;
+      color: #cbd5e1;
+      font-weight: 700;
+    }
+    .icv-item-meta {
+      color: #64748b;
+      font-size: 10px;
+      line-height: 1.45;
+    }
+    .sev-p1 { border-color: rgba(239,68,68,.45); background: rgba(127,29,29,.34); }
+    .sev-p2 { border-color: rgba(234,179,8,.45); background: rgba(120,53,15,.28); }
+    .sev-p3 { border-color: rgba(34,197,94,.35); background: rgba(6,78,59,.2); }
+
+    @media (max-width: 1100px) {
+      .icv-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 1100px) {
+      .grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .layout { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 700px) {
+      .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .page-wrap { padding: 18px 16px 26px; }
+      .card .value { font-size: 22px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 1ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 1ms !important;
+        scroll-behavior: auto !important;
+      }
+      .card.motion-enter { opacity: 1; transform: none; }
+    }
+
+    /* === Onda 13 — Alert Focus Mode === */
+    .blocked-banner {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(185,28,28,.18);
+      border: 1px solid rgba(239,68,68,.35);
+      border-radius: 10px;
+      padding: 8px 14px;
+      margin-bottom: 14px;
+      font-size: 12px;
+      animation: banner-enter var(--motion-medium) var(--motion-ease-out);
+    }
+    @keyframes banner-enter {
+      0% { opacity: 0; transform: translateY(-6px) scale(.99); }
+      100% { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .blocked-banner-icon { font-size: 16px; flex-shrink: 0; }
+    .blocked-banner-text { flex: 1; color: #fca5a5; font-weight: 600; }
+    .blocked-banner-count {
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: rgba(239,68,68,.25);
+      color: #f87171;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .blocked-banner-dismiss {
+      background: none;
+      border: none;
+      color: #64748b;
+      cursor: pointer;
+      font-size: 14px;
+      padding: 0 4px;
+      line-height: 1;
+      transition: color var(--motion-fast) ease;
+      font-family: inherit;
+    }
+    .blocked-banner-dismiss:hover { color: #f87171; }
+
+    .focus-panel {
+      background: rgba(120,8,8,.15);
+      border: 1px solid rgba(239,68,68,.3);
+      border-radius: 14px;
+      padding: 12px;
+      margin-bottom: 12px;
+      animation: banner-enter var(--motion-medium) var(--motion-ease-out);
+    }
+    .focus-panel h2 {
+      font-size: 11px;
+      color: #f87171;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .focus-panel h2 .focus-pulse {
+      display: inline-block;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #f87171;
+      animation: pulse-red 1.4s ease-in-out infinite;
+    }
+    @keyframes pulse-red {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.5); opacity: .6; }
+    }
+    .focus-panel .focus-events {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .focus-event {
+      background: rgba(185,28,28,.22);
+      border: 1px solid rgba(239,68,68,.4);
+      border-radius: 8px;
+      padding: 8px 10px;
+      font-size: 12px;
+      animation: event-pop var(--motion-medium) var(--motion-ease-out);
+    }
+    .focus-event-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+    .focus-event-head strong { color: #fca5a5; }
+    .focus-event-agent { color: #f87171; font-size: 11px; }
+    .focus-event-at { color: #64748b; font-size: 11px; white-space: nowrap; }
+    .focus-event-detail { color: #94a3b8; margin-top: 4px; font-size: 11px; }
+    @media (prefers-reduced-motion: reduce) {
+      .blocked-banner, .focus-panel, .focus-event { animation: none; }
+      .focus-panel .focus-pulse { animation: none; }
+    }
+
+    .deck-footer {
+      margin-top: 24px;
+      padding: 16px 18px;
+      box-sizing: border-box;
+      border: 1px solid rgba(99, 102, 241, 0.22);
+      border-radius: 14px;
+      background: linear-gradient(120deg, rgba(99, 102, 241, 0.16), rgba(34, 211, 238, 0.08) 48%, rgba(15, 23, 42, 0.62) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px 16px;
+      flex-wrap: wrap;
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    }
+    .deck-footer-brand { display: flex; flex-direction: column; gap: 3px; }
+    .deck-footer-brand strong {
+      font-size: 12px;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      color: #c7d2fe;
+    }
+    .deck-footer-brand span,
+    .deck-footer-meta {
+      font-size: 11px;
+      color: #94a3b8;
+    }
+    @media (max-width: 760px) {
+      .deck-footer { align-items: flex-start; }
+      .deck-footer-meta { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <div class="top-accent"></div>
+  <div class="page-wrap">
+  <nav class="premium-nav" role="navigation" aria-label="Navegação do Painel de Controle">
+    <div class="nav-logo">
+      <img src="./logo-axiom-labs.png" alt="Axiom Labs" />
+      <span class="nav-badge">PAINEL DE CONTROLE</span>
+    </div>
+    <div class="premium-nav-track">
+      <a class="premium-nav-link" href="./index.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8"></circle><circle cx="12" cy="12" r="3"></circle></svg>Controle de Missão</a>
+      <a class="premium-nav-link active" href="./command-center.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="14" rx="2"></rect><line x1="8" y1="20" x2="16" y2="20"></line><line x1="10" y1="8" x2="10" y2="14"></line><line x1="14" y1="10" x2="14" y2="14"></line></svg>Central de Comando</a>
+      <a class="premium-nav-link" href="./agents.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3"></circle><circle cx="17" cy="9" r="2.5"></circle><path d="M3 19c0-3.1 2.7-5 6-5s6 1.9 6 5"></path><path d="M14 18c.3-1.8 1.8-3 3.8-3 2 0 3.5 1.2 3.8 3"></path></svg>Catálogo de Agentes</a>
+      <a class="premium-nav-link" href="./portfolio-executive.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="7" width="18" height="12" rx="2"></rect><path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"></path><line x1="3" y1="12" x2="21" y2="12"></line></svg>Portfólio</a>
+      <a class="premium-nav-link" href="./flow-analytics.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 18h16"></path><polyline points="5 14 9 10 13 13 19 7"></polyline><circle cx="9" cy="10" r="1"></circle><circle cx="13" cy="13" r="1"></circle><circle cx="19" cy="7" r="1"></circle></svg>Análise de Fluxo</a>
+      <a class="premium-nav-link" href="./delivery-governance.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>Governança</a>
+      <a class="premium-nav-link" href="./roadmap.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6l9-3 9 3v3l-9 3-9-3V6z"/><path d="M3 12v3l9 3 9-3v-3"/><path d="M3 18v3l9 3 9-3v-3"/></svg>Roteiro</a>
+    </div>
+  </nav>
+  <div class="topbar">
+    <div class="brand">
+      <div>
+        <div class="headline">Painel da Central de Comando</div>
+        <div class="brand-sub">Produto da Axiom Labs &middot; Operado pela MGR Solutions &middot; <span id="generatedAt">Aguardando dados...</span></div>
+      </div>
+    </div>
+    <div class="actions">
+      <span id="envChip" class="ops-chip">ENV: N/A</span>
+      <span id="gateChip" class="ops-chip">GATE: N/A</span>
+      <span id="healthBadge" class="health-badge green"><span class="health-dot"></span> Saudavel</span>
+      <select id="commandPresetSelect" class="preset-select" aria-label="Preset operacional da Central de Comando" onchange="setCommandPreset(this.value)">
+        <option value="custom">Preset: Personalizado</option>
+        <option value="network-ops">Preset: Operações de Rede</option>
+        <option value="governance-review">Preset: Revisão de Governança</option>
+        <option value="executive-snapshot">Preset: Resumo Executivo</option>
+      </select>
+      <span class="preset-hint" id="commandPresetHint">Blocos ajustados manualmente</span>
+      <button class="btn" onclick="exportMarkdown()">Exportar .md</button>
+      <button class="btn" onclick="exportCSV()">Exportar CSV</button>
+      <button class="btn" onclick="loadData()">Atualizar</button>
+    </div>
+  </div>
+
+  <div id="blockedBanner" style="display:none"></div>
+  <div id="focusPanel" style="display:none"></div>
+
+  <section class="ia-block" aria-label="Bloco executivo de resposta imediata">
+    <div class="ia-block-head">
+      <div class="ia-block-title">Executar Agora</div>
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end">
+        <div class="ia-block-sub">Sinais críticos, triagem e status operacional</div>
+        <button class="ia-toggle" type="button" data-target="execute" onclick="toggleIABlock('execute')">Ocultar</button>
+      </div>
+    </div>
+
+  <div class="ia-block-body" id="iaBlockBodyExecute">
+
+  <section class="icv-wrap" aria-label="Incident Command View">
+    <div class="icv-head">
+      <div class="icv-title">Visão de Comando de Incidentes</div>
+      <div class="icv-pulse" id="icvPulse">Ao vivo</div>
+    </div>
+    <div class="icv-grid">
+      <article class="icv-card">
+        <h3>Incidentes Priorizados</h3>
+        <div class="icv-list" id="incidentList"></div>
+      </article>
+      <article class="icv-card">
+        <h3>Fila de Decisão</h3>
+        <div class="icv-list" id="decisionQueue"></div>
+      </article>
+      <article class="icv-card">
+        <h3>Timeline Tática</h3>
+        <div class="icv-list" id="timelineBuckets"></div>
+      </article>
+    </div>
+  </section>
+
+  <div class="grid">
+    <div class="card"><h3>Repos</h3><div class="value" id="vRepos">0</div><div class="meta" id="vReposMeta">com kanban: 0</div></div>
+    <div class="card"><h3>Compliance semanal</h3><div class="value" id="vCompliance">0%</div><div class="meta">workflows instalados</div></div>
+    <div class="card"><h3>Bloqueios</h3><div class="value bad" id="vBlocked">0</div><div class="meta" id="vBlockedMeta">repos bloqueados: 0</div></div>
+    <div class="card"><h3>Média em execução</h3><div class="value" id="vAvgRun">0m</div><div class="meta">todos os agentes em execução</div></div>
+    <div class="card"><h3>Alertas de SLA</h3><div class="value" id="vSla">0</div><div class="meta" id="vSlaMeta">em execução sem output</div></div>
+    <div class="card"><h3>Concluídos sem output</h3><div class="value" id="vDoneNoOut">0%</div><div class="meta" id="vDoneNoOutMeta">0 de 0 tarefas concluídas</div></div>
+    <div class="card"><h3>MTTD</h3><div class="value" id="vMttd">0m</div><div class="meta" id="vMttdMeta">tempo medio de deteccao</div></div>
+    <div class="card"><h3>MTTR</h3><div class="value" id="vMttr">0m</div><div class="meta" id="vMttrMeta">tempo medio de recuperacao</div></div>
+    <div class="card"><h3>Falso positivo</h3><div class="value" id="vFpr">0%</div><div class="meta" id="vFprMeta">incidentes sem falha real</div></div>
+    <div class="card"><h3>Gate de release</h3><div class="value" id="vGate">PASS</div><div class="meta" id="vGateMeta">domínios bloqueados: 0</div></div>
+  </div>
+
+  <div class="layout">
+    <div class="panel">
+      <h2>Saude por repositorio</h2>
+      <div class="filter-bar">
+        <span>Filtrar:</span>
+        <button class="fpill active" onclick="filterTable('all', this)">Todos</button>
+        <button class="fpill" onclick="filterTable('blocked', this)">Bloqueados</button>
+        <button class="fpill" onclick="filterTable('running', this)">Em Execucao</button>
+        <button class="fpill" onclick="filterTable('noncompliant', this)">Sem Compliance</button>
+        <button class="fpill" onclick="filterTable('nooutput', this)">Done sem Output</button>
+        <span style="margin-left:10px">Janela:</span>
+        <button class="fpill time-pill" onclick="setTimeWindow('24h', this)">24h</button>
+        <button class="fpill time-pill active" onclick="setTimeWindow('7d', this)">7d</button>
+        <button class="fpill time-pill" onclick="setTimeWindow('30d', this)">30d</button>
+      </div>
+      <table aria-describedby="repoTableCaption">
+        <caption id="repoTableCaption" class="sr-only">Tabela de saude por repositorio com estados de execucao bloqueio compliance maturidade e risco SLA</caption>
+        <thead>
+          <tr>
+            <th scope="col">Repo</th>
+            <th scope="col">Em execução</th>
+            <th scope="col">Bloqueados</th>
+            <th scope="col">Média</th>
+            <th scope="col">Done sem output</th>
+            <th scope="col">Compliance</th>
+            <th scope="col">Maturidade</th>
+            <th scope="col">Risco SLA</th>
+          </tr>
+        </thead>
+        <tbody id="repoTable"></tbody>
+      </table>
+    </div>
+
+    <div class="panel">
+      <h2>SLA & Deteccao</h2>
+      <div class="small" id="detectionInfo">-</div>
+      <div style="margin-top:8px">
+        <a href="../docs/playbook-sla.md" style="font-size:11px;color:#6366f1;text-decoration:none;" target="_blank">Playbook de resposta SLA &rarr;</a>
+      </div>
+      <div class="alerts" id="alertsList" style="margin-top:10px"></div>
+    </div>
+  </div>
+
+  </div>
+  </section>
+
+  <section class="ia-block" aria-label="Bloco investigativo">
+    <div class="ia-block-head">
+      <div class="ia-block-title">Investigar</div>
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end">
+        <div class="ia-block-sub">Análise de atividade e hipóteses automáticas</div>
+        <button class="ia-toggle" type="button" data-target="investigate" onclick="toggleIABlock('investigate')">Ocultar</button>
+      </div>
+    </div>
+
+  <div class="ia-block-body" id="iaBlockBodyInvestigate">
+
+  <div class="layout" style="margin-top:10px">
+    <div class="panel">
+      <h2>Top 5 Agentes mais ativos</h2>
+      <div class="small" id="topAgentsMeta">janela: 7 dias</div>
+      <div id="topAgentsList"><div class="small">Aguardando dados...</div></div>
+    </div>
+    <div class="panel">
+      <h2>Ranking de Maturidade por Repo</h2>
+      <div id="maturityRanking"><div class="small">Aguardando dados...</div></div>
+    </div>
+  </div>
+
+  <div class="layout" style="margin-top:10px">
+    <div class="panel" style="grid-column: 1 / span 2; min-height: 150px;">
+      <h2>Top 5 Insights Automaticos</h2>
+      <div class="small" id="insightsMeta">janela analitica: 7 dias</div>
+      <div id="insightsList"><div class="small">Aguardando dados...</div></div>
+    </div>
+  </div>
+
+  </div>
+  </section>
+
+  <section class="ia-block" aria-label="Bloco de governança e conformidade">
+    <div class="ia-block-head">
+      <div class="ia-block-title">Governar</div>
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end">
+        <div class="ia-block-sub">Eficácia, risco sistêmico, qualidade e trilha técnica</div>
+        <button class="ia-toggle" type="button" data-target="govern" onclick="toggleIABlock('govern')">Ocultar</button>
+      </div>
+    </div>
+
+  <div class="ia-block-body" id="iaBlockBodyGovern">
+
+  <div class="layout" style="margin-top:10px">
+    <div class="panel">
+      <h2>Eficacia do Time de Agentes</h2>
+      <div class="small" id="agentEffSummary">Aguardando dados...</div>
+      <div id="agentEffList" style="margin-top:10px"></div>
+    </div>
+    <div class="panel">
+      <h2>Release Gates por Dominio</h2>
+      <div class="small" id="releaseGateSummary">Aguardando dados...</div>
+      <div id="releaseGateList" style="margin-top:10px"></div>
+    </div>
+  </div>
+
+  <div class="layout" style="margin-top:10px">
+    <div class="panel" style="grid-column: 1 / span 2; min-height: 170px;">
+      <h2>Observabilidade de Falhas (14 snapshots)</h2>
+      <div class="small" id="failureSummary">Aguardando dados...</div>
+      <div id="failureTrendList" style="margin-top:10px"></div>
+      <div class="small" id="failureTrendLegend" style="margin-top:8px"></div>
+    </div>
+  </div>
+
+  <div class="layout" style="margin-top:10px">
+    <div class="panel">
+      <h2>Erros de Schema / Parse</h2>
+      <div class="alerts" id="parseErrorsList" style="max-height:220px">
+        <div class="small">Sem erros de schema detectados.</div>
+      </div>
+    </div>
+    <div class="panel">
+      <h2>Relatório de diagnóstico</h2>
+      <div class="small" id="doctorSummary">Doctor nao executado nesta geracao.</div>
+      <div class="alerts" id="doctorIssues" style="max-height:220px;margin-top:8px"></div>
+    </div>
+  </div>
+
+  <div class="layout" style="margin-top:10px">
+    <div class="panel" style="grid-column: 1 / span 2;">
+      <h2>Timeline por agente (início, bloqueio, conclusão, handoff)</h2>
+      <div class="timeline" id="timelineList"></div>
+    </div>
+  </div>
+
+  </div>
+  </section>
+
+  <script>
+    const REDUCED_MOTION = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const KPI_STATE = Object.create(null);
+    let CARDS_ANIMATED = false;
+    let LAST_TIMELINE_HASH = null;
+
+    function esc(v) {
+      if (v === null || v === undefined) return "";
+      return String(v).replace(/[&<>"']/g, function(c) {
+        return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c];
+      });
+    }
+
+    function typeClass(type) {
+      if (type === 'blocked') return 'bad';
+      if (type === 'handoff') return 'warn';
+      if (type === 'done') return 'ok';
+      return '';
+    }
+
+    function setText(id, value) {
+      const el = document.getElementById(id);
+      if (el) el.textContent = value;
+    }
+
+    function setMetric(id, target, suffix) {
+      const el = document.getElementById(id);
+      if (!el) return;
+
+      const next = Number(target) || 0;
+      if (REDUCED_MOTION) {
+        el.textContent = String(next) + (suffix || '');
+        KPI_STATE[id] = next;
+        return;
+      }
+
+      const prev = KPI_STATE[id];
+      if (!Number.isFinite(prev)) {
+        KPI_STATE[id] = next;
+        el.textContent = String(next) + (suffix || '');
+        return;
+      }
+
+      if (prev === next) {
+        el.textContent = String(next) + (suffix || '');
+        return;
+      }
+
+      const start = performance.now();
+      const duration = 320;
+      const diff = next - prev;
+
+      if (!REDUCED_MOTION) {
+        el.classList.remove('delta-up', 'delta-down');
+        if (diff > 0) el.classList.add('delta-up');
+        if (diff < 0) el.classList.add('delta-down');
+        window.setTimeout(function() {
+          el.classList.remove('delta-up', 'delta-down');
+        }, 760);
+      }
+
+      function tick(now) {
+        const p = Math.min(1, (now - start) / duration);
+        const eased = 1 - Math.pow(1 - p, 3);
+        const current = Math.round(prev + (diff * eased));
+        el.textContent = String(current) + (suffix || '');
+        if (p < 1) {
+          requestAnimationFrame(tick);
+        } else {
+          KPI_STATE[id] = next;
+        }
+      }
+      requestAnimationFrame(tick);
+    }
+
+    function animateCardsOnce() {
+      if (CARDS_ANIMATED || REDUCED_MOTION) return;
+      var cards = Array.prototype.slice.call(document.querySelectorAll('.grid .card'));
+      cards.forEach(function(card, idx) {
+        card.classList.add('motion-enter');
+        card.style.setProperty('--enter-delay', String(idx * 34) + 'ms');
+      });
+      CARDS_ANIMATED = true;
+    }
+
+    function timelineState(type) {
+      if (type === 'blocked') return 'state-blocked';
+      if (type === 'handoff') return 'state-handoff';
+      if (type === 'done') return 'state-done';
+      return 'state-start';
+    }
+
+    function timelineHash(ev) {
+      return [ev.repo || '', ev.agent || '', ev.type || '', ev.at || '', ev.detail || ''].join('|');
+    }
+
+    function buildSparkline(series, width, height) {
+      if (!series || !series.length) return '';
+      var maxVal = Math.max.apply(null, series.concat([1]));
+      var minVal = Math.min.apply(null, series.concat([0]));
+      var range = Math.max(1, maxVal - minVal);
+      var stepX = series.length > 1 ? (width / (series.length - 1)) : 0;
+      var points = series.map(function(v, i) {
+        var x = Math.round(i * stepX * 100) / 100;
+        var y = Math.round((height - ((v - minVal) / range) * height) * 100) / 100;
+        return x + ',' + y;
+      }).join(' ');
+      return '<svg viewBox="0 0 ' + width + ' ' + height + '" width="100" height="20" aria-label="trend">' +
+        '<polyline fill="none" stroke="#22d3ee" stroke-width="2" points="' + points + '" />' +
+      '</svg>';
+    }
+
+    // Semáforo de saúde
+    function updateHealthBadge(h) {
+      const badge = document.getElementById('healthBadge');
+      if (!badge) return;
+      const isRed    = (h.blockedRepos > 0) || (h.slaAlerts > 0);
+      const isYellow = !isRed && ((h.doneWithoutOutputRate > 20) || (h.weeklyComplianceRate < 80));
+      badge.className = 'health-badge ' + (isRed ? 'red' : isYellow ? 'yellow' : 'green');
+      badge.innerHTML = '<span class="health-dot"></span> ' + (isRed ? 'Atenção' : isYellow ? 'Atenção leve' : 'Saudável');
+    }
+
+    // Filtro de tabela
+    var _dashboardData = null;
+    var _reposData = [];
+    var _currentFilter = 'all';
+    var _timeWindow = '7d';
+    var WINDOW_MS = {
+      '24h': 24 * 60 * 60 * 1000,
+      '7d': 7 * 24 * 60 * 60 * 1000,
+      '30d': 30 * 24 * 60 * 60 * 1000,
+      'all': null
+    };
+
+    function parseDateLike(value) {
+      if (value === null || value === undefined || value === '') return null;
+      if (typeof value === 'number' && Number.isFinite(value)) return value > 9999999999 ? value : value * 1000;
+      if (value instanceof Date) {
+        var t = value.getTime();
+        return Number.isFinite(t) ? t : null;
+      }
+      var raw = String(value).trim();
+      if (!raw) return null;
+      if (/^\d{10,13}$/.test(raw)) {
+        var n = Number(raw);
+        if (Number.isFinite(n)) return raw.length === 10 ? n * 1000 : n;
+      }
+      var parsed = Date.parse(raw);
+      return Number.isFinite(parsed) ? parsed : null;
+    }
+
+    function isWithinWindow(ts, windowKey) {
+      if (!Number.isFinite(ts)) return false;
+      var maxAge = WINDOW_MS[windowKey];
+      if (!maxAge) return true;
+      return (Date.now() - ts) <= maxAge;
+    }
+
+    function timeWindowLabel(windowKey) {
+      return windowKey === '24h' ? '24h' : (windowKey === '30d' ? '30 dias' : (windowKey === 'all' ? 'tudo' : '7 dias'));
+    }
+
+    function formatRelative(ts) {
+      if (!Number.isFinite(ts)) return 'sem timestamp';
+      var sec = Math.max(0, Math.floor((Date.now() - ts) / 1000));
+      if (sec < 60) return 'agora';
+      var min = Math.floor(sec / 60);
+      if (min < 60) return min + 'm atras';
+      var hr = Math.floor(min / 60);
+      if (hr < 24) return hr + 'h atras';
+      var day = Math.floor(hr / 24);
+      return day + 'd atras';
+    }
+
+    function setTimeWindow(windowKey, el) {
+      _timeWindow = windowKey;
+      document.querySelectorAll('.time-pill').forEach(function(p) { p.classList.remove('active'); });
+      if (el) el.classList.add('active');
+      if (_dashboardData) {
+        render();
+      }
+    }
+    function filterTable(type, el) {
+      _currentFilter = type;
+      document.querySelectorAll('.fpill').forEach(function(p) { p.classList.remove('active'); });
+      if (el) el.classList.add('active');
+      renderRepoTable();
+    }
+    // Onda 14 — Row sparkline helpers
+    function buildSyntheticRiskSeries(risk, running, blocked) {
+      // Generate a plausible 7-point history ending at current risk
+      var base = Math.max(0, risk - (blocked * 12) - (running * 3));
+      var series = [];
+      for (var i = 0; i < 7; i++) {
+        var fraction = i / 6;
+        var noise = (Math.sin(i * 1.7) * 6);
+        series.push(Math.round(Math.max(0, Math.min(100, base + (risk - base) * fraction + noise))));
+      }
+      series[6] = risk; // anchor last point to current score
+      return series;
+    }
+
+    function buildRowSparkline(series, color, ariaLabel) {
+      var W = 52, H = 16;
+      if (!series || series.length < 2) return '';
+      var maxV = Math.max.apply(null, series.concat([1]));
+      var minV = Math.min.apply(null, series.concat([0]));
+      var range = Math.max(1, maxV - minV);
+      var step = W / (series.length - 1);
+      var pts = series.map(function(v, i) {
+        var x = Math.round(i * step * 10) / 10;
+        var y = Math.round((H - ((v - minV) / range) * (H - 2) - 1) * 10) / 10;
+        return x + ',' + y;
+      }).join(' ');
+      var lastX = Math.round((series.length - 1) * step * 10) / 10;
+      var lastY = Math.round((H - ((series[series.length - 1] - minV) / range) * (H - 2) - 1) * 10) / 10;
+      return '<svg viewBox="0 0 ' + W + ' ' + H + '" width="' + W + '" height="' + H + '" role="img" aria-label="' + esc(ariaLabel || 'Tendencia de risco') + '">' +
+        '<polyline fill="none" stroke="' + color + '" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" points="' + pts + '" opacity=".8"/>' +
+        '<circle cx="' + lastX + '" cy="' + lastY + '" r="2" fill="' + color + '" opacity=".9"/>' +
+      '</svg>';
+    }
+
+    function renderRepoTable() {
+      var repos = _reposData;
+      if (_currentFilter === 'blocked')      repos = repos.filter(function(r) { return (r.blockedAgents || 0) > 0; });
+      if (_currentFilter === 'running')      repos = repos.filter(function(r) { return (r.runningAgents || 0) > 0; });
+      if (_currentFilter === 'noncompliant') repos = repos.filter(function(r) { return !r.hasWeeklyCompliance; });
+      if (_currentFilter === 'nooutput')     repos = repos.filter(function(r) { return (r.doneWithoutOutput || 0) > 0; });
+      var rows = repos.map(function(r) {
+        var comp = r.hasWeeklyCompliance ? 'OK' : 'MISSING';
+        var compClass = r.hasWeeklyCompliance ? 'ok' : 'bad';
+        var score = r.maturityScore || 0;
+        var scoreClass = score >= 80 ? 'ok' : score >= 40 ? 'warn' : 'bad';
+        var risk = r.slaRiskScore || 0;
+        var riskClass = risk >= 75 ? 'bad' : risk >= 55 ? 'warn' : 'ok';
+        var riskLabel = (r.slaRiskLevel || 'low').toUpperCase();
+        var updatedTs = parseDateLike(r.updatedAt);
+        var freshnessLabel = formatRelative(updatedTs);
+        var freshnessClass = Number.isFinite(updatedTs)
+          ? ((Date.now() - updatedTs) <= (24 * 60 * 60 * 1000) ? 'ok' : ((Date.now() - updatedTs) <= (7 * 24 * 60 * 60 * 1000) ? 'warn' : 'bad'))
+          : 'warn';
+        var detailId = 'detail_' + r.repo.replace(/[^a-z0-9]/gi,'_');
+        var hasRealRiskHistory = Array.isArray(r.slaRiskHistory) && r.slaRiskHistory.length > 1;
+        var sparkSeries = hasRealRiskHistory
+          ? r.slaRiskHistory
+          : buildSyntheticRiskSeries(risk, r.runningAgents || 0, r.blockedAgents || 0);
+        var sparkColor = risk >= 75 ? '#f87171' : risk >= 55 ? '#facc15' : '#4ade80';
+        var rowId = 'row_' + r.repo.replace(/[^a-z0-9]/gi,'_');
+        var sparkLabel = 'Tendencia de risco SLA de ' + r.repo + ': inicio ' + (sparkSeries[0] || 0) + ' fim ' + risk;
+        var sparkSvg = buildRowSparkline(sparkSeries, sparkColor, sparkLabel);
+        var provenance = hasRealRiskHistory ? 'real' : 'estimado';
+        var confidence = hasRealRiskHistory && Number.isFinite(updatedTs) ? 'alta' : (hasRealRiskHistory ? 'media' : 'baixa');
+        return '<tr id="' + rowId + '" class="repo-row" tabindex="0" role="button" aria-expanded="false" onclick="toggleDetail(\'' + detailId + '\', \'' + rowId + '\')" onkeydown="toggleDetailByKey(event, \'' + detailId + '\', \'' + rowId + '\')">'+
+          '<td>' + esc(r.repo) + ' <span style="color:#334155;font-size:10px">&#9660;</span>'+
+            (r.path ? ' <a href="file:///'+r.path.replace(/\\/g, '/')+'/.claude/dashboard/index.html" target="_blank" onclick="event.stopPropagation()" title="Abrir dashboard do projeto" style="font-size:10px;color:#6366f1;text-decoration:none;opacity:.85;margin-left:4px;vertical-align:middle" aria-label="Abrir dashboard de '+esc(r.repo)+'">&#8599;</a>' : '')+
+            '<div class="small ' + freshnessClass + '">atualizado: ' + esc(freshnessLabel) + ' | confianca: ' + esc(confidence) + '</div>' +
+          '</td>'+
+          '<td>' + esc(r.runningAgents || 0) + '</td>'+
+          '<td class="' + ((r.blockedAgents || 0) > 0 ? 'bad' : '') + '">' + esc(r.blockedAgents || 0) + '</td>'+
+          '<td>' + esc(r.averageRunningMinutes || 0) + 'm</td>'+
+          '<td class="' + ((r.doneWithoutOutput || 0) > 0 ? 'warn' : 'ok') + '">' + esc(r.doneWithoutOutput || 0) + '</td>'+
+          '<td class="' + compClass + '">' + comp + '</td>'+
+          '<td class="' + scoreClass + '">' + score + '/100</td>'+
+          '<td class="' + riskClass + '">' + risk + ' (' + riskLabel + ')' +
+            '<span class="row-spark">' + sparkSvg + '</span>' +
+            '<div class="small">serie: ' + provenance + '</div>' +
+          '</td>'+
+        '</tr>'+
+        '<tr id="' + detailId + '" style="display:none"><td colspan="8" style="padding:0">'+
+          '<div class="repo-detail open">'+
+            '<div class="detail-grid">'+
+              '<span><b>Agentes done:</b> ' + esc(r.doneAgents || 0) + '</span>'+
+              '<span><b>Done sem output:</b> ' + esc(r.doneWithoutOutput || 0) + '</span>'+
+              '<span><b>Avg running:</b> ' + esc(r.averageRunningMinutes || 0) + 'm</span>'+
+              '<span><b>Compliance semanal:</b> ' + comp + '</span>'+
+              '<span><b>Auditoria:</b> ' + (r.hasAuditWorkflow ? 'OK' : 'MISSING') + '</span>'+
+              '<span><b>Alertas SLA:</b> ' + esc((r.alerts || []).length) + '</span>'+
+              '<span><b>Maturidade:</b> <span class="' + scoreClass + '">' + score + '/100</span></span>'+
+              '<span><b>Risco SLA:</b> <span class="' + riskClass + '">' + risk + ' (' + riskLabel + ')</span></span>'+
+              '<span><b>Serie de risco:</b> ' + esc(provenance) + '</span>'+
+              '<span><b>Confianca:</b> ' + esc(confidence) + '</span>'+
+              (r.path ? '<span><b>Dashboard:</b> <a href="file:///'+r.path.replace(/\\/g, '/')+'/.claude/dashboard/index.html" target="_blank" style="color:#6366f1;text-decoration:none">Abrir dashboard &#8599;</a></span>' : '')+
+            '</div>'+
+          '</div>'+
+        '</td></tr>';
+      }).join('');
+      document.getElementById('repoTable').innerHTML = rows || '<tr><td colspan="8" class="small">Nenhum repositorio neste filtro.</td></tr>';
+    }
+    function toggleDetail(id, rowId) {
+      var row = document.getElementById(id);
+      if (!row) return;
+      var opening = row.style.display === 'none';
+      row.style.display = opening ? '' : 'none';
+      if (rowId) {
+        var trigger = document.getElementById(rowId);
+        if (trigger) trigger.setAttribute('aria-expanded', opening ? 'true' : 'false');
+      }
+    }
+
+    function toggleDetailByKey(event, detailId, rowId) {
+      if (!event) return;
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        toggleDetail(detailId, rowId);
+      }
+    }
+
+    // Exportar Markdown
+    function exportMarkdown() {
+      var d = window.COMMAND_DASHBOARD_DATA;
+      if (!d) { alert('Dados nao carregados ainda.'); return; }
+      var h = d.health || {};
+      var lines = [
+        '# Squad Health Report — ' + (d.generatedAt || new Date().toLocaleString('pt-BR')),
+        '',
+        '## KPIs Globais',
+        '| Metrica | Valor |',
+        '|---------|-------|',
+        '| Repos totais | ' + (h.totalRepos || 0) + ' |',
+        '| Repos com kanban | ' + (h.reposWithKanban || 0) + ' |',
+        '| Compliance semanal | ' + (h.weeklyComplianceRate || 0) + '% |',
+        '| Agentes bloqueados | ' + (h.totalBlockedAgents || 0) + ' |',
+        '| Repos bloqueados | ' + (h.blockedRepos || 0) + ' |',
+        '| Media running (min) | ' + (h.averageRunningMinutes || 0) + ' |',
+        '| SLA alerts | ' + (h.slaAlerts || 0) + ' |',
+        '| Done sem output | ' + (h.doneWithoutOutputRate || 0) + '% |',
+        '| MTTD | ' + (h.mttdMinutes || 0) + ' min |',
+        '| MTTR | ' + (h.mttrMinutes || 0) + ' min |',
+        '| False positive rate | ' + (h.falsePositiveRate || 0) + '% |',
+        '',
+        '## Repositorios',
+        '| Repo | Running | Blocked | Avg | Done s/output | Compliance |',
+        '|------|---------|---------|-----|--------------|------------|',
+      ];
+      (d.repositories || []).forEach(function(r) {
+        lines.push('| ' + r.repo + ' | ' + (r.runningAgents||0) + ' | ' + (r.blockedAgents||0) + ' | ' + (r.averageRunningMinutes||0) + 'm | ' + (r.doneWithoutOutput||0) + ' | ' + (r.hasWeeklyCompliance ? 'OK' : 'MISSING') + ' |');
+      });
+      if ((d.alerts || []).length > 0) {
+        lines.push('', '## SLA Alerts');
+        d.alerts.forEach(function(a) {
+          lines.push('- **' + a.repo + '** / ' + a.agent + ': ' + a.runningMinutes + 'min (SLA: ' + a.slaMinutes + 'min)');
+        });
+      }
+      var text = lines.join('\n');
+      var ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      alert('Relatorio copiado para a area de transferencia!');
+    }
+
+    // Exportar CSV
+    function csvCell(v) {
+      var s = String(v === null || v === undefined ? '' : v);
+      s = s.replace(/"/g, '""');
+      if (/[",\n;]/.test(s)) return '"' + s + '"';
+      return s;
+    }
+    function exportCSV() {
+      var d = window.COMMAND_DASHBOARD_DATA;
+      if (!d) { alert('Dados nao carregados ainda.'); return; }
+      var h = d.health || {};
+      var header = [
+        'repo','runningAgents','blockedAgents','averageRunningMinutes','doneAgents','doneWithoutOutput',
+        'doneWithoutOutputRateRepo','weeklyCompliance','hasAuditWorkflow','maturityScore','slaRiskScore','slaRiskLevel',
+        'health_totalRepos','health_reposWithKanban','health_weeklyComplianceRate','health_slaAlerts','health_averageSlaRiskScore',
+        'health_mttdMinutes','health_mttrMinutes','health_falsePositiveRate','releaseGateStatus'
+      ];
+      var lines = [header.join(',')];
+      (d.repositories || []).forEach(function(r) {
+        var done = r.doneAgents || 0;
+        var doneNoOut = r.doneWithoutOutput || 0;
+        var doneNoOutRateRepo = done > 0 ? Math.round((doneNoOut / done) * 1000) / 10 : 0;
+        var row = [
+          r.repo,
+          r.runningAgents || 0,
+          r.blockedAgents || 0,
+          r.averageRunningMinutes || 0,
+          done,
+          doneNoOut,
+          doneNoOutRateRepo,
+          r.hasWeeklyCompliance ? 'OK' : 'MISSING',
+          r.hasAuditWorkflow ? 'OK' : 'MISSING',
+          r.maturityScore || 0,
+          r.slaRiskScore || 0,
+          r.slaRiskLevel || 'low',
+          h.totalRepos || 0,
+          h.reposWithKanban || 0,
+          h.weeklyComplianceRate || 0,
+          h.slaAlerts || 0,
+          h.averageSlaRiskScore || 0,
+          h.mttdMinutes || 0,
+          h.mttrMinutes || 0,
+          h.falsePositiveRate || 0,
+          (d.releaseGates && d.releaseGates.overallStatus) ? d.releaseGates.overallStatus : 'N/A'
+        ];
+        lines.push(row.map(csvCell).join(','));
+      });
+
+      var csv = lines.join('\n');
+      var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = 'squad-health-report-' + new Date().toISOString().slice(0, 10) + '.csv';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    // Onda 16 — Skeleton loaders
+    function skelLines(count, widths) {
+      var w = widths || ['wide','mid','short'];
+      var html = '';
+      for (var i = 0; i < count; i++) {
+        html += '<div class="skel skel-line ' + (w[i % w.length]) + '"></div>';
+      }
+      return html;
+    }
+
+    function showSkeletons() {
+      // KPI cards
+      var cards = Array.prototype.slice.call(document.querySelectorAll('.grid .card'));
+      cards.forEach(function(card) {
+        var h3 = card.querySelector('h3');
+        var label = h3 ? h3.outerHTML : '';
+        card.innerHTML = label + '<div class="skel skel-value" style="margin-top:8px"></div>';
+      });
+      // Panels with known IDs
+      var panelSkels = {
+        repoTable:         '<tr><td colspan="8">' + skelLines(3, ['wide','mid','short']) + '</td></tr>',
+        alertsList:        skelLines(2, ['wide','mid']),
+        topAgentsList:     skelLines(3, ['wide','mid','short']),
+        maturityRanking:   skelLines(4, ['wide','mid','wide','short']),
+        insightsList:      skelLines(3, ['wide','mid','wide']),
+        agentEffList:      skelLines(2, ['wide','mid']),
+        releaseGateList:   skelLines(2, ['wide','mid']),
+        failureTrendList:  skelLines(3, ['wide','mid','short']),
+        parseErrorsList:   skelLines(2, ['wide','mid']),
+        doctorIssues:      skelLines(2, ['wide','mid']),
+        timelineList:      skelLines(4, ['wide','mid','short','wide'])
+      };
+      Object.keys(panelSkels).forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el) el.innerHTML = panelSkels[id];
+      });
+      // Summary text targets
+      ['agentEffSummary','releaseGateSummary','failureSummary','doctorSummary','detectionInfo'].forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el) el.innerHTML = '<div class="skel skel-line mid"></div>';
+      });
+    }
+
+    // Onda 15 — Maturity bar animated fill
+    function animateMaturityBars() {
+      if (REDUCED_MOTION) {
+        document.querySelectorAll('.mat-bar-fill').forEach(function(el) {
+          el.style.width = el.style.getPropertyValue('--mat-target') || '0%';
+        });
+        return;
+      }
+      var bars = Array.prototype.slice.call(document.querySelectorAll('.mat-bar-fill'));
+      bars.forEach(function(el, idx) {
+        var target = parseFloat(el.style.getPropertyValue('--mat-target')) || 0;
+        el.style.width = '0%';
+        window.setTimeout(function() {
+          el.classList.add('animate');
+          el.style.width = target + '%';
+        }, 60 + idx * 55);
+      });
+    }
+
+    // Onda 13 — Alert Focus Mode
+    var _bannerDismissed = false;
+
+    function renderBlockedFocus(timeline, health) {
+      var blockedEvents = (timeline || []).filter(function(ev) { return ev.type === 'blocked'; });
+      var blockedAgents = (health && health.totalBlockedAgents) ? health.totalBlockedAgents : 0;
+      var hasBlocked = blockedEvents.length > 0 || blockedAgents > 0;
+
+      var banner = document.getElementById('blockedBanner');
+      var focusPanel = document.getElementById('focusPanel');
+      if (!banner || !focusPanel) return;
+
+      if (!hasBlocked) {
+        banner.style.display = 'none';
+        focusPanel.style.display = 'none';
+        return;
+      }
+
+      // Banner de alerta no topo
+      if (!_bannerDismissed) {
+        var totalBlocked = Math.max(blockedEvents.length, blockedAgents);
+        banner.style.display = '';
+        banner.innerHTML =
+          '<div class="blocked-banner">' +
+            '<span class="blocked-banner-icon">ALERTA</span>' +
+            '<span class="blocked-banner-text">Incidentes bloqueados detectados — ação imediata requerida</span>' +
+            '<span class="blocked-banner-count">' + totalBlocked + ' bloqueados</span>' +
+            '<button class="blocked-banner-dismiss" onclick="dismissBlockedBanner()" title="Fechar" aria-label="Fechar alerta">✕</button>' +
+          '</div>';
+      }
+
+      // Painel de foco: top blocked events
+      var topBlocked = blockedEvents.slice(0, 5);
+      var eventsHtml = topBlocked.map(function(ev) {
+        return '<div class="focus-event">' +
+          '<div class="focus-event-head">' +
+            '<strong>' + esc(ev.repo || '—') + '</strong>' +
+            '<span class="focus-event-agent">:: ' + esc(ev.agent || '—') + '</span>' +
+            '<span class="focus-event-at">' + esc(ev.at || '') + '</span>' +
+          '</div>' +
+          '<div class="focus-event-detail">' + esc(ev.detail || '') + '</div>' +
+        '</div>';
+      }).join('');
+
+      if (!eventsHtml && blockedAgents > 0) {
+        eventsHtml = '<div class="focus-event"><div class="focus-event-head"><strong>' + blockedAgents + ' agente(s) com status bloqueado</strong></div><div class="focus-event-detail">Verifique o kanban de cada repositório para identificar o bloqueio.</div></div>';
+      }
+
+      focusPanel.style.display = '';
+      focusPanel.innerHTML =
+        '<div class="focus-panel">' +
+          '<h2><span class="focus-pulse"></span> Foco: Eventos Bloqueados (' + (topBlocked.length || blockedAgents) + ')</h2>' +
+          '<div class="focus-events">' + eventsHtml + '</div>' +
+        '</div>';
+    }
+
+    function dismissBlockedBanner() {
+      _bannerDismissed = true;
+      var banner = document.getElementById('blockedBanner');
+      if (banner) banner.style.display = 'none';
+    }
+
+    function severityByEvent(ev) {
+      if (!ev) return 'P3';
+      if (ev.type === 'blocked') return 'P1';
+      if (ev.type === 'handoff') return 'P2';
+      return 'P3';
+    }
+
+    function severityClass(sev) {
+      if (sev === 'P1') return 'sev-p1';
+      if (sev === 'P2') return 'sev-p2';
+      return 'sev-p3';
+    }
+
+    function renderIncidentCommandView(d, timeline) {
+      var alerts = d.alerts || [];
+      var priorityEvents = (timeline || []).slice().sort(function(a, b) {
+        var wa = severityByEvent(a) === 'P1' ? 3 : (severityByEvent(a) === 'P2' ? 2 : 1);
+        var wb = severityByEvent(b) === 'P1' ? 3 : (severityByEvent(b) === 'P2' ? 2 : 1);
+        return wb - wa;
+      }).slice(0, 6);
+
+      var incidentHtml = priorityEvents.length ? priorityEvents.map(function(ev) {
+        var sev = severityByEvent(ev);
+        return '<div class="icv-item ' + severityClass(sev) + '">' +
+          '<div class="icv-item-head"><span>' + esc(ev.repo || 'repo') + '</span><span>' + sev + '</span></div>' +
+          '<div class="icv-item-meta">' + esc(ev.agent || 'agente') + ' · ' + esc(ev.type || '-') + ' · ' + esc(ev.at || '-') + '</div>' +
+        '</div>';
+      }).join('') : '<div class="icv-item sev-p3"><div class="icv-item-meta">Sem incidentes ativos nesta janela.</div></div>';
+      var incidentListEl = document.getElementById('incidentList');
+      if (incidentListEl) incidentListEl.innerHTML = incidentHtml;
+
+      var decisionCandidates = [];
+      (timeline || []).forEach(function(ev) {
+        if (ev.type === 'blocked') {
+          decisionCandidates.push({
+            sev: 'P1',
+            text: 'Escalar bloqueio em ' + (ev.repo || 'repo') + ' com ' + (ev.agent || 'agente')
+          });
+        }
+      });
+      alerts.forEach(function(a) {
+        decisionCandidates.push({
+          sev: 'P2',
+          text: 'Revisar SLA de ' + (a.repo || 'repo') + ' (' + (a.runningMinutes || 0) + 'm)'
+        });
+      });
+      if (!decisionCandidates.length) {
+        decisionCandidates.push({ sev: 'P3', text: 'Operacao estavel. Manter monitoramento ativo.' });
+      }
+
+      var queueHtml = decisionCandidates.slice(0, 6).map(function(item, idx) {
+        return '<div class="icv-item ' + severityClass(item.sev) + '">' +
+          '<div class="icv-item-head"><span>Acao #' + (idx + 1) + '</span><span>' + item.sev + '</span></div>' +
+          '<div class="icv-item-meta">' + esc(item.text) + '</div>' +
+        '</div>';
+      }).join('');
+      var queueEl = document.getElementById('decisionQueue');
+      if (queueEl) queueEl.innerHTML = queueHtml;
+
+      var buckets = {
+        blocked: 0,
+        handoff: 0,
+        done: 0,
+        start: 0
+      };
+      (timeline || []).forEach(function(ev) {
+        var t = ev.type || 'start';
+        if (buckets[t] === undefined) buckets[t] = 0;
+        buckets[t] += 1;
+      });
+      var bucketRows = [
+        { label: 'Bloqueados', value: buckets.blocked || 0, sev: 'P1' },
+        { label: 'Handoff', value: buckets.handoff || 0, sev: 'P2' },
+        { label: 'Done', value: buckets.done || 0, sev: 'P3' },
+        { label: 'Start', value: buckets.start || 0, sev: 'P3' }
+      ];
+      var timelineHtml = bucketRows.map(function(r) {
+        return '<div class="icv-item ' + severityClass(r.sev) + '">' +
+          '<div class="icv-item-head"><span>' + r.label + '</span><span>' + r.value + '</span></div>' +
+          '<div class="icv-item-meta">janela ' + timeWindowLabel(_timeWindow) + '</div>' +
+        '</div>';
+      }).join('');
+      var bucketsEl = document.getElementById('timelineBuckets');
+      if (bucketsEl) bucketsEl.innerHTML = timelineHtml;
+
+      var pulseEl = document.getElementById('icvPulse');
+      if (pulseEl) pulseEl.textContent = 'Live · ' + new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    }
+
+    function loadData() {
+      showSkeletons();
+      const old = document.getElementById('_cmd_data_script');
+      if (old) old.remove();
+      const s = document.createElement('script');
+      s.id = '_cmd_data_script';
+      s.src = './command-center-data.js?t=' + Date.now();
+      s.onload = render;
+      s.onerror = function() {
+        setText('generatedAt', 'Falha ao carregar command-center-data.js');
+      };
+      document.body.appendChild(s);
+    }
+
+    function render() {
+      const d = window.COMMAND_DASHBOARD_DATA;
+      if (!d) return;
+      _dashboardData = d;
+
+      setText('generatedAt', 'Gerado em: ' + (d.generatedAt || '-') + ' | root: ' + (d.rootPath || '-'));
+
+      const h = d.health || {};
+      setMetric('vRepos', h.totalRepos || 0, '');
+      setText('vReposMeta', 'com kanban: ' + (h.reposWithKanban || 0));
+      setMetric('vCompliance', h.weeklyComplianceRate || 0, '%');
+      setMetric('vBlocked', h.totalBlockedAgents || 0, '');
+      setText('vBlockedMeta', 'repos bloqueados: ' + (h.blockedRepos || 0) + ' | parse atual: ' + (h.parseErrorsCurrent || 0));
+      setMetric('vAvgRun', h.averageRunningMinutes || 0, 'm');
+      setMetric('vSla', h.slaAlerts || 0, '');
+      setText('vSlaMeta', 'limite: ' + (d.slaMinutes || 0) + ' min | risco medio: ' + (h.averageSlaRiskScore || 0));
+      setMetric('vDoneNoOut', h.doneWithoutOutputRate || 0, '%');
+      const prevRate = (h.previousDoneWithoutOutputRate === null || h.previousDoneWithoutOutputRate === undefined) ? 'n/a' : (h.previousDoneWithoutOutputRate + '%');
+      const delta = (h.doneWithoutOutputRateDelta === null || h.doneWithoutOutputRateDelta === undefined) ? 'n/a' : ((h.doneWithoutOutputRateDelta > 0 ? '+' : '') + h.doneWithoutOutputRateDelta + ' pp');
+      const trend = h.reductionDetected ? 'reducao detectada' : 'sem reducao';
+      setText('vDoneNoOutMeta', (h.doneWithoutOutput || 0) + ' de ' + (h.doneTotal || 0) + ' tarefas done | prev: ' + prevRate + ' | delta: ' + delta + ' | ' + trend);
+
+      setMetric('vMttd', h.mttdMinutes || 0, 'm');
+      setMetric('vMttr', h.mttrMinutes || 0, 'm');
+      setMetric('vFpr', h.falsePositiveRate || 0, '%');
+
+      var gateData = d.releaseGates || null;
+      var gateStatus = gateData && gateData.overallStatus ? gateData.overallStatus : 'N/A';
+      var blockedDomains = gateData && Array.isArray(gateData.blockedDomains) ? gateData.blockedDomains.length : 0;
+      var gateEnv = gateData && gateData.environment ? String(gateData.environment).toUpperCase() : 'N/A';
+      setText('vGate', gateStatus);
+      setText('vGateMeta', 'dominios bloqueados: ' + blockedDomains);
+      setText('envChip', 'ENV: ' + gateEnv);
+      setText('gateChip', 'GATE: ' + gateStatus);
+      var gateEl = document.getElementById('vGate');
+      if (gateEl) {
+        gateEl.className = (gateStatus === 'PASS') ? 'value ok' : (gateStatus === 'BLOCK' ? 'value bad' : 'value warn');
+      }
+
+      animateCardsOnce();
+
+      var timelineForWindow = (d.timeline || []).filter(function(ev) {
+        var ts = parseDateLike(ev.timestamp || ev.at);
+        return isWithinWindow(ts, _timeWindow);
+      });
+
+      renderBlockedFocus(timelineForWindow, h);
+
+      var gateChipEl = document.getElementById('gateChip');
+      if (gateChipEl) {
+        gateChipEl.style.color = gateStatus === 'PASS' ? '#4ade80' : (gateStatus === 'BLOCK' ? '#f87171' : '#facc15');
+        gateChipEl.style.borderColor = gateStatus === 'PASS' ? 'rgba(104,227,166,.35)' : (gateStatus === 'BLOCK' ? 'rgba(255,142,142,.35)' : 'rgba(247,196,104,.35)');
+      }
+
+      const detectionOk = !!h.detectionCompliant;
+      const detectionText = 'Deteccao de desvio: alvo < ' + (h.detectionTargetMinutes || 5) + ' min | monitor: ' + (h.monitorIntervalMinutes || '-') + ' min | status: ' + (detectionOk ? 'OK' : 'NAO OK');
+      const detectionEl = document.getElementById('detectionInfo');
+      detectionEl.textContent = detectionText;
+      detectionEl.className = 'small ' + (detectionOk ? 'ok' : 'bad');
+
+      _reposData = d.repositories || [];
+      renderRepoTable();
+      updateHealthBadge(h);
+
+      const alerts = d.alerts || [];
+      const alertHtml = alerts.map(function(a) {
+        return '<div class="alert">' +
+          '<div><strong>' + esc(a.repo) + '</strong> - ' + esc(a.agent) + '</div>' +
+          '<div class="small">running: ' + esc(a.runningMinutes) + ' min | SLA: ' + esc(a.slaMinutes) + ' min</div>' +
+          '<div class="small">' + esc(a.message) + '</div>' +
+        '</div>';
+      }).join('');
+      document.getElementById('alertsList').innerHTML = alertHtml || '<div class="small ok">Sem alertas SLA no momento.</div>';
+
+      const timeline = timelineForWindow;
+      renderIncidentCommandView(d, timeline);
+      const latestHash = timeline.length ? timelineHash(timeline[0]) : null;
+      const hasNewTimelineEvent = !!latestHash && latestHash !== LAST_TIMELINE_HASH;
+
+      const timelineHtml = timeline.slice(0, 200).map(function(ev, idx) {
+        var stateCls = timelineState(ev.type);
+        var isNewest = hasNewTimelineEvent && idx === 0;
+        return '<div class="event ' + stateCls + (isNewest ? ' new-event' : '') + '">' +
+          '<div class="event-head">' +
+            '<div><strong>' + esc(ev.repo) + '</strong> :: ' + esc(ev.agent) + '</div>' +
+            '<span class="event-type ' + typeClass(ev.type) + '">' + esc(ev.type) + '</span>' +
+          '</div>' +
+          '<div class="small" style="margin-top:4px">' + esc(ev.at || '-') + '</div>' +
+          '<div style="margin-top:6px">' + esc(ev.detail || '') + '</div>' +
+        '</div>';
+      }).join('');
+      document.getElementById('timelineList').innerHTML = timelineHtml || '<div class="small">Sem eventos timeline.</div>';
+      LAST_TIMELINE_HASH = latestHash;
+
+      // V2-010: Parse errors e Doctor report
+      const parseErrors = d.parseErrors || [];
+      const parseErrHtml = parseErrors.map(function(e) {
+        return '<div class="alert" style="border-color:rgba(234,179,8,.3);background:rgba(120,90,8,.18)">' +
+          '<strong>' + esc(e.repo) + '</strong> &mdash; ' + esc(e.reason) + '</div>';
+      }).join('');
+      document.getElementById('parseErrorsList').innerHTML =
+        parseErrHtml || '<div class="small ok">Sem erros de schema detectados.</div>';
+
+      const doctor = d.doctorReport;
+      if (doctor) {
+        const total = doctor.totalChecks || 0;
+        const ok = doctor.passedChecks || 0;
+        const fail = doctor.failedChecks || 0;
+        setText('doctorSummary', 'Checks: ' + total + ' total | ' + ok + ' OK | ' + fail + ' falhas | gerado: ' + (doctor.generatedAt || '-'));
+        const issues = doctor.issues || [];
+        const issueHtml = issues.map(function(i) {
+          return '<div class="alert">' + esc(i.check) + ': ' + esc(i.detail) + '</div>';
+        }).join('');
+        document.getElementById('doctorIssues').innerHTML = issueHtml || '<div class="small ok">Sem issues reportados.</div>';
+      } else {
+        document.getElementById('doctorSummary').textContent = 'Doctor nao executado nesta geracao.';
+      }
+
+      // Onda 5: observabilidade de falhas por repositorio
+      var fobs = d.failureObservability || {};
+      var smoke = fobs.latestSmoke || null;
+      var smokeStatus = smoke ? (smoke.overallStatus || 'UNKNOWN') : 'N/A';
+      var smokeClass = smokeStatus === 'PASS' ? 'ok' : smokeStatus === 'FAIL' ? 'bad' : 'warn';
+      var accelCount = fobs.acceleratingCount || 0;
+      var summary = 'Snapshots analisados: ' + (fobs.snapshotsAnalyzed || 0) +
+        ' | parse errors na janela: ' + (fobs.totalParseErrorsInWindow || 0) +
+        ' | repos com falha: ' + (fobs.reposWithFailures || 0) +
+        ' | acelerando: ' + accelCount +
+        ' | smoke: ' + smokeStatus +
+        (smoke ? (' (' + (smoke.failedChecks || 0) + '/' + (smoke.totalChecks || 0) + ' falhos)') : '');
+      var failureSummaryEl = document.getElementById('failureSummary');
+      failureSummaryEl.textContent = summary;
+      failureSummaryEl.className = 'small ' + smokeClass;
+
+      var accelerating = {};
+      (fobs.acceleratingRepos || []).forEach(function(r) {
+        accelerating[r.repo] = true;
+      });
+
+      var trendRows = (fobs.topFailureTrends || []).map(function(x) {
+        var total = x.total || 0;
+        var trend = x.series || [];
+        var first = trend.length ? trend[0] : 0;
+        var last = trend.length ? trend[trend.length - 1] : 0;
+        var delta = last - first;
+        var deltaTxt = (delta > 0 ? '+' : '') + delta;
+        var deltaCls = delta > 0 ? 'bad' : delta < 0 ? 'ok' : 'warn';
+        var isAccel = !!accelerating[x.repo];
+        var accelBadge = isAccel
+          ? '<span class="bad" style="font-size:10px;font-weight:700;margin-left:6px">ACELERANDO</span>'
+          : '';
+        return '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,.05)">'+
+          '<div style="min-width:160px"><strong>' + esc(x.repo) + '</strong>' + accelBadge + '<div class="small">total: ' + total + ' | delta: <span class="' + deltaCls + '">' + deltaTxt + '</span></div></div>'+
+          '<div>' + buildSparkline(trend, 100, 20) + '</div>'+
+        '</div>';
+      }).join('');
+      document.getElementById('failureTrendList').innerHTML = trendRows || '<div class="small ok">Sem falhas historicas na janela analisada.</div>';
+      var labels = (fobs.snapshotLabels || []);
+      document.getElementById('failureTrendLegend').textContent = labels.length > 0
+        ? ('Janela temporal: ' + labels[0] + ' -> ' + labels[labels.length - 1])
+        : 'Janela temporal indisponivel';
+
+      if (accelCount > 0) {
+        document.getElementById('failureTrendLegend').textContent += ' | ALERTA: ha repositorios com 2+ altas seguidas';
+        document.getElementById('failureTrendLegend').className = 'small bad';
+      } else {
+        document.getElementById('failureTrendLegend').className = 'small ok';
+      }
+
+      // V2-017: Top 5 agentes mais ativos (por contagem de eventos no timeline da janela)
+      var agentCounts = {};
+      timeline.forEach(function(ev) {
+        var key = ev.agentId + '|' + ev.agent;
+        agentCounts[key] = (agentCounts[key] || 0) + 1;
+      });
+      var agentRanking = Object.keys(agentCounts).map(function(k) {
+        var parts = k.split('|');
+        return { id: parts[0], name: parts[1], count: agentCounts[k] };
+      }).sort(function(a, b) { return b.count - a.count; }).slice(0, 5);
+      var topHtml = agentRanking.length > 0 ? agentRanking.map(function(a, i) {
+        var medals = ['🥇','🥈','🥉','4.','5.'];
+        return '<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 4px;border-bottom:1px solid rgba(255,255,255,.05)">'+
+          '<span>' + medals[i] + ' <strong>' + esc(a.name || a.id) + '</strong></span>'+
+          '<span class="ok" style="font-size:11px">' + a.count + ' eventos</span>'+
+          '</div>';
+      }).join('') : '<div class="small">Sem dados de timeline para a janela selecionada.</div>';
+      document.getElementById('topAgentsList').innerHTML = topHtml;
+      setText('topAgentsMeta', 'janela: ' + timeWindowLabel(_timeWindow) + ' | eventos considerados: ' + timeline.length);
+
+      // Ranking de maturidade (top repos por score)
+      var reposByScore = (d.repositories || [])
+        .filter(function(r) { return r.hasKanban; })
+        .sort(function(a, b) { return (b.maturityScore || 0) - (a.maturityScore || 0); })
+        .slice(0, 8);
+      var matHtml = reposByScore.length > 0 ? reposByScore.map(function(r) {
+        var s = r.maturityScore || 0;
+        var cls = s >= 80 ? 'ok' : s >= 40 ? 'warn' : 'bad';
+        var barColor = s >= 90 ? '#a78bfa' : s >= 70 ? '#4ade80' : s >= 40 ? '#facc15' : '#f87171';
+        var badgeTier = s >= 90 ? 'elite' : s >= 70 ? 'solid' : s >= 40 ? 'growing' : 'at-risk';
+        var badgeLabel = s >= 90 ? 'ELITE' : s >= 70 ? 'SOLID' : s >= 40 ? 'GROWING' : 'AT-RISK';
+        var barId = 'matbar_' + r.repo.replace(/[^a-z0-9]/gi,'_');
+        return '<div style="margin-bottom:10px">'+
+          '<div style="display:flex;justify-content:space-between;align-items:center;font-size:11px;margin-bottom:4px">'+
+            '<span>' + esc(r.repo) + '</span>'+
+            '<span class="' + cls + '">' + s + '/100' +
+              '<span class="mat-badge ' + badgeTier + '">' + badgeLabel + '</span>' +
+            '</span>'+
+          '</div>'+
+          '<div class="mat-bar-wrap">'+
+            '<div id="' + barId + '" class="mat-bar-fill" style="--mat-target:' + s + '%;background:' + barColor + '"></div>'+
+          '</div>'+
+        '</div>';
+      }).join('') : '<div class="small">Sem repos com kanban.</div>';
+      document.getElementById('maturityRanking').innerHTML = matHtml;
+      animateMaturityBars();
+
+      // V2-021: Top 5 insights automaticos (anomaly-first)
+      var insights = [];
+      var repos = d.repositories || [];
+      var hasKanban = repos.filter(function(r) { return r.hasKanban; });
+      var prioritizedRepos = hasKanban.slice().sort(function(a, b) {
+        var scoreA = (a.slaRiskScore || 0) + ((a.blockedAgents || 0) * 15) + ((a.doneWithoutOutput || 0) > 0 ? 10 : 0);
+        var scoreB = (b.slaRiskScore || 0) + ((b.blockedAgents || 0) * 15) + ((b.doneWithoutOutput || 0) > 0 ? 10 : 0);
+        return scoreB - scoreA;
+      });
+      if ((h.reposAtRiskCritical || 0) > 0) {
+        insights.push('Existem ' + (h.reposAtRiskCritical || 0) + ' repositorios em risco SLA CRITICO; priorize desbloqueio e output imediato.');
+      }
+      var worstRiskRepo = prioritizedRepos[0];
+      if (worstRiskRepo) {
+        insights.push('Prioridade #1 (anomaly-first): ' + worstRiskRepo.repo + ' | risco SLA ' + (worstRiskRepo.slaRiskScore || 0) + ' | blocked ' + (worstRiskRepo.blockedAgents || 0) + '.');
+      }
+      var blockedRepo = repos.slice().sort(function(a, b) { return (b.blockedAgents || 0) - (a.blockedAgents || 0); })[0];
+      if (blockedRepo && (blockedRepo.blockedAgents || 0) > 0) {
+        insights.push('Maior concentracao de bloqueios: ' + blockedRepo.repo + ' com ' + blockedRepo.blockedAgents + ' agente(s) blocked.');
+      }
+      var weakestMaturity = hasKanban.slice().sort(function(a, b) { return (a.maturityScore || 0) - (b.maturityScore || 0); })[0];
+      if (weakestMaturity) {
+        insights.push('Menor maturidade operacional: ' + weakestMaturity.repo + ' com score ' + (weakestMaturity.maturityScore || 0) + '/100.');
+      }
+      if ((h.doneWithoutOutputRate || 0) > 20) {
+        insights.push('Taxa de done sem output em ' + (h.doneWithoutOutputRate || 0) + '%; reforcar checklist de evidencia no fechamento das tarefas.');
+      } else {
+        insights.push('Taxa de done sem output sob controle em ' + (h.doneWithoutOutputRate || 0) + '%.');
+      }
+      if (!insights.length) {
+        insights.push('Sem anomalias relevantes no ciclo atual.');
+      }
+      var insightsHtml = insights.slice(0, 5).map(function(msg, idx) {
+        return '<div style="padding:8px 0;border-bottom:1px solid rgba(255,255,255,.06)"><strong style="color:#94a3b8">#' + (idx + 1) + '</strong> ' + esc(msg) + '</div>';
+      }).join('');
+      document.getElementById('insightsList').innerHTML = insightsHtml;
+      setText('insightsMeta', 'janela analitica: ' + timeWindowLabel(_timeWindow));
+
+      var eff = d.agentEffectiveness || {};
+      var effSummary =
+        'Incidentes: ' + (eff.incidentsTotal || 0) +
+        ' | Resolvidos: ' + (eff.incidentsResolved || 0) +
+        ' | Abertos: ' + (eff.incidentsOpen || 0) +
+        ' | Janela: ' + (eff.windowDays || 14) + ' dias';
+      setText('agentEffSummary', effSummary);
+      var effRows = [
+        { k: 'MTTD', v: (eff.mttdMinutes || 0) + ' min', cls: (eff.mttdMinutes || 0) <= 360 ? 'ok' : 'warn' },
+        { k: 'MTTR', v: (eff.mttrMinutes || 0) + ' min', cls: (eff.mttrMinutes || 0) <= 720 ? 'ok' : 'warn' },
+        { k: 'False Positive Rate', v: (eff.falsePositiveRate || 0) + '%', cls: (eff.falsePositiveRate || 0) <= 25 ? 'ok' : 'warn' }
+      ];
+      document.getElementById('agentEffList').innerHTML = effRows.map(function(r) {
+        return '<div style="display:flex;justify-content:space-between;padding:7px 4px;border-bottom:1px solid rgba(255,255,255,.05)">' +
+          '<span>' + esc(r.k) + '</span>' +
+          '<strong class="' + esc(r.cls) + '">' + esc(r.v) + '</strong>' +
+        '</div>';
+      }).join('');
+
+      var gates = d.releaseGates || null;
+      if (gates && Array.isArray(gates.domains)) {
+        setText('releaseGateSummary', 'Status geral: ' + (gates.overallStatus || 'N/A') + ' | versao: ' + (gates.configVersion || 'n/a'));
+        var gateRows = gates.domains.map(function(domain) {
+          var cls = domain.gateStatus === 'PASS' ? 'ok' : 'bad';
+          var checks = (domain.checks || []).map(function(c) {
+            var cCls = c.ok ? 'ok' : 'bad';
+            return '<div class="small ' + cCls + '">' + esc(c.metric) + ': ' + esc(c.value) + ' ' + esc(c.operator) + ' ' + esc(c.target) + '</div>';
+          }).join('');
+          return '<div style="padding:8px 0;border-bottom:1px solid rgba(255,255,255,.06)">' +
+            '<div style="display:flex;justify-content:space-between"><strong>' + esc(domain.name || domain.id) + '</strong><span class="' + cls + '">' + esc(domain.gateStatus || 'N/A') + '</span></div>' +
+            '<div class="small" style="margin-top:3px">' + esc(domain.description || '') + '</div>' +
+            '<div style="margin-top:5px">' + checks + '</div>' +
+          '</div>';
+        }).join('');
+        document.getElementById('releaseGateList').innerHTML = gateRows || '<div class="small">Sem dados de gates.</div>';
+      } else {
+        setText('releaseGateSummary', 'Release gate ainda nao avaliado.');
+        document.getElementById('releaseGateList').innerHTML = '<div class="small">Execute evaluate-release-gates para preencher este painel.</div>';
+      }
+    }
+
+    function initGlobalDeckHotkeys() {
+      var links = Array.prototype.slice.call(document.querySelectorAll('.premium-nav-link'));
+      var map = { '1': 0, '2': 1, '3': 2 };
+      document.addEventListener('keydown', function(e) {
+        if (e.ctrlKey || e.altKey || e.metaKey) return;
+        var target = e.target;
+        if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) return;
+        var idx = map[e.key];
+        if (idx === undefined || !links[idx]) return;
+        e.preventDefault();
+        var link = links[idx];
+        link.classList.add('hotkey-flash');
+        window.setTimeout(function() {
+          link.classList.remove('hotkey-flash');
+          window.location.href = link.getAttribute('href');
+        }, 120);
+      });
+    }
+
+    var IA_BLOCK_STORAGE_KEY = 'command-center:ia-blocks';
+    var COMMAND_PRESET_STORAGE_KEY = 'command-center:preset';
+    var IA_BLOCK_MAP = {
+      execute: { bodyId: 'iaBlockBodyExecute', sectionIndex: 0 },
+      investigate: { bodyId: 'iaBlockBodyInvestigate', sectionIndex: 1 },
+      govern: { bodyId: 'iaBlockBodyGovern', sectionIndex: 2 }
+    };
+    var IA_BLOCK_PRESETS = {
+      'network-ops': { execute: false, investigate: true, govern: true },
+      'governance-review': { execute: true, investigate: false, govern: false },
+      'executive-snapshot': { execute: true, investigate: true, govern: false }
+    };
+    var COMMAND_PRESET_ALIASES = {
+      incident: 'network-ops',
+      analyst: 'governance-review',
+      triage: 'executive-snapshot'
+    };
+    var COMMAND_PRESET_HINTS = {
+      custom: 'Blocos ajustados manualmente',
+      'network-ops': 'Foco em executar agora',
+      'governance-review': 'Foco em investigar e governar',
+      'executive-snapshot': 'Foco em governar com leitura executiva'
+    };
+
+    function getIABlockSections() {
+      return Array.prototype.slice.call(document.querySelectorAll('.ia-block'));
+    }
+
+    function loadIABlockState() {
+      try {
+        var raw = localStorage.getItem(IA_BLOCK_STORAGE_KEY);
+        return raw ? JSON.parse(raw) : {};
+      } catch (_) {
+        return {};
+      }
+    }
+
+    function saveIABlockState(state) {
+      try {
+        localStorage.setItem(IA_BLOCK_STORAGE_KEY, JSON.stringify(state || {}));
+      } catch (_) {
+        // Ignore persistence failures (private mode/quota)
+      }
+    }
+
+    function loadCommandPreset() {
+      try {
+        var raw = localStorage.getItem(COMMAND_PRESET_STORAGE_KEY) || 'custom';
+        return COMMAND_PRESET_ALIASES[raw] || raw;
+      } catch (_) {
+        return 'custom';
+      }
+    }
+
+    function saveCommandPreset(key) {
+      try {
+        localStorage.setItem(COMMAND_PRESET_STORAGE_KEY, key || 'custom');
+      } catch (_) {
+        // Ignore storage failures
+      }
+    }
+
+    function updateCommandPresetHint(key) {
+      var hint = document.getElementById('commandPresetHint');
+      if (!hint) return;
+      hint.textContent = COMMAND_PRESET_HINTS[key] || COMMAND_PRESET_HINTS.custom;
+    }
+
+    function applyCommandPreset(key) {
+      var preset = IA_BLOCK_PRESETS[key];
+      if (!preset) return;
+      var state = {};
+      Object.keys(IA_BLOCK_MAP).forEach(function(blockKey) {
+        state[blockKey] = !!preset[blockKey];
+        setIABlockCollapsed(blockKey, !!preset[blockKey]);
+      });
+      saveIABlockState(state);
+    }
+
+    function setCommandPreset(key) {
+      var select = document.getElementById('commandPresetSelect');
+      var valid = key === 'custom' || !!IA_BLOCK_PRESETS[key];
+      var next = valid ? key : 'custom';
+      if (select) select.value = next;
+      saveCommandPreset(next);
+      updateCommandPresetHint(next);
+      if (next !== 'custom') {
+        applyCommandPreset(next);
+      }
+    }
+
+    function initCommandPreset() {
+      var select = document.getElementById('commandPresetSelect');
+      if (!select) return;
+      var stored = loadCommandPreset();
+      if (stored !== 'custom' && IA_BLOCK_PRESETS[stored]) {
+        applyCommandPreset(stored);
+        select.value = stored;
+        updateCommandPresetHint(stored);
+        return;
+      }
+      select.value = 'custom';
+      saveCommandPreset('custom');
+      updateCommandPresetHint('custom');
+    }
+
+    function setIABlockCollapsed(key, collapsed) {
+      var conf = IA_BLOCK_MAP[key];
+      if (!conf) return;
+      var sections = getIABlockSections();
+      var section = sections[conf.sectionIndex] || null;
+      var body = document.getElementById(conf.bodyId);
+      var btn = document.querySelector('.ia-toggle[data-target="' + key + '"]');
+      if (!section || !body || !btn) return;
+
+      if (collapsed) {
+        section.classList.add('collapsed');
+        body.setAttribute('hidden', 'hidden');
+        btn.textContent = 'Expandir';
+        btn.setAttribute('aria-expanded', 'false');
+      } else {
+        section.classList.remove('collapsed');
+        body.removeAttribute('hidden');
+        btn.textContent = 'Ocultar';
+        btn.setAttribute('aria-expanded', 'true');
+      }
+    }
+
+    function toggleIABlock(key) {
+      var state = loadIABlockState();
+      var next = !state[key];
+      state[key] = next;
+      saveIABlockState(state);
+      setIABlockCollapsed(key, next);
+      var select = document.getElementById('commandPresetSelect');
+      if (select && select.value !== 'custom') {
+        select.value = 'custom';
+        saveCommandPreset('custom');
+      }
+      updateCommandPresetHint('custom');
+    }
+
+    function initIABlocks() {
+      var state = loadIABlockState();
+      Object.keys(IA_BLOCK_MAP).forEach(function(key) {
+        setIABlockCollapsed(key, !!state[key]);
+      });
+    }
+
+    initGlobalDeckHotkeys();
+    initIABlocks();
+    initCommandPreset();
+    loadData();
+    setInterval(loadData, 60000);
+  </script>
+  <footer class="deck-footer" aria-label="Rodapé premium do Painel de Controle">
+    <div class="deck-footer-brand">
+      <strong>Axiom Labs Painel de Controle</strong>
+      <span>Produto da Axiom Labs &middot; Operado pela MGR Solutions</span>
+    </div>
+    <div class="deck-footer-meta">Deck unificado de operação, portfólio e análises</div>
+  </footer>
+  </div>
+</body>
+</html>
