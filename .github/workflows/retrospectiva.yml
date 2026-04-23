@@ -1,0 +1,121 @@
+# MGR Squad — Auto-Melhoria via GitHub Actions
+#
+# COMO USAR:
+# 1. Copie este arquivo para: .github/workflows/retrospectiva.yml no seu projeto
+# 2. O workflow dispara automaticamente quando arquivos em .claude/learnings/ são alterados
+# 3. Ele cria um Job Summary com estatísticas + prompt pronto para colar no chat
+#
+# Nota: este workflow apenas ALERTA. Ele não modifica arquivos nem chama LLMs.
+# A aplicação das melhorias é sempre feita manualmente com /korosensei.
+
+name: "🔄 Korosensei — Alertar sobre Aprendizados"
+
+on:
+  push:
+    branches: [main, master, develop]
+    paths:
+      - ".claude/learnings/**"
+      - ".claude/impediments.md"
+      - ".claude/velocity.md"
+
+jobs:
+  retrospectiva-alert:
+    name: Verificar Aprendizados Pendentes
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Verificar learnings não processados
+        id: check
+        run: |
+          LEARNINGS_DIR=".claude/learnings"
+          if [ ! -d "$LEARNINGS_DIR" ]; then
+            echo "nao_processados=0" >> "$GITHUB_OUTPUT"
+            echo "total=0" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          TOTAL=$(find "$LEARNINGS_DIR" -name "*.md" | wc -l | tr -d ' ')
+          NAO_PROC=$(find "$LEARNINGS_DIR" -name "*.md" | xargs grep -rL "PROCESSADO" 2>/dev/null | wc -l | tr -d ' ')
+
+          echo "nao_processados=$NAO_PROC" >> "$GITHUB_OUTPUT"
+          echo "total=$TOTAL" >> "$GITHUB_OUTPUT"
+
+          if [ "$NAO_PROC" -gt 0 ]; then
+            LISTA=$(find "$LEARNINGS_DIR" -name "*.md" | xargs grep -rL "PROCESSADO" 2>/dev/null | xargs -I{} basename {} .md | paste -sd ', ' -)
+            echo "lista=$LISTA" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Verificar impedimentos abertos
+        id: impediments
+        run: |
+          if [ -f ".claude/impediments.md" ]; then
+            ABERTOS=$(grep -c "🔴 Aberto" .claude/impediments.md 2>/dev/null || echo "0")
+            echo "abertos=$ABERTOS" >> "$GITHUB_OUTPUT"
+          else
+            echo "abertos=0" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Gerar Job Summary
+        env:
+          NAO_PROC: ${{ steps.check.outputs.nao_processados }}
+          TOTAL: ${{ steps.check.outputs.total }}
+          LISTA: ${{ steps.check.outputs.lista }}
+          ABERTOS: ${{ steps.impediments.outputs.abertos }}
+          REPO: ${{ github.repository }}
+          BRANCH: ${{ github.ref_name }}
+          COMMIT: ${{ github.sha }}
+          ACTOR: ${{ github.actor }}
+        run: |
+          cat >> "$GITHUB_STEP_SUMMARY" << 'SUMMARY'
+          ## 🔄 Korosensei — Relatório de Aprendizados
+          SUMMARY
+
+          echo "| Item | Valor |" >> "$GITHUB_STEP_SUMMARY"
+          echo "|------|-------|" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Repositório | \`$REPO\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Branch | \`$BRANCH\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Commit | \`${COMMIT:0:7}\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Autor | $ACTOR |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Total de learnings | $TOTAL |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| **Não processados** | **$NAO_PROC** |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Impedimentos abertos | $ABERTOS |" >> "$GITHUB_STEP_SUMMARY"
+
+          if [ "$NAO_PROC" -gt 0 ]; then
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "### ⚠️ Aprendizados aguardando Retrospectiva" >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "Agentes com learnings não processados: **$LISTA**" >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "**Prompt para copiar e colar no chat:**" >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+            echo "/korosensei Fazer retrospectiva do projeto $REPO (branch $BRANCH)." >> "$GITHUB_STEP_SUMMARY"
+            echo "Agentes com learnings: $LISTA." >> "$GITHUB_STEP_SUMMARY"
+            echo "Tarefas: sprint review + coletar aprendizados em .claude/learnings/ + propor melhorias nos .md se aplicável." >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "### ✅ Todos os aprendizados foram processados" >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "Nenhuma ação necessária." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+          if [ "$ABERTOS" -gt 0 ]; then
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "### 🔴 $ABERTOS impedimento(s) em aberto" >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "Consulte \`.claude/impediments.md\` e use \`/korosensei\` para resolver." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Falhar se houver muitos learnings pendentes (opcional)
+        # Descomente as linhas abaixo para bloquear PRs com 3+ learnings não processados:
+        # if: steps.check.outputs.nao_processados >= 3
+        # run: |
+        #   echo "::error::3+ learnings não processados. Execute /korosensei antes de fazer merge."
+        #   exit 1
+        run: echo "Check concluído — ${{ steps.check.outputs.nao_processados }} learnings não processados."

@@ -1,0 +1,138 @@
+﻿name: Deploy Backend (Railway)
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+      - 'feature/**'
+  pull_request:
+    branches:
+      - main
+      - develop
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deploy target'
+        required: true
+        type: choice
+        options: [dev, staging, production]
+
+# Evita race conditions: cancela runs anteriores (exceto main)
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+jobs:
+  lint-and-test:
+    name: Lint & Test
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v3  # v3 le versao do package.json automaticamente
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+      - run: pnpm build
+      - run: pnpm test --if-present
+        env:
+          NODE_ENV: test
+      - name: Post CI status on PR
+        if: github.event_name == 'pull_request' && always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const status = '${{ job.status }}' === 'success' ? 'OK' : 'FAIL';
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `CI: ${status} (${{ job.status }}) - Lint, Build, Tests`
+            });
+
+  deploy-dev:
+    name: Deploy DEV
+    runs-on: ubuntu-22.04
+    needs: lint-and-test
+    permissions:
+      contents: read
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/heads/feature/')
+    steps:
+      - uses: actions/checkout@v4
+      - uses: bervProject/railway-deploy@c8b8e2f0da766585bcb50512e99789a4434c79a8
+        with:
+          railway_token: ${{ secrets.RAILWAY_TOKEN_DEV }}
+          service: ${{ secrets.RAILWAY_SERVICE_ID_DEV }}
+
+  deploy-staging:
+    name: Deploy Staging (HML)
+    runs-on: ubuntu-22.04
+    needs: lint-and-test
+    permissions:
+      contents: read
+    if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
+    environment:
+      name: staging
+    steps:
+      - uses: actions/checkout@v4
+      - uses: bervProject/railway-deploy@c8b8e2f0da766585bcb50512e99789a4434c79a8
+        with:
+          railway_token: ${{ secrets.RAILWAY_TOKEN_HML }}
+          service: ${{ secrets.RAILWAY_SERVICE_ID_HML }}
+
+  deploy-production:
+    name: Deploy Production (PRD)
+    runs-on: ubuntu-22.04
+    needs: lint-and-test
+    permissions:
+      contents: read
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    environment:
+      name: production
+      url: ${{ secrets.APP_URL_PRD }}
+      # IMPORTANTE: Configurar no GitHub -> Settings -> Environments -> production:
+      #   Required reviewers (minimo 1 aprovador)
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deploy to Railway PRD
+        uses: bervProject/railway-deploy@c8b8e2f0da766585bcb50512e99789a4434c79a8
+        with:
+          railway_token: ${{ secrets.RAILWAY_TOKEN_PRD }}
+          service: ${{ secrets.RAILWAY_SERVICE_ID_PRD }}
+      - name: Health Check PRD
+        if: success()
+        run: |
+          MAX_RETRIES=10
+          RETRY_DELAY=15
+          for i in $(seq 1 $MAX_RETRIES); do
+            echo "Health check $i/$MAX_RETRIES..."
+            STATUS=$(curl -f -s -o /dev/null -w "%{http_code}" "${{ secrets.APP_URL_PRD }}/health" || echo "000")
+            if [ "$STATUS" = "200" ]; then
+              echo "Backend healthy!"
+              exit 0
+            fi
+            echo "Status: $STATUS - retrying in ${RETRY_DELAY}s..."
+            sleep $RETRY_DELAY
+          done
+          echo "::error::Health check failed after $MAX_RETRIES attempts!"
+          exit 1
+
+# ───────────────────────────────────────────────────────────────
+# GitHub Secrets necessarios:
+#   RAILWAY_TOKEN_DEV, RAILWAY_TOKEN_HML, RAILWAY_TOKEN_PRD
+#   RAILWAY_SERVICE_ID_DEV, RAILWAY_SERVICE_ID_HML, RAILWAY_SERVICE_ID_PRD
+#   APP_URL_PRD (ex: https://api.meuapp.com)
+# GitHub Environments necessarios:
+#   staging    -> sem aprovacao obrigatoria
+#   production -> Required reviewers (1+)
+# ───────────────────────────────────────────────────────────────
+# bervProject/railway-deploy — SHA pinado em c8b8e2f (2025). Renew via github.com/bervProject/railway-deploy/commits/main
+# ───────────────────────────────────────────────────────────────
+# Dependabot recomendado (.github/dependabot.yml):
+#   package-ecosystem: github-actions | schedule: weekly

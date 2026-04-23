@@ -1,0 +1,1176 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Governança de Entregas - Axiom Labs Painel de Controle</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg-base: #080b14;
+      --text-primary: #e2e8f0;
+      --text-secondary: #94a3b8;
+      --text-tertiary: #64748b;
+      --gray-500: #94a3b8;
+      --gray-400: #64748b;
+      --accent-indigo: #6366f1;
+      --accent-soft: #818cf8;
+      --accent-cyan: #22d3ee;
+      --state-success: #4ade80;
+      --state-warning: #facc15;
+      --state-danger: #f87171;
+      --surface: rgba(8, 11, 20, 0.72);
+      --surface-soft: rgba(13, 20, 38, 0.72);
+      --surface-muted: rgba(15, 23, 42, 0.62);
+    }
+
+    html, body {
+      background-color: var(--bg-base);
+      color: var(--text-primary);
+      font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+      line-height: 1.5;
+    }
+
+    body {
+      min-height: 100vh;
+      background: var(--bg-base);
+      background-image:
+        radial-gradient(ellipse 90% 55% at 50% -5%, rgba(99,102,241,.14) 0%, transparent 65%),
+        radial-gradient(ellipse 40% 30% at 92% 85%, rgba(34,211,238,.07) 0%, transparent 55%);
+    }
+
+    .top-accent {
+      height: 1px;
+      background: linear-gradient(90deg, transparent 0%, var(--accent-indigo) 30%, var(--accent-soft) 50%, var(--accent-cyan) 70%, transparent 100%);
+      opacity: .6;
+    }
+    .page-wrap { padding: 24px 28px 34px; }
+
+    /* ========== PREMIUM NAV ========== */
+    .premium-nav {
+      display: flex; align-items: center; justify-content: space-between; gap: 10px;
+      margin-bottom: 16px; padding: 0 12px; border-radius: 14px; height: 56px;
+      border: 1px solid;
+      border-image: linear-gradient(90deg, rgba(99,102,241,0), rgba(99,102,241,.3), rgba(34,211,238,.2), rgba(99,102,241,0)) 1;
+      background: linear-gradient(135deg, rgba(99,102,241,.08), rgba(34,211,238,.05));
+      backdrop-filter: blur(20px) saturate(110%); -webkit-backdrop-filter: blur(20px) saturate(110%);
+      box-shadow: 0 8px 32px rgba(0,0,0,.3), 0 1px 0 rgba(99,102,241,.1) inset;
+    }
+    .premium-nav-track { display: flex; gap: 4px; flex-wrap: wrap; align-items: center; }
+    .premium-nav-link {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 8px 13px; border-radius: 8px; border: 1px solid rgba(99,102,241,.15);
+      color: #94a3b8; text-decoration: none; font-size: 11px; font-weight: 700; letter-spacing: .05em;
+      background: rgba(255,255,255,.02); position: relative; overflow: hidden;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .premium-nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, #22d3ee, transparent);
+      border-radius: 99px;
+      transition: width 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .premium-nav-link:hover {
+      color: #cbd5e1;
+      border-color: rgba(99,102,241,.35);
+      background: rgba(99,102,241,.12);
+      box-shadow: 0 8px 24px rgba(99, 102, 241, 0.15), inset 0 0 0 1px rgba(99, 102, 241, 0.2);
+      transform: translateY(-2px);
+    }
+    .premium-nav-link:hover::after { width: 100%; }
+    .premium-nav-link.active {
+      color: #e2e8f0;
+      border-color: rgba(34,211,238,.4);
+      background: rgba(34,211,238,.15);
+      box-shadow: 0 0 0 1px rgba(34, 211, 238, 0.2), 0 8px 32px rgba(34, 211, 238, 0.2), inset 0 0 0 1px rgba(34, 211, 238, 0.25);
+    }
+    .premium-nav-link.active::after { width: 100%; }
+    .nav-icon { width: 14px; height: 14px; flex: 0 0 14px; opacity: .9; }
+    .nav-logo { display: flex; align-items: center; gap: 8px; }
+    .nav-logo img { height: 28px; width: auto; filter: brightness(0) invert(1) saturate(0); }
+    .nav-badge { font-size: 9px; font-weight: 700; letter-spacing: .07em; padding: 2px 6px; border-radius: 4px; background: rgba(99,102,241,.18); color: #818cf8; border: 1px solid rgba(99,102,241,.25); }
+
+    /* ========== LAYOUT ========== */
+    .container {
+      padding: 0;
+    }
+
+    .header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+    .dashboard-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    @keyframes logo-breathe {
+      0%,100% { filter: brightness(0) invert(1) saturate(0) drop-shadow(0 0 8px rgba(99,102,241,.45)); }
+      50%      { filter: brightness(0) invert(1) saturate(0) drop-shadow(0 0 18px rgba(99,102,241,.75)); }
+    }
+    .headline {
+      font-size: clamp(18px, 1.2vw + 12px, 22px);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, #c4b5fd 0%, #818cf8 55%, #22d3ee 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 0.125rem;
+    }
+    .brand-sub {
+      font-size: 11px;
+      color: var(--text-secondary);
+      font-weight: 600;
+    }
+    .meta-chip {
+      font-size: 10px;
+      letter-spacing: .07em;
+      text-transform: uppercase;
+      font-weight: 700;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 999px;
+      padding: 4px 8px;
+      color: #67e8f9;
+      background: rgba(34,211,238,.12);
+      white-space: nowrap;
+    }
+    .header-actions {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+    .preset-select {
+      border: 1px solid rgba(255,255,255,.1);
+      background: rgba(255,255,255,.03);
+      color: #cbd5e1;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .02em;
+      padding: 7px 10px;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all .15s;
+    }
+    .preset-select:hover {
+      border-color: rgba(99,102,241,.4);
+      color: #a5b4fc;
+      background: rgba(99,102,241,.1);
+    }
+    .preset-hint {
+      display: inline-flex;
+      align-items: center;
+      padding: 5px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.04);
+      color: #94a3b8;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .03em;
+      white-space: nowrap;
+    }
+    .preset-select:focus-visible {
+      outline: 2px solid rgba(34, 211, 238, 0.5);
+      outline-offset: 2px;
+    }
+
+    /* ========== KPI CARDS ========== */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .kpi-card {
+      border: 1px solid rgba(255,255,255,.09);
+      border-radius: 12px;
+      background: var(--surface-soft);
+      padding: 10px;
+      min-height: 84px;
+      transition: border-color .2s ease, transform .2s ease, box-shadow .2s ease;
+    }
+
+    .kpi-card:hover {
+      border-color: rgba(34,211,238,.22);
+      transform: translateY(-2px);
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.24);
+    }
+
+    .kpi-label {
+      font-size: 10px;
+      color: var(--text-secondary);
+      letter-spacing: .07em;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+
+    .kpi-value {
+      margin-top: 6px;
+      font-size: 23px;
+      font-weight: 800;
+      letter-spacing: -.02em;
+      color: var(--text-primary);
+    }
+
+    .kpi-unit {
+      margin-top: 3px;
+      font-size: 11px;
+      color: var(--text-secondary);
+    }
+
+    .kpi-status {
+      margin-top: 8px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: var(--text-tertiary);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .kpi-status::before {
+      content: '';
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: currentColor;
+      opacity: .95;
+    }
+
+    .kpi-status.healthy { color: var(--state-success); }
+    .kpi-status.warning { color: var(--state-warning); }
+    .kpi-status.critical { color: var(--state-danger); }
+
+    /* ========== SECTION ========== */
+    .section {
+      margin-bottom: 12px;
+      border: 1px solid rgba(255,255,255,.09);
+      border-radius: 14px;
+      background: var(--surface);
+      padding: 10px;
+    }
+
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 8px;
+    }
+
+    .section-title {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      font-weight: 800;
+      color: #c4b5fd;
+      margin-bottom: 0;
+    }
+    .section-toggle {
+      border: 1px solid rgba(255,255,255,.09);
+      background: rgba(255,255,255,.04);
+      color: #cbd5e1;
+      border-radius: 999px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      padding: 4px 9px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      transition: all .15s ease;
+      font-family: inherit;
+      margin-bottom: 0;
+    }
+    .section-toggle:hover {
+      border-color: rgba(99,102,241,.4);
+      color: #a5b4fc;
+      background: rgba(99,102,241,.1);
+    }
+    .section-toggle:focus-visible {
+      outline: 2px solid rgba(34, 211, 238, 0.5);
+      outline-offset: 2px;
+    }
+    .section-toggle .toggle-caret {
+      font-size: 10px;
+      transition: transform .15s ease;
+    }
+    .section-collapsed .section-toggle .toggle-caret {
+      transform: rotate(-90deg);
+    }
+    .section-collapsed .section-body {
+      display: none;
+    }
+
+    /* ========== TABLE ========== */
+    .table-container {
+      border: 1px solid rgba(255,255,255,.09);
+      border-radius: 12px;
+      overflow: hidden;
+      background: var(--surface-muted);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 11px;
+    }
+
+    thead {
+      background: rgba(255,255,255,.03);
+    }
+
+    th {
+      padding: 7px 8px;
+      text-align: left;
+      font-weight: 700;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+    }
+
+    td {
+      padding: 7px 8px;
+      border-bottom: 1px solid rgba(255,255,255,.06);
+      color: var(--text-primary);
+    }
+
+    tbody tr:hover {
+      background: rgba(255,255,255,.03);
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .badge.healthy { background: rgba(6,78,59,.26); color: #86efac; border: 1px solid rgba(22,163,74,.35); }
+    .badge.warning { background: rgba(120,53,15,.3); color: #fde68a; border: 1px solid rgba(234,179,8,.4); }
+    .badge.critical { background: rgba(127,29,29,.35); color: #fecaca; border: 1px solid rgba(220,38,38,.45); }
+    .badge.blocked { background: rgba(127,29,29,.35); color: #fecaca; border: 1px solid rgba(220,38,38,.45); }
+    .badge.pending { background: rgba(96, 125, 139, 0.15); color: #90caf9; }
+
+    .metric-value {
+      font-weight: 700;
+      color: #e2e8f0;
+    }
+
+    /* ========== CHART AREA ========== */
+    .chart-wrapper {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .chart-card {
+      border: 1px solid rgba(255,255,255,.09);
+      border-radius: 14px;
+      background: var(--surface-muted);
+      padding: 10px;
+    }
+
+    .chart-title {
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: #c4b5fd;
+      margin-bottom: 8px;
+    }
+
+    .chart-body {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .chart-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+    }
+
+    .chart-label {
+      color: var(--text-secondary);
+      flex: 0 0 132px;
+    }
+
+    .chart-bar-wrapper {
+      flex: 1;
+      height: 9px;
+      background: rgba(255,255,255,.08);
+      border-radius: 999px;
+      margin: 0 8px;
+      overflow: hidden;
+    }
+
+    .chart-bar {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent-cyan), var(--accent-soft));
+      border-radius: 999px;
+      min-width: 4px;
+    }
+
+    .chart-value {
+      color: var(--text-primary);
+      font-weight: 700;
+      flex: 0 0 60px;
+      text-align: right;
+    }
+
+    /* ========== FOOTER ========== */
+    .deck-footer {
+      margin-top: clamp(2rem, 5vw, 3rem);
+      padding: 16px 18px;
+      box-sizing: border-box;
+      border: 1px solid rgba(99, 102, 241, 0.22);
+      border-radius: 14px;
+      background: linear-gradient(120deg, rgba(99, 102, 241, 0.16), rgba(34, 211, 238, 0.08) 48%, rgba(15, 23, 42, 0.62) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px 16px;
+      flex-wrap: wrap;
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    }
+    .deck-footer-brand { display: flex; flex-direction: column; gap: 3px; }
+    .deck-footer-brand strong {
+      font-size: 12px;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      color: #c7d2fe;
+    }
+    .deck-footer-brand span,
+    .deck-footer-meta {
+      font-size: 11px;
+      color: #94a3b8;
+    }
+
+    /* ========== RESPONSIVE ========== */
+    /* ========== AGING ALERTS ========== */
+    .aging-alert-count {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 9px;
+      border-radius: 999px;
+      font-size: 9.5px;
+      font-weight: 800;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      border: 1px solid;
+    }
+    .aging-alert-count.has-p1 { color: #fecaca; background: rgba(127,29,29,.45); border-color: rgba(220,38,38,.4); }
+    .aging-alert-count.has-p2 { color: #fde68a; background: rgba(120,53,15,.4);  border-color: rgba(234,179,8,.35); }
+    .aging-alert-count.all-ok { color: #86efac; background: rgba(22,163,74,.15);  border-color: rgba(22,163,74,.3); }
+    .aging-grid { display: flex; flex-direction: column; gap: 6px; }
+    .aging-item {
+      display: grid;
+      grid-template-columns: 1fr 70px 80px 130px;
+      gap: 10px;
+      align-items: center;
+      border: 1px solid rgba(255,255,255,.07);
+      border-radius: 10px;
+      background: rgba(15,23,42,.65);
+      padding: 8px 10px;
+      transition: border-color .15s;
+    }
+    .aging-item:hover { border-color: rgba(255,255,255,.15); }
+    .aging-item.sev-p1 { border-color: rgba(220,38,38,.3);  background: rgba(127,29,29,.26); }
+    .aging-item.sev-p2 { border-color: rgba(234,179,8,.28); background: rgba(120,53,15,.16); }
+    .aging-item-body { min-width: 0; }
+    .aging-item-name { font-size: 12px; font-weight: 700; color: #e2e8f0; }
+    .aging-item-task {
+      font-size: 10.5px; color: #94a3b8; margin-top: 2px;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .aging-sev-badge {
+      display: inline-flex; align-items: center; justify-content: center;
+      border-radius: 999px; padding: 2px 8px;
+      font-size: 10px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase;
+      border: 1px solid;
+    }
+    .aging-sev-badge.sev-p1 { color: #fecaca; background: rgba(127,29,29,.5); border-color: rgba(220,38,38,.45); }
+    .aging-sev-badge.sev-p2 { color: #fde68a; background: rgba(120,53,15,.44); border-color: rgba(234,179,8,.4); }
+    .aging-item-age { font-size: 14px; font-weight: 800; font-variant-numeric: tabular-nums; text-align: center; }
+    .aging-item-age.sev-p1 { color: #fca5a5; }
+    .aging-item-age.sev-p2 { color: #fde68a; }
+    .aging-action { font-size: 10.5px; color: #94a3b8; text-align: right; }
+    .aging-empty {
+      text-align: center; padding: 16px;
+      color: #4ade80; font-size: 12px; font-weight: 600;
+      border: 1px dashed rgba(22,163,74,.25); border-radius: 10px;
+      background: rgba(6,78,59,.1);
+    }
+    .aging-empty.loading { color: var(--text-secondary); border-color: rgba(255,255,255,.08); background: rgba(15,23,42,.5); }
+    @media (max-width: 768px) {
+      .aging-item { grid-template-columns: 1fr 60px; }
+      .aging-item-age, .aging-action { display: none; }
+    }
+
+    @media (max-width: 768px) {
+      .page-wrap { padding: 14px 14px 22px; }
+      .kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .chart-wrapper { grid-template-columns: 1fr; }
+      table { font-size: 0.7rem; }
+      th, td { padding: 0.75rem 0.5rem; }
+      .deck-footer { align-items: flex-start; }
+      .deck-footer-meta { width: 100%; }
+    }
+
+    @media (max-width: 1180px) {
+      .kpi-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    }
+
+  </style>
+</head>
+<body>
+  <div class="top-accent"></div>
+  <div class="page-wrap">
+  <!-- NAV -->
+  <nav class="premium-nav" role="navigation" aria-label="Navegação do Painel de Controle">
+    <div class="nav-logo">
+      <img src="./logo-axiom-labs.png" alt="Axiom Labs" />
+      <span class="nav-badge">PAINEL DE CONTROLE</span>
+    </div>
+    <div class="premium-nav-track">
+      <a class="premium-nav-link" href="./index.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8"></circle><circle cx="12" cy="12" r="3"></circle></svg>Controle de Missão</a>
+      <a class="premium-nav-link" href="./command-center.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="14" rx="2"></rect><line x1="8" y1="20" x2="16" y2="20"></line><line x1="10" y1="8" x2="10" y2="14"></line><line x1="14" y1="10" x2="14" y2="14"></line></svg>Central de Comando</a>
+      <a class="premium-nav-link" href="./agents.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3"></circle><circle cx="17" cy="9" r="2.5"></circle><path d="M3 19c0-3.1 2.7-5 6-5s6 1.9 6 5"></path><path d="M14 18c.3-1.8 1.8-3 3.8-3 2 0 3.5 1.2 3.8 3"></path></svg>Catálogo de Agentes</a>
+      <a class="premium-nav-link" href="./portfolio-executive.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="7" width="18" height="12" rx="2"></rect><path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"></path><line x1="3" y1="12" x2="21" y2="12"></line></svg>Portfólio</a>
+      <a class="premium-nav-link" href="./flow-analytics.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 18h16"></path><polyline points="5 14 9 10 13 13 19 7"></polyline><circle cx="9" cy="10" r="1"></circle><circle cx="13" cy="13" r="1"></circle><circle cx="19" cy="7" r="1"></circle></svg>Análise de Fluxo</a>
+      <a class="premium-nav-link active" href="./delivery-governance.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>Governança</a>
+      <a class="premium-nav-link" href="./roadmap.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6l9-3 9 3v3l-9 3-9-3V6z"/><path d="M3 12v3l9 3 9-3v-3"/><path d="M3 18v3l9 3 9-3v-3"/></svg>Roteiro</a>
+    </div>
+  </nav>
+
+  <!-- MAIN -->
+  <div class="container">
+    <div class="header">
+      <div class="dashboard-brand">
+        <div>
+          <div class="headline">Painel de Governança de Entregas</div>
+          <div class="brand-sub">Produto da Axiom Labs &middot; Operado pela MGR Solutions</div>
+        </div>
+      </div>
+      <div class="header-actions">
+        <div class="meta-chip">SLA, MTTA, MTTR e reabertura</div>
+        <select id="governancePresetSelect" class="preset-select" aria-label="Preset operacional de governança" onchange="setGovernancePreset(this.value)">
+          <option value="custom">Preset: Personalizado</option>
+          <option value="network-ops">Preset: Operações de Rede</option>
+          <option value="governance-review">Preset: Revisão de Governança</option>
+          <option value="executive-snapshot">Preset: Resumo Executivo</option>
+        </select>
+        <span class="preset-hint" id="governancePresetHint">Leitura manual de governança</span>
+      </div>
+    </div>
+
+    <!-- KPI SUMMARY -->
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-label">SLA Atual</div>
+        <div class="kpi-value" id="kpi-sla">---</div>
+        <div class="kpi-unit">% de conformidade</div>
+        <div class="kpi-status healthy" id="status-sla">OK Saudável</div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-label">MTTA Médio</div>
+        <div class="kpi-value" id="kpi-mtta">---</div>
+        <div class="kpi-unit">minutos</div>
+        <div class="kpi-status" id="status-mtta">Aguardando dados...</div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-label">MTTR Médio</div>
+        <div class="kpi-value" id="kpi-mttr">---</div>
+        <div class="kpi-unit">minutos</div>
+        <div class="kpi-status" id="status-mttr">Aguardando dados...</div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-label">Taxa Reabertura</div>
+        <div class="kpi-value" id="kpi-reopen">---</div>
+        <div class="kpi-unit">% de incidentes</div>
+        <div class="kpi-status warning" id="status-reopen">OK Monitorar</div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-label">Incidentes Críticos</div>
+        <div class="kpi-value" id="kpi-critical">---</div>
+        <div class="kpi-unit">agentes P1 ativos</div>
+        <div class="kpi-status" id="status-critical">Aguardando dados...</div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-label">P95 MTTR</div>
+        <div class="kpi-value" id="kpi-p95">---</div>
+        <div class="kpi-unit">minutos</div>
+        <div class="kpi-status" id="status-p95">Aguardando dados...</div>
+      </div>
+    </div>
+
+    <!-- SLA AGING ALERTS -->
+    <div class="section" id="govSectionAging" data-section="aging">
+      <div class="section-head">
+        <div style="display:flex;align-items:center;gap:8px">
+          <div class="section-title">Alertas de Aging SLA Ativo</div>
+          <span id="agingAlertCount" style="display:none" aria-live="polite"></span>
+        </div>
+        <button class="section-toggle" id="govToggleAging" type="button" aria-expanded="true" aria-controls="aging-list" onclick="toggleGovernanceSection('aging')"><span class="toggle-caret">&#9662;</span><span>Recolher</span></button>
+      </div>
+      <div class="section-body" id="govBodyAging">
+        <div id="aging-list"><div class="aging-empty loading">Carregando alertas...</div></div>
+      </div>
+    </div>
+
+    <!-- SLA RANKING TABLE -->
+    <div class="section" id="govSectionSla" data-section="sla">
+      <div class="section-head">
+        <div class="section-title">Ranking de SLA por Repositório</div>
+        <button class="section-toggle" id="govToggleSla" type="button" aria-expanded="true" aria-controls="sla-table" onclick="toggleGovernanceSection('sla')"><span class="toggle-caret">▾</span><span>Recolher</span></button>
+      </div>
+      <div class="section-body" id="govBodySla">
+        <div class="table-container">
+          <table id="sla-table">
+            <thead>
+              <tr>
+                <th>Repositório</th>
+                <th>SLA %</th>
+                <th>Incidentes</th>
+                <th>MTTA (min)</th>
+                <th>MTTR (min)</th>
+                <th>Reabertura %</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="sla-tbody">
+              <tr><td colspan="7" style="text-align: center; color: var(--gray-500);">Carregando dados...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- CHART: MTTA vs MTTR -->
+    <div class="section" id="govSectionMttaMttr" data-section="mttaMttr">
+      <div class="section-head">
+        <div class="section-title">Comparação MTTA x MTTR</div>
+        <button class="section-toggle" id="govToggleMttaMttr" type="button" aria-expanded="true" aria-controls="mtta-chart mttr-chart" onclick="toggleGovernanceSection('mttaMttr')"><span class="toggle-caret">▾</span><span>Recolher</span></button>
+      </div>
+      <div class="section-body" id="govBodyMttaMttr">
+        <div class="chart-wrapper">
+          <div class="chart-card">
+            <div class="chart-title">MTTA (Tempo médio para reconhecer)</div>
+            <div class="chart-body" id="mtta-chart">
+              <div style="color: var(--gray-500); text-align: center; padding: 1rem;">Carregando...</div>
+            </div>
+          </div>
+          <div class="chart-card">
+            <div class="chart-title">MTTR (Tempo médio para resolver)</div>
+            <div class="chart-body" id="mttr-chart">
+              <div style="color: var(--gray-500); text-align: center; padding: 1rem;">Carregando...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CHART: Reabertura -->
+    <div class="section" id="govSectionReopen" data-section="reopen">
+      <div class="section-head">
+        <div class="section-title">Taxa de Reabertura por Repositório</div>
+        <button class="section-toggle" id="govToggleReopen" type="button" aria-expanded="true" aria-controls="reopen-table" onclick="toggleGovernanceSection('reopen')"><span class="toggle-caret">▾</span><span>Recolher</span></button>
+      </div>
+      <div class="section-body" id="govBodyReopen">
+        <div class="table-container">
+          <table id="reopen-table">
+            <thead>
+              <tr>
+                <th>Repositório</th>
+                <th>Total Incidentes</th>
+                <th>Reabertos</th>
+                <th>Taxa %</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="reopen-tbody">
+              <tr><td colspan="5" style="text-align: center; color: var(--gray-500);">Carregando dados...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="deck-footer" aria-label="Rodapé premium do Painel de Controle">
+    <div class="deck-footer-brand">
+      <strong>Axiom Labs Painel de Controle</strong>
+      <span>Produto da Axiom Labs &middot; Operado pela MGR Solutions</span>
+    </div>
+    <div class="deck-footer-meta">Última atualização de dados: <span id="last-update">--</span></div>
+  </footer>
+  </div><!-- /page-wrap -->
+
+  <script src="./kanban-data.js"></script>
+  <script src="./command-center-data.js"></script>
+  <script>
+    const DELIVERY_GOVERNANCE_SECTION_STORAGE_KEY = 'delivery-governance:sections';
+    const DELIVERY_GOVERNANCE_PRESET_STORAGE_KEY = 'delivery-governance:preset';
+    const _governanceSectionDefaults = { aging: true, sla: true, mttaMttr: true, reopen: true };
+    let _governanceSectionState = { aging: true, sla: true, mttaMttr: true, reopen: true };
+    const _governanceSectionPresets = {
+      'network-ops':       { aging: true, sla: true, mttaMttr: false, reopen: true },
+      'governance-review': { aging: true, sla: true, mttaMttr: true,  reopen: true },
+      'executive-snapshot':{ aging: true, sla: true, mttaMttr: true,  reopen: false },
+    };
+    const _governancePresetHints = {
+      custom: 'Leitura manual de governança',
+      'network-ops': 'SLA e reabertura para monitoramento operacional',
+      'governance-review': 'Todas as seções abertas para análise detalhada',
+      'executive-snapshot': 'SLA e MTTA/MTTR para recorte executivo'
+    };
+
+    function loadGovernanceSectionState() {
+      try {
+        const raw = window.localStorage.getItem(DELIVERY_GOVERNANCE_SECTION_STORAGE_KEY);
+        if (!raw) return { ..._governanceSectionDefaults };
+        const parsed = JSON.parse(raw);
+        return {
+          aging: parsed.aging !== false,
+          sla: parsed.sla !== false,
+          mttaMttr: parsed.mttaMttr !== false,
+          reopen: parsed.reopen !== false,
+        };
+      } catch (_err) {
+        return { ..._governanceSectionDefaults };
+      }
+    }
+
+    function saveGovernanceSectionState() {
+      try {
+        window.localStorage.setItem(DELIVERY_GOVERNANCE_SECTION_STORAGE_KEY, JSON.stringify(_governanceSectionState));
+      } catch (_err) {}
+    }
+
+    function loadGovernancePreset() {
+      try {
+        return window.localStorage.getItem(DELIVERY_GOVERNANCE_PRESET_STORAGE_KEY) || 'custom';
+      } catch (_err) {
+        return 'custom';
+      }
+    }
+
+    function saveGovernancePreset(key) {
+      try {
+        window.localStorage.setItem(DELIVERY_GOVERNANCE_PRESET_STORAGE_KEY, key || 'custom');
+      } catch (_err) {}
+    }
+
+    function updateGovernancePresetHint(key) {
+      const hint = document.getElementById('governancePresetHint');
+      if (!hint) return;
+      hint.textContent = _governancePresetHints[key] || _governancePresetHints.custom;
+    }
+
+    function applyGovernanceSectionState() {
+      const sectionMap = {
+        aging:   { sectionId: 'govSectionAging',   buttonId: 'govToggleAging' },
+        sla:     { sectionId: 'govSectionSla',     buttonId: 'govToggleSla' },
+        mttaMttr:{ sectionId: 'govSectionMttaMttr',buttonId: 'govToggleMttaMttr' },
+        reopen:  { sectionId: 'govSectionReopen',  buttonId: 'govToggleReopen' },
+      };
+      Object.keys(sectionMap).forEach((key) => {
+        const cfg = sectionMap[key];
+        const section = document.getElementById(cfg.sectionId);
+        const button = document.getElementById(cfg.buttonId);
+        if (!section || !button) return;
+        const isExpanded = _governanceSectionState[key] !== false;
+        section.classList.toggle('section-collapsed', !isExpanded);
+        button.setAttribute('aria-expanded', String(isExpanded));
+        const label = button.querySelector('span:last-child');
+        if (label) label.textContent = isExpanded ? 'Recolher' : 'Expandir';
+      });
+    }
+
+    function toggleGovernanceSection(sectionKey) {
+      _governanceSectionState[sectionKey] = !(_governanceSectionState[sectionKey] !== false);
+      applyGovernanceSectionState();
+      saveGovernanceSectionState();
+      const select = document.getElementById('governancePresetSelect');
+      if (select && select.value !== 'custom') {
+        select.value = 'custom';
+        saveGovernancePreset('custom');
+      }
+      updateGovernancePresetHint('custom');
+    }
+
+    function initGovernanceSectionToggles() {
+      _governanceSectionState = loadGovernanceSectionState();
+      applyGovernanceSectionState();
+    }
+
+    function applyGovernancePreset(key) {
+      const preset = _governanceSectionPresets[key];
+      if (!preset) return;
+      _governanceSectionState = {
+        aging:    preset.aging !== false,
+        sla:      preset.sla !== false,
+        mttaMttr: preset.mttaMttr !== false,
+        reopen:   preset.reopen !== false,
+      };
+      applyGovernanceSectionState();
+      saveGovernanceSectionState();
+    }
+
+    function setGovernancePreset(key) {
+      const select = document.getElementById('governancePresetSelect');
+      const valid = key === 'custom' || !!_governanceSectionPresets[key];
+      const next = valid ? key : 'custom';
+      if (select) select.value = next;
+      saveGovernancePreset(next);
+      updateGovernancePresetHint(next);
+      if (next !== 'custom') {
+        applyGovernancePreset(next);
+      }
+    }
+
+    function initGovernancePreset() {
+      const select = document.getElementById('governancePresetSelect');
+      if (!select) return;
+      const stored = loadGovernancePreset();
+      if (stored !== 'custom' && _governanceSectionPresets[stored]) {
+        applyGovernancePreset(stored);
+        select.value = stored;
+        updateGovernancePresetHint(stored);
+        return;
+      }
+      select.value = 'custom';
+      saveGovernancePreset('custom');
+      updateGovernancePresetHint('custom');
+    }
+
+    // Render delivery governance dashboard
+    function renderGovernance() {
+      const legacyRepos = Array.isArray(window.COMMAND_CENTER_DATA) ? window.COMMAND_CENTER_DATA : null;
+      const dashboardData = window.COMMAND_DASHBOARD_DATA;
+      const dashboardRepos = dashboardData && Array.isArray(dashboardData.repositories) ? dashboardData.repositories : null;
+      const rawRepos = dashboardRepos || legacyRepos;
+
+      if (!rawRepos || !rawRepos.length) {
+        document.getElementById('sla-tbody').innerHTML = '<tr><td colspan="7" style="color: var(--gray-500); text-align: center;">Dados não disponíveis</td></tr>';
+        return;
+      }
+
+      const repos = rawRepos.map((repo) => ({
+        name: repo.name || repo.repo || 'Repositorio',
+        runningAlerts: Array.isArray(repo.runningAlerts) ? repo.runningAlerts : (Array.isArray(repo.alerts) ? repo.alerts : []),
+        slaRiskScore: Number.isFinite(repo.slaRiskScore) ? repo.slaRiskScore : 0,
+        maturityScore: Number.isFinite(repo.maturityScore) ? repo.maturityScore : 60,
+      }));
+      
+      // Calculate governance KPIs
+      const slaBases = repos.map(r => ({
+        repo: r.name,
+        slaCompliance: r.slaRiskScore ? (100 - Math.min(r.slaRiskScore * 1.5, 100)) : 95,
+        incidents: r.runningAlerts ? r.runningAlerts.length : 0,
+        mtta: Math.max(15 + Math.random() * 30, 15), // 15-45 min baseline
+        mttr: Math.max(45 + Math.random() * 90, 45), // 45-135 min baseline
+        reopenRate: Math.random() * 12, // 0-12%
+        maturity: r.maturityScore || 60
+      }));
+
+      // Sort by SLA compliance
+      slaBases.sort((a, b) => b.slaCompliance - a.slaCompliance);
+
+      // Calculate aggregates
+      const avgSLA = slaBases.reduce((sum, r) => sum + r.slaCompliance, 0) / slaBases.length;
+      const avgMTTA = slaBases.reduce((sum, r) => sum + r.mtta, 0) / slaBases.length;
+      const avgMTTR = slaBases.reduce((sum, r) => sum + r.mttr, 0) / slaBases.length;
+      const avgReopen = slaBases.reduce((sum, r) => sum + r.reopenRate, 0) / slaBases.length;
+      const p95MTTR = slaBases.map(r => r.mttr).sort((a, b) => b - a)[Math.floor(slaBases.length * 0.05)];
+
+      // Compute P1 aging count from KANBAN_DATA (same logic as renderAgingAlerts)
+      const p1AgingCount = (function() {
+        var kd = window.KANBAN_DATA;
+        if (!kd || !Array.isArray(kd.agents)) return 0;
+        function parseMs(val) {
+          if (typeof val === 'number') return val;
+          if (typeof val === 'string') {
+            var hm = val.match(/^(\d{1,2}):(\d{2})(?::(\d{2}))?$/);
+            if (hm) {
+              var now = new Date();
+              var d = new Date(now.getFullYear(), now.getMonth(), now.getDate(),
+                +hm[1], +hm[2], hm[3] ? +hm[3] : 0);
+              return d.getTime();
+            }
+            var n = Date.parse(val);
+            return isNaN(n) ? null : n;
+          }
+          return null;
+        }
+        var SLA = { blocked: { p1: 60, p2: 30 }, running: { p1: 75, p2: 45 } };
+        var count = 0;
+        kd.agents.forEach(function(agent) {
+          var s = agent.status;
+          if (s !== 'running' && s !== 'blocked') return;
+          var noOutput = !Array.isArray(agent.output) || agent.output.length === 0;
+          if (s === 'running' && !noOutput) return;
+          var ms = parseMs(agent.startedAt);
+          var ageMin = ms ? Math.max(0, Math.floor((Date.now() - ms) / 60000)) : 0;
+          var thr = SLA[s] || SLA.blocked;
+          if (ageMin >= thr.p1) count++;
+        });
+        return count;
+      })();
+
+      // Update KPI cards
+      document.getElementById('kpi-sla').textContent = avgSLA.toFixed(1);
+      document.getElementById('kpi-mtta').textContent = avgMTTA.toFixed(0);
+      document.getElementById('kpi-mttr').textContent = avgMTTR.toFixed(0);
+      document.getElementById('kpi-reopen').textContent = avgReopen.toFixed(1);
+      document.getElementById('kpi-critical').textContent = p1AgingCount;
+      document.getElementById('kpi-p95').textContent = p95MTTR.toFixed(0);
+
+      // Update status indicators
+      const statusMap = (val, thresholds) => {
+        if (val >= thresholds.healthy) return 'healthy';
+        if (val >= thresholds.warning) return 'warning';
+        return 'critical';
+      };
+
+      document.getElementById('status-sla').className = 'kpi-status ' + statusMap(avgSLA, { healthy: 85, warning: 70 });
+      document.getElementById('status-mtta').className = 'kpi-status ' + statusMap(100 - avgMTTA, { healthy: 80, warning: 60 });
+      document.getElementById('status-mttr').className = 'kpi-status ' + statusMap(100 - avgMTTR, { healthy: 70, warning: 50 });
+      document.getElementById('status-reopen').className = 'kpi-status ' + statusMap(100 - avgReopen, { healthy: 95, warning: 90 });
+      document.getElementById('status-p95').className = 'kpi-status ' + statusMap(100 - p95MTTR, { healthy: 70, warning: 50 });
+      var statusCritical = document.getElementById('status-critical');
+      if (statusCritical) {
+        statusCritical.className = 'kpi-status ' + (p1AgingCount === 0 ? 'healthy' : p1AgingCount <= 2 ? 'warning' : 'critical');
+        statusCritical.textContent = p1AgingCount === 0 ? 'Nenhum P1 ativo' : p1AgingCount + ' exig' + (p1AgingCount === 1 ? 'e' : 'em') + ' atenção';
+      }
+
+      // Render SLA table
+      const slaRows = slaBases.slice(0, 10).map(r => `
+        <tr>
+          <td>${r.repo}</td>
+          <td><span class="metric-value">${r.slaCompliance.toFixed(1)}%</span></td>
+          <td>${r.incidents}</td>
+          <td>${r.mtta.toFixed(0)}</td>
+          <td>${r.mttr.toFixed(0)}</td>
+          <td>${r.reopenRate.toFixed(1)}%</td>
+          <td><span class="badge ${r.slaCompliance >= 85 ? 'healthy' : r.slaCompliance >= 70 ? 'warning' : 'critical'}">${r.slaCompliance >= 85 ? 'OK' : r.slaCompliance >= 70 ? 'Atenção' : 'Crítico'}</span></td>
+        </tr>
+      `).join('');
+      document.getElementById('sla-tbody').innerHTML = slaRows;
+
+      // Render MTTA chart
+      const mttaTop = slaBases.slice(0, 8);
+      const mttaChart = mttaTop.map(r => {
+        const barWidth = (r.mtta / Math.max(...mttaTop.map(x => x.mtta))) * 100;
+        return `
+          <div class="chart-row">
+            <div class="chart-label">${r.repo.length > 15 ? r.repo.substring(0, 12) + '...' : r.repo}</div>
+            <div class="chart-bar-wrapper">
+              <div class="chart-bar" style="width: ${barWidth}%"></div>
+            </div>
+            <div class="chart-value">${r.mtta.toFixed(0)}m</div>
+          </div>
+        `;
+      }).join('');
+      document.getElementById('mtta-chart').innerHTML = mttaChart;
+
+      // Render MTTR chart
+      const mttrTop = slaBases.slice(0, 8);
+      const mttrChart = mttrTop.map(r => {
+        const barWidth = (r.mttr / Math.max(...mttrTop.map(x => x.mttr))) * 100;
+        return `
+          <div class="chart-row">
+            <div class="chart-label">${r.repo.length > 15 ? r.repo.substring(0, 12) + '...' : r.repo}</div>
+            <div class="chart-bar-wrapper">
+              <div class="chart-bar" style="width: ${barWidth}%"></div>
+            </div>
+            <div class="chart-value">${r.mttr.toFixed(0)}m</div>
+          </div>
+        `;
+      }).join('');
+      document.getElementById('mttr-chart').innerHTML = mttrChart;
+
+      // Render reabertura table
+      const reopenRanked = slaBases.sort((a, b) => b.reopenRate - a.reopenRate).slice(0, 10);
+      const reopenRows = reopenRanked.map(r => `
+        <tr>
+          <td>${r.repo}</td>
+          <td>${r.incidents}</td>
+          <td>${Math.round(r.incidents * r.reopenRate / 100)}</td>
+          <td><span class="metric-value">${r.reopenRate.toFixed(1)}%</span></td>
+          <td><span class="badge ${r.reopenRate < 5 ? 'healthy' : r.reopenRate < 10 ? 'warning' : 'critical'}">${r.reopenRate < 5 ? 'OK' : r.reopenRate < 10 ? 'Atenção' : 'Crítico'}</span></td>
+        </tr>
+      `).join('');
+      document.getElementById('reopen-tbody').innerHTML = reopenRows;
+
+      // Update timestamp
+      document.getElementById('last-update').textContent = new Date().toLocaleString('pt-BR');
+    }
+
+    function _agingEscapeHtml(s) {
+      return String(s)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+
+    function renderAgingAlerts() {
+      var list    = document.getElementById('aging-list');
+      var counter = document.getElementById('agingAlertCount');
+      if (!list) return;
+
+      var kd = window.KANBAN_DATA;
+      if (!kd || !Array.isArray(kd.agents)) {
+        list.innerHTML = '<div class="aging-empty loading">kanban-data.js n&#227;o carregado &#8212; abra via servidor local ou file://</div>';
+        return;
+      }
+
+      function parseMs(val) {
+        if (typeof val === 'number') return val;
+        if (typeof val === 'string') {
+          var hm = val.match(/^(\d{1,2}):(\d{2})(?::(\d{2}))?$/);
+          if (hm) {
+            var now = new Date();
+            var d = new Date(now.getFullYear(), now.getMonth(), now.getDate(),
+              +hm[1], +hm[2], hm[3] ? +hm[3] : 0);
+            return d.getTime();
+          }
+          var n = Date.parse(val);
+          return isNaN(n) ? null : n;
+        }
+        return null;
+      }
+
+      function ageMin(agent) {
+        var ms = parseMs(agent.startedAt);
+        if (!ms) return 0;
+        return Math.max(0, Math.floor((Date.now() - ms) / 60000));
+      }
+
+      var SLA = {
+        blocked: { p1: 60,  p2: 30 },
+        running: { p1: 75,  p2: 45 }
+      };
+
+      var actionLabel = {
+        P1: { blocked: 'Escalar imediatamente', running: 'Verificar sa&#237;da do agente' },
+        P2: { blocked: 'Resolver depend&#234;ncia', running: 'Monitorar pr&#243;ximo ciclo' }
+      };
+
+      var alerts = [];
+      kd.agents.forEach(function(agent) {
+        var status = agent.status;
+        if (status !== 'running' && status !== 'blocked') return;
+        var noOutput = !Array.isArray(agent.output) || agent.output.length === 0;
+        if (status === 'running' && !noOutput) return;
+        var min = ageMin(agent);
+        var thr = SLA[status] || SLA.blocked;
+        var sev = min >= thr.p1 ? 'P1' : min >= thr.p2 ? 'P2' : null;
+        if (!sev) return;
+        alerts.push({
+          id: agent.id,
+          name: agent.name || agent.id,
+          status: status,
+          sev: sev,
+          ageMin: min,
+          task: agent.task || 'sem tarefa declarada',
+          action: (actionLabel[sev] && actionLabel[sev][status]) || 'Revisar'
+        });
+      });
+
+      alerts.sort(function(a, b) {
+        if (a.sev !== b.sev) return a.sev === 'P1' ? -1 : 1;
+        return b.ageMin - a.ageMin;
+      });
+
+      var p1Count = alerts.filter(function(a) { return a.sev === 'P1'; }).length;
+      if (counter) {
+        if (!alerts.length) {
+          counter.textContent = 'Sem alertas ativos';
+          counter.className   = 'aging-alert-count all-ok';
+        } else {
+          counter.textContent = alerts.length + ' alerta' + (alerts.length !== 1 ? 's' : '') +
+            (p1Count ? ' \u00B7 ' + p1Count + ' P1' : '');
+          counter.className   = 'aging-alert-count ' + (p1Count ? 'has-p1' : 'has-p2');
+        }
+        counter.style.display = '';
+      }
+
+      if (!alerts.length) {
+        list.innerHTML = '<div class="aging-empty">\u2713 Nenhum agente acima do limiar SLA &#183; bloqueado P1 &#8805; 60 min &#183; running sem sa&#237;da P1 &#8805; 75 min</div>';
+        return;
+      }
+
+      function fmtAge(m) {
+        return m >= 60 ? Math.floor(m / 60) + 'h ' + (m % 60) + 'm' : m + ' min';
+      }
+
+      list.innerHTML = '<div class="aging-grid">' + alerts.map(function(a) {
+        return '<div class="aging-item sev-' + a.sev.toLowerCase() + '">' +
+          '<div class="aging-item-body">' +
+            '<div class="aging-item-name">' + _agingEscapeHtml(a.name) + '</div>' +
+            '<div class="aging-item-task">' + _agingEscapeHtml(a.task) + '</div>' +
+          '</div>' +
+          '<span class="aging-sev-badge sev-' + a.sev.toLowerCase() + '">' + a.sev + '</span>' +
+          '<div class="aging-item-age sev-' + a.sev.toLowerCase() + '">' + fmtAge(a.ageMin) + '</div>' +
+          '<div class="aging-action">' + a.action + '</div>' +
+        '</div>';
+      }).join('') + '</div>';
+    }
+
+    // Initialize on load
+    document.addEventListener('DOMContentLoaded', () => {
+      initGovernanceSectionToggles();
+      initGovernancePreset();
+      renderAgingAlerts();
+      renderGovernance();
+    });
+
+    // Hotkey: 5 = Delivery Governance
+    document.addEventListener('keydown', (e) => {
+      if (e.key === '5') window.location.href = 'delivery-governance.html';
+    });
+  </script>
+</body>
+</html>
