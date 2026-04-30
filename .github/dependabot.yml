@@ -12,10 +12,11 @@ updates:
       time: "09:00"
       timezone: "America/Sao_Paulo"
     reviewers:
-      - "owner-username"  # Substituir pelo usuario do repo
+      - "marcelogourod"  # Substituir pelo usuario do repo
     commit-message:
       prefix: "chore(ci)"
     labels:
       - "dependencies"
       - "ci"
     open-pull-requests-limit: 5
+
