@@ -1,3 +1,27 @@
+import ComingSoon from '@/components/ComingSoon'
+import { Users } from 'lucide-react'
+
+export default function QuemSomosPage() {
+  return (
+    <ComingSoon
+      title="Quem Somos"
+      description="Estamos preparando uma página especial para contar a história do Projeto Maya — nossa missão, equipe e o impacto que já geramos juntos. Em breve!"
+      icon={Users}
+      backHref="/"
+      backLabel="Voltar ao início"
+      features={[
+        'História e origem do Projeto Maya',
+        'Conheça nossa equipe e voluntários',
+        'Impacto em números: resgates, adoções e campanhas',
+        'Transparência: como usamos cada doação',
+        'Parceiros e apoiadores da causa',
+      ]}
+    />
+  )
+}
+
+// Conteúdo completo preservado abaixo — será restaurado em breve
+/*
 'use client'
 
 import Image from 'next/image'
@@ -15,7 +39,7 @@ function CountUpNumber({ target, label }: { target: number; label: string }) {
   )
 }
 
-export default function QuemSomosPage() {
+function QuemSomosPageFull() {
   return (
     <div className="min-h-screen bg-maya-beige dark:bg-gray-900">
       {/* Hero */}
@@ -192,3 +216,4 @@ export default function QuemSomosPage() {
     </div>
   )
 }
+*/
