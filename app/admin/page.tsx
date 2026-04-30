@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { PawPrint, Heart, Users, DollarSign, TrendingUp, Plus, Edit, Trash2, AlertTriangle, Dog, Cat, LogOut, Target, X } from 'lucide-react'
+import { PawPrint, Heart, Users, DollarSign, TrendingUp, Plus, Edit, Trash2, AlertTriangle, Dog, Cat, LogOut, Target, X, BarChart3, ClipboardList, HandHeart } from 'lucide-react'
 import { useAnimals } from '@/hooks/useAnimals'
 import { useAuth } from '@/hooks/useAuth'
 import { createAdminClient } from '@/lib/supabase-admin'
@@ -340,7 +340,7 @@ export default function AdminDashboard() {
               <h2 className="font-display text-2xl text-maya-brown dark:text-white mb-4">
                 Ações Rápidas
               </h2>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                 <Link
                   href="/admin/animais"
                   className="p-4 bg-maya-green/10 hover:bg-maya-green/20 rounded-xl transition-colors text-left"
@@ -369,19 +369,40 @@ export default function AdminDashboard() {
                   </p>
                 </Link>
                 <Link
-                  href="/doacoes"
+                  href="/admin/voluntarios"
+                  className="p-4 bg-maya-sand/10 hover:bg-maya-sand/20 rounded-xl transition-colors text-left"
+                >
+                  <HandHeart className="w-6 h-6 text-maya-sand mb-2" />
+                  <p className="font-semibold text-maya-brown dark:text-white text-sm">
+                    Voluntários
+                  </p>
+                  <span className="text-xs text-maya-orange font-semibold">Em breve</span>
+                </Link>
+                <Link
+                  href="/admin/adotantes"
+                  className="p-4 bg-purple-500/10 hover:bg-purple-500/20 rounded-xl transition-colors text-left"
+                >
+                  <ClipboardList className="w-6 h-6 text-purple-500 mb-2" />
+                  <p className="font-semibold text-maya-brown dark:text-white text-sm">
+                    Adotantes
+                  </p>
+                  <span className="text-xs text-maya-orange font-semibold">Em breve</span>
+                </Link>
+                <Link
+                  href="/admin/relatorios"
                   className="p-4 bg-green-500/10 hover:bg-green-500/20 rounded-xl transition-colors text-left"
                 >
-                  <DollarSign className="w-6 h-6 text-green-500 mb-2" />
+                  <BarChart3 className="w-6 h-6 text-green-500 mb-2" />
                   <p className="font-semibold text-maya-brown dark:text-white text-sm">
-                    Ver Doações
+                    Relatórios
                   </p>
+                  <span className="text-xs text-maya-orange font-semibold">Em breve</span>
                 </Link>
                 <Link
                   href="/adocao"
-                  className="p-4 bg-purple-500/10 hover:bg-purple-500/20 rounded-xl transition-colors text-left"
+                  className="p-4 bg-gray-500/10 hover:bg-gray-500/20 rounded-xl transition-colors text-left"
                 >
-                  <PawPrint className="w-6 h-6 text-purple-500 mb-2" />
+                  <PawPrint className="w-6 h-6 text-maya-brown/60 dark:text-gray-400 mb-2" />
                   <p className="font-semibold text-maya-brown dark:text-white text-sm">
                     Ver Site
                   </p>

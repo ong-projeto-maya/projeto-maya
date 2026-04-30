@@ -22,7 +22,8 @@ import {
   MapPin,
   ClipboardList,
   Users,
-  AlertTriangle
+  AlertTriangle,
+  HandHeart,
 } from 'lucide-react'
 import DarkModeToggle from './DarkModeToggle'
 import { useFavorites } from '@/hooks/useFavorites'
@@ -94,6 +95,7 @@ export default function Header() {
       submenu: [
         { href: '/doacoes', label: 'Fazer Doação', icon: Heart },
         { href: '/campanhas', label: 'Campanhas Ativas', icon: Target },
+        { href: '/voluntariado', label: 'Seja Voluntário', icon: HandHeart },
       ]
     },
     { 
