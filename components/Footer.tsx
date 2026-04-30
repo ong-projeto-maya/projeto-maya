@@ -101,8 +101,8 @@ export default function Footer() {
                 <div className="w-8 h-8 bg-white/10 rounded-lg flex items-center justify-center flex-shrink-0">
                   <Phone size={16} />
                 </div>
-                <a href={`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? '5519994224336'}`} className="text-white/60 hover:text-maya-green text-sm transition-colors">
-                  (19) 99422-4336
+                <a href={`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? '5519994128408'}`} className="text-white/60 hover:text-maya-green text-sm transition-colors">
+                  (19) 99412-8408
                 </a>
               </li>
               <li className="flex items-center space-x-3">

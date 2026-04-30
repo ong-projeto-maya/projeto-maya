@@ -71,7 +71,7 @@ export default function HowToHelp() {
           </Link>
 
           {/* Voluntariado */}
-          <a href={`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? '5519994224336'}?text=Ol%C3%A1!%20Gostaria%20de%20ser%20volunt%C3%A1rio%20no%20Projeto%20Maya`} target="_blank" rel="noopener noreferrer" className={`card group card-hover-lift card-hover-glow transition-all duration-500 text-center scroll-hidden scroll-up ${cardsVisible ? 'scroll-visible' : ''} stagger-4`}>
+          <a href={`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? '5519994128408'}?text=Ol%C3%A1!%20Gostaria%20de%20ser%20volunt%C3%A1rio%20no%20Projeto%20Maya`} target="_blank" rel="noopener noreferrer" className={`card group card-hover-lift card-hover-glow transition-all duration-500 text-center scroll-hidden scroll-up ${cardsVisible ? 'scroll-visible' : ''} stagger-4`}>
             <div className="w-20 h-20 bg-maya-sand rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:bg-maya-sand/80 transition-colors icon-hover-bounce">
               <Users className="w-10 h-10 text-white" />
             </div>
