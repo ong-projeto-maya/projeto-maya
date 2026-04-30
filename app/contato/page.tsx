@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Mail, Phone, Send, Check, MessageSquare, AlertTriangle } from 'lucide-react'
+import { Mail, Phone, Send, Check, MessageSquare, AlertTriangle, ExternalLink } from 'lucide-react'
 import { createClient } from '@/lib/supabase'
 
 const WHATSAPP = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? '5519994128408'
@@ -17,6 +17,31 @@ export default function ContatoPage() {
   const [submitted, setSubmitted] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [whatsappUrl, setWhatsappUrl] = useState('')
+
+  const subjectLabels: Record<string, string> = {
+    adocao: 'Interesse em Adoção',
+    doacao: 'Doações',
+    voluntario: 'Voluntariado',
+    apadrinhamento: 'Apadrinhamento',
+    duvida: 'Dúvida Geral',
+    outro: 'Outro',
+  }
+
+  const buildWhatsappUrl = (data: typeof formData) => {
+    const text = [
+      `Olá! Enviei uma mensagem pelo site do Projeto Maya.`,
+      ``,
+      `*Nome:* ${data.name}`,
+      `*E-mail:* ${data.email}`,
+      data.phone ? `*Telefone:* ${data.phone}` : null,
+      `*Assunto:* ${subjectLabels[data.subject] ?? data.subject}`,
+      ``,
+      `*Mensagem:*`,
+      data.message,
+    ].filter(line => line !== null).join('\n')
+    return `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(text)}`
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -38,10 +63,14 @@ export default function ContatoPage() {
       return
     }
 
+    const url = buildWhatsappUrl(formData)
+    setWhatsappUrl(url)
+    // Abre WhatsApp automaticamente em nova aba
+    window.open(url, '_blank', 'noopener,noreferrer')
+
     setSubmitted(true)
     setLoading(false)
     setFormData({ name: '', email: '', phone: '', subject: 'adocao', message: '' })
-    setTimeout(() => setSubmitted(false), 5000)
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -121,12 +150,23 @@ export default function ContatoPage() {
               </h2>
 
               {submitted && (
-                <div className="bg-green-50 border-l-4 border-green-500 p-4 mb-6 rounded-lg">
-                  <div className="flex items-center gap-3">
-                    <Check className="w-6 h-6 text-green-600" />
-                    <div>
-                      <p className="font-semibold text-green-800">Mensagem enviada com sucesso!</p>
-                      <p className="text-sm text-green-700">Responderemos em breve.</p>
+                <div className="bg-green-50 dark:bg-green-900/20 border-l-4 border-green-500 p-4 mb-6 rounded-xl">
+                  <div className="flex items-start gap-3">
+                    <Check className="w-6 h-6 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" />
+                    <div className="flex-1">
+                      <p className="font-semibold text-green-800 dark:text-green-300 mb-1">Mensagem enviada com sucesso!</p>
+                      <p className="text-sm text-green-700 dark:text-green-400 mb-3">
+                        Uma janela do WhatsApp foi aberta para você continuar a conversa conosco.
+                      </p>
+                      <a
+                        href={whatsappUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-semibold rounded-lg transition-colors"
+                      >
+                        <ExternalLink size={14} />
+                        Abrir WhatsApp
+                      </a>
                     </div>
                   </div>
                 </div>
