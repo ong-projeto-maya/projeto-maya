@@ -119,7 +119,7 @@ export default function EventosPage() {
                     </p>
 
                     <a
-                      href={`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? '5519994224336'}?text=Ol%C3%A1!%20Gostaria%20de%20me%20inscrever%20no%20evento:%20${encodeURIComponent(event.title)}`}
+                      href={`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? '5519994128408'}?text=Ol%C3%A1!%20Gostaria%20de%20me%20inscrever%20no%20evento:%20${encodeURIComponent(event.title)}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="btn-primary inline-block"
