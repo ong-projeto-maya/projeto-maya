@@ -84,7 +84,7 @@ export default function ContatoPage() {
                 Telefone/WhatsApp
               </h3>
               <a href={`tel:+${WHATSAPP}`} className="text-maya-brown/70 dark:text-gray-300 hover:text-maya-green">
-                (19) 9 9422-4336
+                (19) 99412-8408
               </a>
             </div>
 
