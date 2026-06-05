@@ -1,4 +1,4 @@
-import ComingSoon from '@/components/ComingSoon'
+﻿import ComingSoon from '@/components/ComingSoon'
 import { Users } from 'lucide-react'
 
 export default function QuemSomosPage() {
@@ -19,5 +19,3 @@ export default function QuemSomosPage() {
     />
   )
 }
-
-

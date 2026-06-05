@@ -8,8 +8,10 @@ import { createServiceClient } from './supabase-server'
 
 export interface StoredDonation {
   id: string
-  stripeSessionId: string
-  stripeSubscriptionId?: string
+  /** PagBank reference_id (stored in stripe_session_id column for backward compat) */
+  paymentId: string
+  /** PagBank subscription ID (stored in stripe_subscription_id column) */
+  subscriptionId?: string
   email: string
   amount: number
   type: 'single' | 'monthly'
@@ -23,8 +25,8 @@ export interface StoredDonation {
 function mapRow(row: Record<string, unknown>): StoredDonation {
   return {
     id: row.id as string,
-    stripeSessionId: row.stripe_session_id as string,
-    stripeSubscriptionId: (row.stripe_subscription_id as string | null) ?? undefined,
+    paymentId: row.stripe_session_id as string,
+    subscriptionId: (row.stripe_subscription_id as string | null) ?? undefined,
     email: row.doador_email as string,
     amount: row.valor as number,
     type: row.tipo as 'single' | 'monthly',
@@ -45,8 +47,8 @@ export async function saveDonation(
     .from('doacoes')
     .upsert(
       {
-        stripe_session_id: donation.stripeSessionId,
-        stripe_subscription_id: donation.stripeSubscriptionId ?? null,
+        stripe_session_id: donation.paymentId,
+        stripe_subscription_id: donation.subscriptionId ?? null,
         doador_email: donation.email,
         valor: donation.amount,
         tipo: donation.type,
@@ -56,7 +58,7 @@ export async function saveDonation(
         created_at: donation.createdAt,
         proximo_pagamento: donation.nextBillingDate ?? null,
       },
-      { onConflict: 'stripe_session_id', ignoreDuplicates: true }
+      { onConflict: 'stripe_session_id', ignoreDuplicates: true } // column name kept for backward compat
     )
     .select()
     .single()
@@ -67,18 +69,18 @@ export async function saveDonation(
   }
 
   // If this is a new monthly donation, upsert its subscription record
-  if (donation.type === 'monthly' && donation.stripeSubscriptionId) {
+  if (donation.type === 'monthly' && donation.subscriptionId) {
     const { error: subError } = await supabase.from('assinaturas').upsert(
       {
         doador_email: donation.email,
-        stripe_subscription_id: donation.stripeSubscriptionId,
+        stripe_subscription_id: donation.subscriptionId,
         valor: donation.amount,
         status: 'active',
         proximo_pagamento: donation.nextBillingDate ?? null,
         data_inicio: donation.createdAt.split('T')[0],
         metodo_pagamento: 'Cartão',
       },
-      { onConflict: 'stripe_subscription_id', ignoreDuplicates: true }
+      { onConflict: 'stripe_subscription_id', ignoreDuplicates: true } // column name kept for backward compat
     )
     if (subError) console.error('saveDonation: subscription upsert error:', subError)
   }
@@ -87,14 +89,14 @@ export async function saveDonation(
 }
 
 export async function updateDonationStatus(
-  stripeSessionId: string,
+  paymentId: string,
   status: StoredDonation['status']
 ): Promise<void> {
   const supabase = createServiceClient()
   const { error } = await supabase
     .from('doacoes')
     .update({ status })
-    .eq('stripe_session_id', stripeSessionId)
+    .eq('stripe_session_id', paymentId)
   if (error) console.error('updateDonationStatus error:', error)
 }
 
@@ -126,30 +128,30 @@ export async function getAllDonations(): Promise<StoredDonation[]> {
 }
 
 export async function updateDonationStatusBySubscription(
-  stripeSubscriptionId: string,
+  subscriptionId: string,
   status: StoredDonation['status']
 ): Promise<void> {
   const supabase = createServiceClient()
   const { error } = await supabase
     .from('doacoes')
     .update({ status })
-    .eq('stripe_subscription_id', stripeSubscriptionId)
+    .eq('stripe_subscription_id', subscriptionId)
   if (error) console.error('updateDonationStatusBySubscription error:', error)
 }
 
 export async function cancelSubscriptionByStripeId(
-  stripeSubscriptionId: string
+  subscriptionId: string
 ): Promise<void> {
   const supabase = createServiceClient()
   const [{ error: donError }, { error: subError }] = await Promise.all([
     supabase
       .from('doacoes')
       .update({ status: 'cancelled' })
-      .eq('stripe_subscription_id', stripeSubscriptionId),
+      .eq('stripe_subscription_id', subscriptionId),
     supabase
       .from('assinaturas')
       .update({ status: 'cancelled' })
-      .eq('stripe_subscription_id', stripeSubscriptionId),
+      .eq('stripe_subscription_id', subscriptionId),
   ])
   if (donError) console.error('cancelSubscriptionByStripeId: doacoes error:', donError)
   if (subError) console.error('cancelSubscriptionByStripeId: assinaturas error:', subError)
@@ -165,6 +167,7 @@ export async function syncSubscriptionStatus(
     stripeStatus === 'active' ? 'active' :
     stripeStatus === 'paused' ? 'paused' :
     stripeStatus === 'canceled' ? 'cancelled' :
+    stripeStatus === 'cancelled' ? 'cancelled' :
     stripeStatus === 'past_due' ? 'paused' :
     'cancelled'
   const nextBilling = new Date(subscription.current_period_end * 1000).toISOString().split('T')[0]
@@ -176,13 +179,13 @@ export async function syncSubscriptionStatus(
 }
 
 export async function updateNextBillingDate(
-  stripeSubscriptionId: string,
+  subscriptionId: string,
   nextBillingDate: string
 ): Promise<void> {
   const supabase = createServiceClient()
   const { error } = await supabase
     .from('assinaturas')
     .update({ proximo_pagamento: nextBillingDate })
-    .eq('stripe_subscription_id', stripeSubscriptionId)
+    .eq('stripe_subscription_id', subscriptionId)
   if (error) console.error('updateNextBillingDate error:', error)
 }

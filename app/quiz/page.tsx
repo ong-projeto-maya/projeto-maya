@@ -81,7 +81,10 @@ export default function QuizPage() {
   }
 
   const calculateResult = (finalAnswers: Record<string, string>) => {
-    if (animals.length === 0) return
+    if (animals.length === 0) {
+      setShowResult(true)
+      return
+    }
     // Simple matching algorithm based on pet characteristics
     const scores = animals.map(animal => {
       let score = 0
@@ -134,6 +137,35 @@ export default function QuizPage() {
     setAnswers({})
     setResult(null)
     setShowResult(false)
+  }
+
+  if (showResult && !result) {
+    return (
+      <div className="min-h-screen bg-maya-beige dark:bg-gray-900 py-12">
+        <div className="container mx-auto px-4">
+          <div className="max-w-2xl mx-auto text-center">
+            <div className="mb-8">
+              <ClipboardList className="w-16 h-16 text-maya-green mx-auto mb-4" />
+              <h1 className="text-3xl sm:text-4xl font-display text-maya-brown dark:text-white mb-4">
+                Quiz Concluído!
+              </h1>
+              <p className="text-lg text-maya-brown/70 dark:text-gray-300">
+                Obrigado por responder! No momento não há animais cadastrados para fazer o match, mas você pode visitar nossa página de adoção e conhecer nossos pets.
+              </p>
+            </div>
+            <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl p-8 mb-8 flex flex-col sm:flex-row gap-4 justify-center">
+              <Link href="/adocao" className="btn-primary inline-flex items-center gap-2">
+                Ver Animais para Adoção
+                <ChevronRight size={20} />
+              </Link>
+              <button onClick={restart} className="btn-outline">
+                Fazer Quiz Novamente
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   if (showResult && result) {

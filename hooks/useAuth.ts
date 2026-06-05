@@ -32,35 +32,55 @@ export function useAuth() {
     let mounted = true
 
     const init = async () => {
-      // getUser() verifies the JWT server-side; never trust getSession() for auth checks
-      const {
-        data: { user },
-      } = await supabase.auth.getUser()
-      if (user) {
-        const adminUser = await resolveAdminUser(user.id)
-        if (mounted) setUser(adminUser)
+      try {
+        // getUser() verifies the JWT server-side; never trust getSession() for auth checks
+        // 5s timeout prevents infinite loading when Supabase is unreachable
+        let resolved = false
+        const timeoutId = setTimeout(() => {
+          if (!resolved && mounted) setLoading(false)
+        }, 5000)
+        const { data: { user } } = await supabase.auth.getUser()
+        resolved = true
+        clearTimeout(timeoutId)
+        if (user) {
+          const adminUser = await resolveAdminUser(user.id)
+          if (mounted) setUser(adminUser)
+        }
+      } catch {
+        // Network error or misconfigured Supabase — treat as unauthenticated
+      } finally {
+        if (mounted) setLoading(false)
       }
-      if (mounted) setLoading(false)
     }
 
     init()
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, session) => {
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      // IMPORTANT: Do NOT use await inside onAuthStateChange — Supabase JS SDK v2
+      // holds an internal lock during this callback. Awaiting async DB operations
+      // here causes a deadlock that blocks subsequent auth calls (e.g., login()).
+      // Fire-and-forget pattern: resolve outside the callback.
       if (session?.user) {
-        const adminUser = await resolveAdminUser(session.user.id)
-        if (!adminUser) {
-          // Signed-in user is not an admin — sign them out silently
-          await supabase.auth.signOut()
-          if (mounted) setUser(null)
-        } else {
-          if (mounted) setUser(adminUser)
-        }
+        const userId = session.user.id
+        resolveAdminUser(userId).then(adminUser => {
+          if (!adminUser) {
+            // Do NOT call supabase.auth.signOut() here — this event may have been
+            // triggered by a donor session (different storageKey). Signing out here
+            // would destroy the donor's session. Simply mark admin as unauthenticated.
+            if (mounted) setUser(null)
+          } else {
+            if (mounted) setUser(adminUser)
+          }
+          if (mounted) setLoading(false)
+        })
       } else {
-        if (mounted) setUser(null)
+        if (mounted) {
+          setUser(null)
+          setLoading(false)
+        }
       }
-      if (mounted) setLoading(false)
     })
 
     return () => {

@@ -58,7 +58,7 @@ export default function AnimaisAjudadosPage() {
         </div>
 
         {/* Stats Banner */}
-        <div className="bg-gradient-to-r from-maya-green to-maya-green rounded-3xl p-8 mb-12 text-white shadow-2xl">
+        <div className="bg-gradient-to-r from-maya-green to-maya-blue rounded-3xl p-8 mb-12 text-white shadow-2xl">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
             <div>
               <p className="text-5xl font-bold mb-2">{doador.animalsHelped}</p>

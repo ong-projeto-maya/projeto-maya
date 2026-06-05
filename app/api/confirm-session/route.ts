@@ -1,41 +1,42 @@
 import { NextResponse } from 'next/server'
-import Stripe from 'stripe'
-import { stripe } from '@/lib/stripe'
+import { findOrderByReference, mapChargeStatus } from '@/lib/pagbank'
 import { createRouteLogger } from '@/lib/logger'
 
 const log = createRouteLogger('confirm-session')
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
-  const sessionId = searchParams.get('session_id')
+  const ref = searchParams.get('ref')
 
-  if (!sessionId) {
-    return NextResponse.json({ error: 'session_id é obrigatório' }, { status: 400 })
+  if (!ref) {
+    return NextResponse.json({ error: 'ref é obrigatório' }, { status: 400 })
   }
 
   try {
-    const session = await stripe.checkout.sessions.retrieve(sessionId, {
-      expand: ['line_items', 'subscription'],
-    })
+    const order = await findOrderByReference(ref)
 
-    const subscription = session.subscription as Stripe.Subscription | null
+    if (!order) {
+      return NextResponse.json({ error: 'Pedido não encontrado' }, { status: 404 })
+    }
+
+    const firstCharge = order.charges?.[0]
+    const chargeStatus = firstCharge ? mapChargeStatus(firstCharge) : 'pending'
+    const metadata = order.metadata ?? {}
 
     return NextResponse.json({
-      id: session.id,
-      status: session.payment_status,
-      amount: (session.amount_total ?? 0) / 100,
-      currency: session.currency,
-      customerEmail: session.customer_email,
-      donationType: session.metadata?.donationType ?? 'single',
-      campaignId: session.metadata?.campaignId ?? null,
-      campaignName: session.metadata?.campaignName ?? null,
-      subscriptionId: subscription?.id ?? null,
-      nextBillingDate: subscription
-        ? new Date((subscription as any).current_period_end * 1000).toISOString().split('T')[0]
-        : null,
+      id: ref,
+      status: chargeStatus,
+      amount: firstCharge ? firstCharge.amount.value / 100 : 0,
+      currency: 'BRL',
+      customerEmail: order.customer?.email ?? null,
+      donationType: (metadata.donationType as 'single' | 'monthly') ?? 'single',
+      campaignId: metadata.campaignId ?? null,
+      campaignName: metadata.campaignName ?? null,
+      subscriptionId: null,
+      nextBillingDate: null,
     })
   } catch (error) {
     log.error({ error }, 'confirm-session failed')
-    return NextResponse.json({ error: 'Erro ao recuperar sessão' }, { status: 500 })
+    return NextResponse.json({ error: 'Erro ao recuperar pedido' }, { status: 500 })
   }
 }

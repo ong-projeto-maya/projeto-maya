@@ -21,18 +21,18 @@ interface SessionData {
 
 function DonationSuccessContent() {
   const searchParams = useSearchParams()
-  const sessionId = searchParams.get('session_id')
+  const ref = searchParams.get('ref')
   const [session, setSession] = useState<SessionData | null>(null)
-  const [loading, setLoading] = useState(!!sessionId)
+  const [loading, setLoading] = useState(!!ref)
   const [error, setError] = useState<string | null>(null)
   const { doador, addDonation } = useDoador()
 
   useEffect(() => {
-    if (!sessionId) return
+    if (!ref) return
 
     async function fetchSession() {
       try {
-        const res = await fetch(`/api/confirm-session?session_id=${sessionId}`)
+        const res = await fetch(`/api/confirm-session?ref=${ref}`)
         const data = await res.json()
         if (!res.ok) throw new Error(data.error)
         setSession(data)
@@ -40,7 +40,7 @@ function DonationSuccessContent() {
         // Reload donor data from Supabase after webhook persists the donation
         if (doador) {
           await addDonation({
-            stripeSessionId: sessionId!,
+            paymentId: ref!,
             amount: data.amount,
             type: data.donationType,
             status: 'completed',
@@ -50,8 +50,8 @@ function DonationSuccessContent() {
             nextBillingDate: data.nextBillingDate ?? undefined,
           })
         }
-      } catch (err: any) {
-        setError(err.message)
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : 'Erro desconhecido')
       } finally {
         setLoading(false)
       }
@@ -59,7 +59,7 @@ function DonationSuccessContent() {
 
     fetchSession()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sessionId])
+  }, [ref])
 
   const shareUrl = typeof window !== 'undefined' ? window.location.origin : ''
 
@@ -159,7 +159,7 @@ function DonationSuccessContent() {
               </>
             )}
 
-            {!sessionId && (
+            {!ref && (
               <>
                 <h2 className="font-display text-2xl text-maya-brown dark:text-white mb-4">
                   Seu Impacto

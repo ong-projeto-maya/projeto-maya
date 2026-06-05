@@ -7,8 +7,7 @@ import Image from 'next/image'
 import { getCampaignDaysLeft } from '@/data/campaigns'
 import { useCampaigns } from '@/hooks/useCampaigns'
 import { createClient } from '@/lib/supabase'
-import { 
-  ArrowLeft,
+import { ArrowLeft,
   Heart,
   Calendar,
   Target,
@@ -25,9 +24,6 @@ import {
   MapPin,
   FileText
 } from 'lucide-react'
-import { loadStripe } from '@stripe/stripe-js'
-
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || '')
 
 type DonationType = 'single' | 'monthly'
 type ActiveTab = 'donate' | 'register'
@@ -133,7 +129,7 @@ export default function CampanhaDetailPage() {
         }),
       })
 
-      const { sessionId, error } = await response.json()
+      const { checkoutUrl, error } = await response.json()
 
       if (error) {
         setDonationError(error)
@@ -141,13 +137,8 @@ export default function CampanhaDetailPage() {
         return
       }
 
-      const stripe = await stripePromise
-      if (stripe) {
-        const { error } = await stripe.redirectToCheckout({ sessionId })
-        if (error) {
-          setDonationError(error.message ?? 'Erro ao redirecionar para pagamento.')
-        }
-      }
+      // Redirect to PagBank hosted checkout
+      window.location.href = checkoutUrl
     } catch {
       setDonationError('Erro ao processar doação. Tente novamente.')
     }
@@ -523,7 +514,7 @@ export default function CampanhaDetailPage() {
                 <Check className="w-8 h-8 text-maya-green mx-auto mb-2" />
                 <p className="text-sm text-maya-brown/70 dark:text-gray-300">
                   <strong>100% seguro</strong><br />
-                  Todas as doações são processadas com segurança pelo Stripe
+                  Todas as doações são processadas com segurança pelo PagBank
                 </p>
               </div>
             </div>
