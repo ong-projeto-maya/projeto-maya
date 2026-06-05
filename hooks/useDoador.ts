@@ -78,7 +78,7 @@ export function useDoador() {
         amount: d.valor,
         type: d.tipo as 'single' | 'monthly',
         status: d.status as 'completed' | 'pending' | 'failed',
-        receipt: d.receipt_url ?? undefined,
+        receipt: undefined,
         campaignId: d.campaign_id ?? undefined,
         campaignName: d.campaign_name ?? undefined,
         paymentId: d.stripe_session_id ?? undefined,
