@@ -3,9 +3,6 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { Heart, DollarSign, CreditCard, Check, Lock } from 'lucide-react'
-import { loadStripe } from '@stripe/stripe-js'
-
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || '')
 
 type DonationType = 'single' | 'monthly'
 
@@ -31,7 +28,7 @@ export default function DoacoesPage() {
         return
       }
 
-      // Call API to create Stripe checkout session
+      // Call API to create PagBank checkout
       const response = await fetch('/api/create-checkout-session', {
         method: 'POST',
         headers: {
@@ -43,7 +40,7 @@ export default function DoacoesPage() {
         }),
       })
 
-      const { sessionId, error } = await response.json()
+      const { checkoutUrl, error } = await response.json()
 
       if (error) {
         setDonationError(error)
@@ -51,14 +48,8 @@ export default function DoacoesPage() {
         return
       }
 
-      // Redirect to Stripe Checkout
-      const stripe = await stripePromise
-      if (stripe) {
-        const { error } = await stripe.redirectToCheckout({ sessionId })
-        if (error) {
-          setDonationError(error.message ?? 'Erro ao redirecionar para o pagamento.')
-        }
-      }
+      // Redirect to PagBank hosted checkout
+      window.location.href = checkoutUrl
     } catch (error) {
       console.error('Error:', error)
       setDonationError('Erro ao processar doação. Tente novamente.')
@@ -238,7 +229,7 @@ export default function DoacoesPage() {
 
             <p className="text-xs text-maya-brown/60 dark:text-gray-400 text-center mt-4 flex items-center justify-center gap-1">
               <Lock className="w-3 h-3" />
-              Pagamento seguro processado pelo Stripe
+              Pagamento seguro processado pelo PagBank
             </p>
 
             {/* Doador CTA */}

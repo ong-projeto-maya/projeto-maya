@@ -15,7 +15,7 @@ export default function AssinaturaPage() {
   const [portalLoading, setPortalLoading] = useState(false)
   const [portalError, setPortalError] = useState('')
 
-  const openStripePortal = async () => {
+  const openSubscriptionPortal = async () => {
     setPortalLoading(true)
     setPortalError('')
     const { data: { user } } = await supabase.auth.getUser()
@@ -245,7 +245,7 @@ export default function AssinaturaPage() {
                       Pausar Assinatura
                     </button>
                     <button
-                      onClick={openStripePortal}
+                      onClick={openSubscriptionPortal}
                       disabled={portalLoading}
                       className="flex items-center justify-center gap-2 px-6 py-3 bg-maya-green/10 dark:bg-maya-green/20 text-maya-green dark:text-maya-green rounded-xl hover:bg-maya-green/20 dark:hover:bg-maya-green/30 transition-colors font-semibold disabled:opacity-50"
                     >
@@ -253,12 +253,12 @@ export default function AssinaturaPage() {
                       {portalLoading ? 'Abrindo...' : 'Alterar Valor'}
                     </button>
                     <button
-                      onClick={openStripePortal}
+                      onClick={openSubscriptionPortal}
                       disabled={portalLoading}
                       className="flex items-center justify-center gap-2 px-6 py-3 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors font-semibold disabled:opacity-50"
                     >
                       <CreditCard size={20} />
-                      {portalLoading ? 'Abrindo...' : 'Atualizar Cartão'}
+                      {portalLoading ? 'Abrindo...' : 'Atualizar Cart\u00e3o'}
                     </button>
                   </>
                 )}

@@ -18,12 +18,13 @@ const securityHeaders = [
     key: 'Content-Security-Policy',
     value: [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-inline' https://js.stripe.com",
+      // 'unsafe-eval' is required for Next.js Fast Refresh (HMR) in development
+      `script-src 'self' 'unsafe-inline' https://js.stripe.com${process.env.NODE_ENV !== 'production' ? " 'unsafe-eval'" : ''}`,
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       "img-src 'self' data: blob: https://images.unsplash.com https://*.supabase.co",
       "font-src 'self' https://fonts.gstatic.com",
       "frame-src https://js.stripe.com https://hooks.stripe.com",
-      "connect-src 'self' https://*.supabase.co https://api.stripe.com https://*.sentry.io https://sentry.io",
+      `connect-src 'self' https://*.supabase.co https://api.stripe.com https://*.sentry.io https://sentry.io${process.env.NODE_ENV !== 'production' ? ' http://127.0.0.1:54321 http://localhost:54321' : ''}`,
       "form-action 'self'",
       "base-uri 'self'",
     ].join('; '),

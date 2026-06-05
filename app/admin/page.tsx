@@ -2,11 +2,12 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { PawPrint, Heart, Users, DollarSign, TrendingUp, Plus, Edit, Trash2, AlertTriangle, Dog, Cat, LogOut, Target, X, BarChart3, ClipboardList, HandHeart } from 'lucide-react'
+import { PawPrint, Heart, Users, DollarSign, TrendingUp, Plus, Edit, Trash2, Dog, Cat, LogOut, Target, X, BarChart3, ClipboardList, HandHeart, Mail, Pencil, Save, ChevronDown, ChevronUp } from 'lucide-react'
 import { useAnimals } from '@/hooks/useAnimals'
 import { useAuth } from '@/hooks/useAuth'
 import { createAdminClient } from '@/lib/supabase-admin'
 import Link from 'next/link'
+import Image from 'next/image'
 
 interface RecentActivity {
   id: string
@@ -29,14 +30,22 @@ interface DonacaoRow {
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState<'overview' | 'animals' | 'donations'>('overview')
   const [showLogoutModal, setShowLogoutModal] = useState(false)
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const [deletingAnimalId, setDeletingAnimalId] = useState<string | null>(null)
+  const [deletingAnimalName, setDeletingAnimalName] = useState('')
   const [dbStats, setDbStats] = useState({ rescued: 0, adopted: 0, volunteers: 0, monthlyGoal: 0 })
   const [currentDonations, setCurrentDonations] = useState(0)
   const [recentActivity, setRecentActivity] = useState<RecentActivity[]>([])
   const [recentDonations, setRecentDonations] = useState<DonacaoRow[]>([])
+  const [editingStats, setEditingStats] = useState(false)
+  const [statsForm, setStatsForm] = useState<Record<string, number>>({})
+  const [statsSaving, setStatsSaving] = useState(false)
+  const [statsSaved, setStatsSaved] = useState(false)
+  const [statsExpanded, setStatsExpanded] = useState(false)
   const stats = { ...dbStats, currentDonations }
   const router = useRouter()
   const { user, loading, isAuthenticated, logout } = useAuth()
-  const { animals } = useAnimals()
+  const { animals, deleteAnimal } = useAnimals()
 
   useEffect(() => {
     if (!loading && !isAuthenticated) {
@@ -71,6 +80,7 @@ export default function AdminDashboard() {
             volunteers: map['volunteers'] ?? 0,
             monthlyGoal: map['monthly_goal'] ?? 0,
           })
+          setStatsForm(map)
         }
       })
     // Load recent activities: latest 3 donations + recently adopted animals
@@ -116,6 +126,23 @@ export default function AdminDashboard() {
     router.push('/admin/login')
   }
 
+  const handleSaveStats = async () => {
+    setStatsSaving(true)
+    const supabase = createAdminClient()
+    const rows = Object.entries(statsForm).map(([key, value]) => ({ key, value: Number(value) }))
+    await supabase.from('site_stats').upsert(rows, { onConflict: 'key' })
+    setDbStats({
+      rescued: statsForm['rescued'] ?? 0,
+      adopted: statsForm['adopted'] ?? 0,
+      volunteers: statsForm['volunteers'] ?? 0,
+      monthlyGoal: statsForm['monthly_goal'] ?? 0,
+    })
+    setStatsSaving(false)
+    setStatsSaved(true)
+    setEditingStats(false)
+    setTimeout(() => setStatsSaved(false), 3000)
+  }
+
   // Mostrar loading enquanto verifica autenticação
   if (loading) {
     return (
@@ -135,6 +162,31 @@ export default function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-100 to-white dark:from-gray-900 dark:to-gray-800 py-12">
+      {/* Delete Animal Confirmation Modal */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-2xl max-w-sm w-full mx-4">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-display text-xl text-maya-brown dark:text-white">Excluir Animal</h3>
+              <button onClick={() => setShowDeleteModal(false)} className="text-maya-brown/40 hover:text-maya-brown dark:text-gray-400 dark:hover:text-white">
+                <X size={20} />
+              </button>
+            </div>
+            <p className="text-maya-brown/70 dark:text-gray-300 mb-6">Tem certeza que deseja excluir <strong>{deletingAnimalName}</strong>? Esta ação não pode ser desfeita.</p>
+            <div className="flex gap-3">
+              <button onClick={() => setShowDeleteModal(false)} className="flex-1 py-2 rounded-xl border-2 border-gray-200 dark:border-gray-600 text-maya-brown dark:text-white font-semibold hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                Cancelar
+              </button>
+              <button
+                onClick={() => { if (deletingAnimalId) deleteAnimal(deletingAnimalId); setShowDeleteModal(false); setDeletingAnimalId(null) }}
+                className="flex-1 py-2 rounded-xl bg-red-500 hover:bg-red-600 text-white font-semibold transition-colors"
+              >
+                Excluir
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       {/* Logout Confirmation Modal */}
       {showLogoutModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
@@ -161,9 +213,11 @@ export default function AdminDashboard() {
         {/* Header */}
         <div className="mb-8 flex items-center justify-between">
           <div className="flex items-center gap-6">
-            <img 
+            <Image 
               src="/logo.png" 
               alt="Projeto Maya" 
+              width={64}
+              height={64}
               className="h-16 w-auto hidden sm:block"
             />
             <div>
@@ -197,21 +251,6 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        {/* Warning */}
-        <div className="bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-yellow-500 p-4 rounded-lg mb-8">
-          <div className="flex items-start gap-3">
-            <AlertTriangle className="w-6 h-6 text-yellow-600 dark:text-yellow-400 flex-shrink-0" />
-            <div>
-              <p className="font-semibold text-yellow-800 dark:text-yellow-200 mb-1">
-                Dashboard em Desenvolvimento
-              </p>
-              <p className="text-sm text-yellow-700 dark:text-yellow-300">
-                Esta é uma versão de demonstração. As doações são carregadas do Supabase em tempo real. Animais, adoções e voluntários serão integrados em breve.
-              </p>
-            </div>
-          </div>
-        </div>
-
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg">
@@ -229,8 +268,8 @@ export default function AdminDashboard() {
 
           <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg">
             <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 bg-green-500/10 rounded-xl flex items-center justify-center">
-                <Heart className="w-6 h-6 text-green-500" />
+              <div className="w-12 h-12 bg-maya-green/10 rounded-xl flex items-center justify-center">
+                <Heart className="w-6 h-6 text-maya-green" />
               </div>
               <TrendingUp className="w-5 h-5 text-green-500" />
             </div>
@@ -242,8 +281,8 @@ export default function AdminDashboard() {
 
           <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg">
             <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 bg-blue-500/10 rounded-xl flex items-center justify-center">
-                <Users className="w-6 h-6 text-blue-500" />
+              <div className="w-12 h-12 bg-maya-blue/10 rounded-xl flex items-center justify-center">
+                <Users className="w-6 h-6 text-maya-blue" />
               </div>
               <TrendingUp className="w-5 h-5 text-green-500" />
             </div>
@@ -380,23 +419,39 @@ export default function AdminDashboard() {
                 </Link>
                 <Link
                   href="/admin/adotantes"
-                  className="p-4 bg-purple-500/10 hover:bg-purple-500/20 rounded-xl transition-colors text-left"
+                  className="p-4 bg-maya-blue/10 hover:bg-maya-blue/20 rounded-xl transition-colors text-left"
                 >
-                  <ClipboardList className="w-6 h-6 text-purple-500 mb-2" />
+                  <ClipboardList className="w-6 h-6 text-maya-blue mb-2" />
                   <p className="font-semibold text-maya-brown dark:text-white text-sm">
                     Adotantes
                   </p>
-                  <span className="text-xs text-maya-orange font-semibold">Em breve</span>
                 </Link>
                 <Link
                   href="/admin/relatorios"
-                  className="p-4 bg-green-500/10 hover:bg-green-500/20 rounded-xl transition-colors text-left"
+                  className="p-4 bg-maya-green/10 hover:bg-maya-green/20 rounded-xl transition-colors text-left"
                 >
-                  <BarChart3 className="w-6 h-6 text-green-500 mb-2" />
+                  <BarChart3 className="w-6 h-6 text-maya-green mb-2" />
                   <p className="font-semibold text-maya-brown dark:text-white text-sm">
                     Relatórios
                   </p>
-                  <span className="text-xs text-maya-orange font-semibold">Em breve</span>
+                </Link>
+                <Link
+                  href="/admin/mensagens"
+                  className="p-4 bg-maya-pink/10 hover:bg-maya-pink/20 rounded-xl transition-colors text-left"
+                >
+                  <Mail className="w-6 h-6 text-maya-pink mb-2" />
+                  <p className="font-semibold text-maya-brown dark:text-white text-sm">
+                    Mensagens
+                  </p>
+                </Link>
+                <Link
+                  href="/admin/doadores"
+                  className="p-4 bg-maya-orange/10 hover:bg-maya-orange/20 rounded-xl transition-colors text-left"
+                >
+                  <Users className="w-6 h-6 text-maya-orange mb-2" />
+                  <p className="font-semibold text-maya-brown dark:text-white text-sm">
+                    Doadores
+                  </p>
                 </Link>
                 <Link
                   href="/adocao"
@@ -409,7 +464,90 @@ export default function AdminDashboard() {
                 </Link>
               </div>
             </div>
+
+            {/* Site Stats Editor */}
+          <div className="lg:col-span-2 bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden">
+            <button
+              onClick={() => setStatsExpanded(v => !v)}
+              className="w-full flex items-center justify-between p-6 hover:bg-maya-beige/30 dark:hover:bg-gray-700/30 transition-colors"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-maya-green/10 rounded-xl flex items-center justify-center">
+                  <Pencil className="w-5 h-5 text-maya-green" />
+                </div>
+                <div className="text-left">
+                  <h2 className="font-display text-xl text-maya-brown dark:text-white">Editar Estatísticas do Site</h2>
+                  <p className="text-sm text-maya-brown/60 dark:text-gray-400">Contadores exibidos na landing page</p>
+                </div>
+                {statsSaved && <span className="ml-4 text-xs font-semibold text-maya-green bg-maya-green/10 px-2 py-1 rounded-full">Salvo!</span>}
+              </div>
+              {statsExpanded ? <ChevronUp className="text-gray-400" size={20} /> : <ChevronDown className="text-gray-400" size={20} />}
+            </button>
+
+            {statsExpanded && (
+              <div className="px-6 pb-6 border-t border-gray-100 dark:border-gray-700 pt-4">
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 mb-6">
+                  {[
+                    { key: 'rescued',       label: 'Animais Resgatados',   icon: '🐾' },
+                    { key: 'adopted',       label: 'Adoções Realizadas',   icon: '💚' },
+                    { key: 'volunteers',    label: 'Voluntários Ativos',   icon: '👥' },
+                    { key: 'monthly_goal',  label: 'Meta Mensal (R$)',      icon: '🎯' },
+                    { key: 'total_donors',  label: 'Total de Doadores',    icon: '❤️' },
+                    { key: 'total_raised',  label: 'Total Arrecadado (R$)', icon: '💰' },
+                    { key: 'animals_helped',label: 'Animais Impactados',   icon: '🐶' },
+                  ].map(stat => (
+                    <div key={stat.key} className="bg-maya-beige dark:bg-gray-700/50 rounded-xl p-4">
+                      <label className="block text-xs font-semibold text-maya-brown/70 dark:text-gray-400 mb-1.5">
+                        {stat.icon} {stat.label}
+                      </label>
+                      {editingStats ? (
+                        <input
+                          type="number"
+                          min="0"
+                          value={statsForm[stat.key] ?? 0}
+                          onChange={e => setStatsForm(prev => ({ ...prev, [stat.key]: Number(e.target.value) }))}
+                          className="w-full px-3 py-2 border-2 border-maya-green/50 focus:border-maya-green rounded-lg focus:outline-none bg-white dark:bg-gray-700 text-maya-brown dark:text-white font-bold text-lg"
+                        />
+                      ) : (
+                        <p className="text-2xl font-bold text-maya-brown dark:text-white">
+                          {(statsForm[stat.key] ?? 0).toLocaleString('pt-BR')}
+                        </p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+                <div className="flex gap-3">
+                  {editingStats ? (
+                    <>
+                      <button
+                        onClick={handleSaveStats}
+                        disabled={statsSaving}
+                        className="btn-primary inline-flex items-center gap-2 disabled:opacity-60"
+                      >
+                        <Save size={18} />
+                        {statsSaving ? 'Salvando...' : 'Salvar Alterações'}
+                      </button>
+                      <button
+                        onClick={() => setEditingStats(false)}
+                        className="px-4 py-2 rounded-xl border-2 border-gray-200 dark:border-gray-600 text-maya-brown dark:text-white font-semibold hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                      >
+                        Cancelar
+                      </button>
+                    </>
+                  ) : (
+                    <button
+                      onClick={() => setEditingStats(true)}
+                      className="inline-flex items-center gap-2 px-4 py-2 bg-maya-green/10 hover:bg-maya-green/20 text-maya-green rounded-xl font-semibold transition-colors"
+                    >
+                      <Pencil size={16} />
+                      Editar Valores
+                    </button>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
+        </div>
         )}
 
         {activeTab === 'animals' && (
@@ -474,10 +612,18 @@ export default function AdminDashboard() {
                         </td>
                         <td className="py-3 px-4">
                           <div className="flex gap-2">
-                            <button className="p-2 hover:bg-maya-beige dark:hover:bg-gray-600 rounded-lg transition-colors">
+                            <button
+                              onClick={() => router.push('/admin/animais')}
+                              className="p-2 hover:bg-maya-beige dark:hover:bg-gray-600 rounded-lg transition-colors"
+                              title="Editar no gerenciamento"
+                            >
                               <Edit size={16} className="text-maya-brown dark:text-gray-300" />
                             </button>
-                            <button className="p-2 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors">
+                            <button
+                              onClick={() => { setDeletingAnimalId(animal.id); setDeletingAnimalName(animal.name); setShowDeleteModal(true) }}
+                              className="p-2 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                              title="Excluir animal"
+                            >
                               <Trash2 size={16} className="text-red-500" />
                             </button>
                           </div>
@@ -507,7 +653,7 @@ export default function AdminDashboard() {
               </div>
               <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 overflow-hidden">
                 <div
-                  className="bg-gradient-to-r from-maya-green to-maya-green h-full transition-all duration-500"
+                  className="bg-gradient-to-r from-maya-green to-maya-blue h-full transition-all duration-500"
                   style={{ width: `${Math.min((stats.currentDonations / (stats.monthlyGoal || 1)) * 100, 100)}%` }}
                 />
               </div>

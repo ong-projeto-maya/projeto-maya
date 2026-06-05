@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server'
-import { stripe } from '@/lib/stripe'
 import { createServiceClient } from '@/lib/supabase-server'
 import { createRouteLogger } from '@/lib/logger'
 
@@ -9,7 +8,7 @@ export async function POST(request: Request) {
   try {
     const authHeader = request.headers.get('authorization')
     if (!authHeader?.startsWith('Bearer ')) {
-      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
+      return NextResponse.json({ error: 'NÃ£o autorizado' }, { status: 401 })
     }
 
     const token = authHeader.slice(7)
@@ -17,27 +16,21 @@ export async function POST(request: Request) {
 
     const { data: { user }, error: authError } = await supabase.auth.getUser(token)
     if (authError || !user?.email) {
-      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
+      return NextResponse.json({ error: 'NÃ£o autorizado' }, { status: 401 })
     }
 
     const { data: sub } = await supabase
       .from('assinaturas')
-      .select('id, stripe_subscription_id')
+      .select('id')
       .eq('doador_email', user.email)
       .eq('status', 'active')
       .order('created_at', { ascending: false })
       .limit(1)
       .maybeSingle()
 
-    if (!sub?.stripe_subscription_id) {
+    if (!sub?.id) {
       return NextResponse.json({ error: 'Nenhuma assinatura ativa encontrada' }, { status: 404 })
     }
-
-    await stripe.subscriptions.update(
-      sub.stripe_subscription_id,
-      { pause_collection: { behavior: 'void' } },
-      { idempotencyKey: `pause-${user.id}-${sub.id}` },
-    )
 
     await supabase
       .from('assinaturas')

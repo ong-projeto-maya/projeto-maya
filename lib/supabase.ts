@@ -10,5 +10,5 @@ export const createClient = () =>
   createBrowserClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL ?? 'https://placeholder.supabase.co',
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? 'placeholder-anon-key',
-    { auth: { storageKey: 'maya_donor_supabase' } }
+    {}
   )

@@ -1,7 +1,11 @@
 import { NextResponse } from 'next/server'
 import { headers } from 'next/headers'
-import type Stripe from 'stripe'
-import { stripe, getWebhookSecret } from '@/lib/stripe'
+import {
+  validateWebhookSignature,
+  mapChargeStatus,
+  findOrderByReference,
+  type PagBankWebhookPayload,
+} from '@/lib/pagbank'
 import { createRouteLogger } from '@/lib/logger'
 import {
   saveDonation,
@@ -9,7 +13,6 @@ import {
   updateDonationStatusBySubscription,
   cancelSubscriptionByStripeId,
   syncSubscriptionStatus,
-  updateNextBillingDate,
 } from '@/lib/donationStorage'
 
 const log = createRouteLogger('webhook')
@@ -17,140 +20,128 @@ const log = createRouteLogger('webhook')
 export async function POST(request: Request) {
   try {
     const body = await request.text()
-    const signature = headers().get('stripe-signature')
+    const headerList = headers()
+    const signature = headerList.get('x-pagbank-signature')
 
-    if (!signature) {
-      return NextResponse.json({ error: 'No signature' }, { status: 400 })
-    }
-
-    let event: Stripe.Event
-
-    try {
-      event = stripe.webhooks.constructEvent(body, signature, getWebhookSecret())
-    } catch (err: unknown) {
-      log.error({ error: err }, 'webhook signature verification failed')
+    if (!validateWebhookSignature(body, signature)) {
+      log.error('webhook signature verification failed')
       return NextResponse.json({ error: 'Webhook signature invalid' }, { status: 400 })
     }
 
-    switch (event.type) {
-      case 'checkout.session.completed': {
-        const session = event.data.object as Stripe.Checkout.Session
-        const donationType = (session.metadata?.donationType ?? 'single') as 'single' | 'monthly'
-        const subscriptionId = typeof session.subscription === 'string'
-          ? session.subscription
-          : session.subscription?.id
+    let payload: PagBankWebhookPayload
+    try {
+      payload = JSON.parse(body) as PagBankWebhookPayload
+    } catch {
+      return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 })
+    }
 
+    const eventType = payload.type // e.g. "CHARGE", "ORDER", "SUBSCRIPTION"
+    const chargeStatus = payload.data?.status
+
+    log.info({ eventType, chargeStatus, notificationId: payload.id }, 'PagBank webhook received')
+
+    // ── CHARGE / ORDER events ──────────────────────────────────────────────
+
+    if (eventType === 'CHARGE' || eventType === 'ORDER') {
+      const referenceId = payload.data?.reference_id
+
+      if (!referenceId) {
+        log.warn({ payload }, 'webhook missing reference_id, skipping')
+        return NextResponse.json({ received: true })
+      }
+
+      // Fetch full order details from PagBank to get metadata and amounts
+      const order = await findOrderByReference(referenceId)
+      if (!order) {
+        log.warn({ referenceId }, 'order not found for reference, skipping')
+        return NextResponse.json({ received: true })
+      }
+
+      const firstCharge = order.charges?.[0]
+      if (!firstCharge) {
+        log.warn({ referenceId }, 'order has no charges, skipping')
+        return NextResponse.json({ received: true })
+      }
+
+      const donationStatus = mapChargeStatus(firstCharge)
+      const metadata = order.metadata ?? {}
+
+      if (donationStatus === 'completed') {
         await saveDonation({
-          stripeSessionId: session.id,
-          stripeSubscriptionId: subscriptionId,
-          email: session.customer_email ?? '',
-          amount: (session.amount_total ?? 0) / 100,
-          type: donationType,
+          paymentId: referenceId,
+          email: order.customer?.email ?? '',
+          amount: (firstCharge.amount.value ?? 0) / 100,
+          type: (metadata.donationType as 'single' | 'monthly') ?? 'single',
           status: 'completed',
-          campaignId: session.metadata?.campaignId,
-          campaignName: session.metadata?.campaignName,
+          campaignId: metadata.campaignId,
+          campaignName: metadata.campaignName,
           createdAt: new Date().toISOString(),
         })
+        log.info({ referenceId }, 'donation saved')
+      } else if (donationStatus === 'failed' || donationStatus === 'cancelled') {
+        await updateDonationStatus(referenceId, donationStatus)
+        log.warn({ referenceId, donationStatus }, 'donation failed or cancelled')
+      }
+    }
 
-        log.info({ sessionId: session.id }, 'donation saved')
-        break
+    // ── SUBSCRIPTION events ────────────────────────────────────────────────
+
+    else if (eventType === 'SUBSCRIPTION') {
+      const subscriptionId = payload.data?.id
+      const status = payload.data?.status
+
+      if (!subscriptionId || !status) {
+        return NextResponse.json({ received: true })
       }
 
-      case 'customer.subscription.created': {
-        const subscription = event.data.object as Stripe.Subscription
-        log.info({ subscriptionId: subscription.id }, 'new subscription created')
-        break
-      }
-
-      case 'customer.subscription.updated': {
-        const subscription = event.data.object as Stripe.Subscription
+      if (status === 'SUSPENDED' || status === 'CANCELED') {
+        await cancelSubscriptionByStripeId(subscriptionId)
+        log.info({ subscriptionId, status }, 'subscription cancelled')
+      } else {
+        const dbStatus =
+          status === 'ACTIVE' ? 'active' :
+          status === 'SUSPENDED' ? 'paused' :
+          'cancelled'
         await syncSubscriptionStatus({
-          id: subscription.id,
-          status: subscription.status,
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          current_period_end: (subscription as any).current_period_end as number,
+          id: subscriptionId,
+          status: dbStatus,
+          current_period_end: 0,
         })
-        log.info({ subscriptionId: subscription.id }, 'subscription updated')
-        break
+        log.info({ subscriptionId, status }, 'subscription status synced')
       }
+    }
 
-      case 'customer.subscription.deleted': {
-        const subscription = event.data.object as Stripe.Subscription
-        await cancelSubscriptionByStripeId(subscription.id)
-        log.info({ subscriptionId: subscription.id }, 'subscription cancelled')
-        break
+    // ── SUBSCRIPTION_CHARGE events (recurring billing) ────────────────────
+
+    else if (eventType === 'SUBSCRIPTION_CHARGE') {
+      const charges = payload.data?.charges
+      if (!charges?.length) return NextResponse.json({ received: true })
+
+      const charge = charges[0]
+      const subscriptionId = payload.data?.id
+
+      if (charge.status === 'PAID' && subscriptionId) {
+        await saveDonation({
+          paymentId: charge.id,
+          subscriptionId,
+          email: '',
+          amount: (charge.amount.value ?? 0) / 100,
+          type: 'monthly',
+          status: 'completed',
+          createdAt: new Date().toISOString(),
+        })
+        log.info({ chargeId: charge.id, subscriptionId }, 'recurring charge saved')
+      } else if (charge.status === 'DECLINED' && subscriptionId) {
+        await updateDonationStatusBySubscription(subscriptionId, 'failed')
+        log.warn({ chargeId: charge.id }, 'recurring charge failed')
       }
+    }
 
-      case 'invoice.payment_succeeded': {
-        type InvoiceExpanded = Stripe.Invoice & {
-          subscription?: string | { id: string } | null
-          customer_email?: string | null
-        }
-        const invoice = event.data.object as InvoiceExpanded
-        // Skip the first invoice — checkout.session.completed already recorded it.
-        // billing_reason 'subscription_create' means first charge of a new subscription.
-        if (invoice.billing_reason === 'subscription_create') {
-          // Still sync nextBillingDate on the subscription record
-          const subId = typeof invoice.subscription === 'string'
-            ? invoice.subscription
-            : (invoice.subscription as { id: string } | null | undefined)?.id
-          if (subId) {
-            const nextBilling = invoice.lines.data[0]?.period?.end
-              ? new Date(invoice.lines.data[0].period.end * 1000).toISOString().split('T')[0]
-              : undefined
-            if (nextBilling) {
-              await updateNextBillingDate(subId, nextBilling)
-            }
-          }
-          break
-        }
-        // Subsequent monthly charges — save as new donation entry
-        const subId = typeof invoice.subscription === 'string'
-          ? invoice.subscription
-          : (invoice.subscription as { id: string } | null | undefined)?.id
-        const customerEmail = invoice.customer_email
-        if (subId && customerEmail) {
-          const nextBilling = invoice.lines.data[0]?.period?.end
-            ? new Date(invoice.lines.data[0].period.end * 1000).toISOString().split('T')[0]
-            : undefined
-          await saveDonation({
-            stripeSessionId: invoice.id,
-            stripeSubscriptionId: subId,
-            email: customerEmail,
-            amount: (invoice.amount_paid ?? 0) / 100,
-            type: 'monthly',
-            status: 'completed',
-            createdAt: new Date().toISOString(),
-            nextBillingDate: nextBilling,
-          })
-          log.info({ invoiceId: invoice.id }, 'monthly invoice saved')
-        }
-        break
-      }
-
-      case 'invoice.payment_failed': {
-        type InvoiceExpanded = Stripe.Invoice & {
-          subscription?: string | { id: string } | null
-        }
-        const invoice = event.data.object as InvoiceExpanded
-        const subId = typeof invoice.subscription === 'string'
-          ? invoice.subscription
-          : (invoice.subscription as { id: string } | null | undefined)?.id
-        if (subId) {
-          await updateDonationStatusBySubscription(subId, 'failed')
-        } else {
-          await updateDonationStatus(invoice.id, 'failed')
-        }
-        log.warn({ invoiceId: invoice.id }, 'payment failed')
-        break
-      }
-
-      default:
-        log.debug({ eventType: event.type }, 'unhandled webhook event')
+    else {
+      log.debug({ eventType }, 'unhandled PagBank webhook event type')
     }
 
     return NextResponse.json({ received: true })
-
   } catch (error) {
     log.error({ error }, 'webhook handler error')
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })

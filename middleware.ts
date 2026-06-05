@@ -46,11 +46,16 @@ export async function middleware(request: NextRequest) {
   const isAdminPublic = ADMIN_PUBLIC.some(r => pathname.startsWith(r))
 
   if (isAdminRoute && !isAdminPublic) {
+    // Fail-safe: if Supabase credentials are missing, redirect to login
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+      const loginUrl = new URL('/admin/login', request.url)
+      loginUrl.searchParams.set('redirectTo', pathname)
+      return NextResponse.redirect(loginUrl)
+    }
     const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      process.env.NEXT_PUBLIC_SUPABASE_URL,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
       {
-        auth: { storageKey: 'maya_admin_supabase' },
         cookies: {
           getAll() { return request.cookies.getAll() },
           setAll(cookiesToSet) {
@@ -88,9 +93,15 @@ export async function middleware(request: NextRequest) {
   const isDonorRoute = DONOR_ROUTES.some(r => pathname.startsWith(r))
 
   if (isDonorRoute) {
+    // Fail-safe: if Supabase credentials are missing, redirect to login
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+      const loginUrl = new URL('/doador/login', request.url)
+      loginUrl.searchParams.set('redirectTo', pathname)
+      return NextResponse.redirect(loginUrl)
+    }
     const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      process.env.NEXT_PUBLIC_SUPABASE_URL,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
       {
         cookies: {
           getAll() { return request.cookies.getAll() },

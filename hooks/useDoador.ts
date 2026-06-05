@@ -12,7 +12,7 @@ export interface Donation {
   receipt?: string
   campaignId?: string
   campaignName?: string
-  stripeSessionId?: string
+  paymentId?: string
   subscriptionId?: string
   nextBillingDate?: string
 }
@@ -78,9 +78,10 @@ export function useDoador() {
         amount: d.valor,
         type: d.tipo as 'single' | 'monthly',
         status: d.status as 'completed' | 'pending' | 'failed',
+        receipt: d.receipt_url ?? undefined,
         campaignId: d.campaign_id ?? undefined,
         campaignName: d.campaign_name ?? undefined,
-        stripeSessionId: d.stripe_session_id ?? undefined,
+        paymentId: d.stripe_session_id ?? undefined,
         subscriptionId: d.stripe_subscription_id ?? undefined,
         nextBillingDate: d.proximo_pagamento ?? undefined,
       }))
@@ -105,7 +106,7 @@ export function useDoador() {
         totalDonated: profile.total_doado ?? 0,
         donationCount: profile.contagem_doacoes ?? 0,
         firstDonation: profile.primeira_doacao ?? new Date().toISOString().split('T')[0],
-        level: (profile.nivel ?? 'bronze') as Doador['level'],
+        level: getLevelByDate(profile.primeira_doacao ?? new Date().toISOString().split('T')[0]),
         animalsHelped: profile.animais_ajudados ?? 0,
         subscription: mappedSubscription,
         donations: mappedDonations,
@@ -250,7 +251,7 @@ export function useDoador() {
   // This function waits briefly then reloads the donor data so
   // the success page reflects the new donation immediately.
   const addDonation = async (data: {
-    stripeSessionId: string
+    paymentId: string
     amount: number
     type: 'single' | 'monthly'
     status: 'completed' | 'pending' | 'failed'
@@ -271,29 +272,48 @@ export function useDoador() {
   }
 
   // Pure helpers — no DB needed
-  const getLevel = (totalDonated: number): Doador['level'] => {
-    if (totalDonated >= 5000) return 'diamond'
-    if (totalDonated >= 2000) return 'gold'
-    if (totalDonated >= 500) return 'silver'
+
+  /** Months elapsed since a given ISO date string */
+  const monthsSince = (isoDate: string): number => {
+    const start = new Date(isoDate)
+    const now = new Date()
+    return (now.getFullYear() - start.getFullYear()) * 12 + (now.getMonth() - start.getMonth())
+  }
+
+  /**
+   * Level by membership duration:
+   *  Bronze  — 0–5 months
+   *  Prata   — 6–11 months
+   *  Ouro    — 12–23 months
+   *  Diamante — 24+ months
+   */
+  const getLevelByDate = (firstDonation: string): Doador['level'] => {
+    const months = monthsSince(firstDonation)
+    if (months >= 24) return 'diamond'
+    if (months >= 12) return 'gold'
+    if (months >= 6)  return 'silver'
     return 'bronze'
   }
 
+  const getLevel = getLevelByDate
+
   const getLevelProgress = (
-    totalDonated: number
+    firstDonation: string
   ): { current: number; next: number; percentage: number } => {
-    const levels = [
-      { min: 0, max: 500 },
-      { min: 500, max: 2000 },
-      { min: 2000, max: 5000 },
-      { min: 5000, max: 10000 },
+    const months = monthsSince(firstDonation)
+    const tiers = [
+      { min: 0, max: 6 },
+      { min: 6, max: 12 },
+      { min: 12, max: 24 },
+      { min: 24, max: 48 },
     ]
-    for (const level of levels) {
-      if (totalDonated < level.max) {
-        const percentage = ((totalDonated - level.min) / (level.max - level.min)) * 100
-        return { current: level.min, next: level.max, percentage: Math.round(percentage) }
+    for (const tier of tiers) {
+      if (months < tier.max) {
+        const percentage = ((months - tier.min) / (tier.max - tier.min)) * 100
+        return { current: tier.min, next: tier.max, percentage: Math.round(percentage) }
       }
     }
-    return { current: 5000, next: 10000, percentage: 100 }
+    return { current: 24, next: 48, percentage: 100 }
   }
 
   return {

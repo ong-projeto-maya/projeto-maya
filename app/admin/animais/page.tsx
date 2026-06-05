@@ -29,6 +29,8 @@ export default function AdminAnimaisPage() {
   const [showModal, setShowModal] = useState(false)
   const [editingAnimal, setEditingAnimal] = useState<Animal | null>(null)
   const [successMessage, setSuccessMessage] = useState('')
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const [animalToDelete, setAnimalToDelete] = useState<Animal | null>(null)
   
   // Form state
   const [formData, setFormData] = useState({
@@ -114,7 +116,7 @@ export default function AdminAnimaisPage() {
     const animalData = {
       ...formData,
       temperament: formData.temperament.split(',').map(t => t.trim()).filter(t => t),
-      images: [formData.image, formData.image, formData.image], // Mock: usar mesma imagem 3x
+      images: formData.image ? [formData.image] : [],
     }
 
     if (editingAnimal) {
@@ -130,11 +132,17 @@ export default function AdminAnimaisPage() {
   }
 
   const handleDelete = (animal: Animal) => {
-    if (confirm(`Tem certeza que deseja excluir ${animal.name}?`)) {
-      deleteAnimal(animal.id)
-      setSuccessMessage(`${animal.name} removido com sucesso!`)
-      setTimeout(() => setSuccessMessage(''), 3000)
-    }
+    setAnimalToDelete(animal)
+    setShowDeleteModal(true)
+  }
+
+  const confirmDelete = () => {
+    if (!animalToDelete) return
+    deleteAnimal(animalToDelete.id)
+    setSuccessMessage(`${animalToDelete.name} removido com sucesso!`)
+    setTimeout(() => setSuccessMessage(''), 3000)
+    setShowDeleteModal(false)
+    setAnimalToDelete(null)
   }
 
   const handleToggleAdopted = (animal: Animal) => {
@@ -343,6 +351,37 @@ export default function AdminAnimaisPage() {
           )}
         </div>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && animalToDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-2xl max-w-sm w-full mx-4">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-display text-xl text-maya-brown dark:text-white">Excluir Animal</h3>
+              <button onClick={() => { setShowDeleteModal(false); setAnimalToDelete(null) }} className="text-maya-brown/40 hover:text-maya-brown dark:text-gray-400 dark:hover:text-white">
+                <X size={20} />
+              </button>
+            </div>
+            <p className="text-maya-brown/70 dark:text-gray-300 mb-6">
+              Tem certeza que deseja excluir <strong>{animalToDelete.name}</strong>? Esta ação não pode ser desfeita.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => { setShowDeleteModal(false); setAnimalToDelete(null) }}
+                className="flex-1 py-2 rounded-xl border-2 border-gray-200 dark:border-gray-600 text-maya-brown dark:text-white font-semibold hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={confirmDelete}
+                className="flex-1 py-2 rounded-xl bg-red-500 hover:bg-red-600 text-white font-semibold transition-colors"
+              >
+                Excluir
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Modal */}
       {showModal && (

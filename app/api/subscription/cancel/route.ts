@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server'
-import { stripe } from '@/lib/stripe'
 import { createServiceClient } from '@/lib/supabase-server'
 import { createRouteLogger } from '@/lib/logger'
 
@@ -29,15 +28,9 @@ export async function POST(request: Request) {
       .limit(1)
       .maybeSingle()
 
-    if (!sub?.stripe_subscription_id) {
+    if (!sub?.id) {
       return NextResponse.json({ error: 'Nenhuma assinatura ativa encontrada' }, { status: 404 })
     }
-
-    await stripe.subscriptions.update(
-      sub.stripe_subscription_id,
-      { cancel_at_period_end: true },
-      { idempotencyKey: `cancel-${user.id}-${sub.id}` },
-    )
 
     await supabase
       .from('assinaturas')

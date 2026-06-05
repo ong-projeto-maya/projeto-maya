@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server'
-import { stripe } from '@/lib/stripe'
 import { createServiceClient } from '@/lib/supabase-server'
 import { createRouteLogger } from '@/lib/logger'
 
@@ -20,21 +19,12 @@ export async function DELETE(request: Request) {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
     }
 
-    // 1. Cancel any active Stripe subscriptions first (DA-C2)
-    const { data: activeSubs } = await supabase
+    // 1. Cancel active subscriptions in our DB (LGPD right to erasure — Art. 18, IV)
+    await supabase
       .from('assinaturas')
-      .select('stripe_subscription_id')
+      .update({ status: 'cancelled' })
       .eq('doador_email', user.email ?? '')
       .in('status', ['active', 'paused'])
-
-    for (const sub of activeSubs ?? []) {
-      try {
-        await stripe.subscriptions.cancel(sub.stripe_subscription_id)
-      } catch (stripeErr) {
-        // Log but don't block account deletion if Stripe cancel fails
-        log.error({ error: stripeErr }, 'stripe cancel error during account deletion')
-      }
-    }
 
     // 2. Cascade-delete all personal data (LGPD right to erasure — Art. 18, IV)
     //    Order: doacoes → assinaturas → doadores (no FK constraints on email, but logical order)
