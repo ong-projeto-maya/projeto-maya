@@ -90,12 +90,17 @@ export function DoadorProvider({ children }: { children: React.ReactNode }) {
   const [doador, setDoador] = useState<Doador | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const supabase = useMemo(() => createClient(), [])
-  // Prevents concurrent loadDoadorData calls from the same provider instance
+  // Prevents concurrent loadDoadorData calls
   const loadingRef = useRef(false)
+  // Tracks the user ID for whom data has been successfully loaded
+  // Used to skip redundant reloads on TOKEN_REFRESHED / repeated auth events
+  const loadedForUserRef = useRef<string | null>(null)
 
   const loadDoadorData = useCallback(
     async (userId: string, userEmail?: string, userName?: string) => {
       if (loadingRef.current) return
+      // Skip reload if data for this exact user is already loaded
+      if (loadedForUserRef.current === userId) return
       loadingRef.current = true
 
       try {
@@ -182,6 +187,7 @@ export function DoadorProvider({ children }: { children: React.ReactNode }) {
           subscription: mappedSubscription,
           donations: mappedDonations,
         })
+        loadedForUserRef.current = userId
       } finally {
         loadingRef.current = false
       }
@@ -230,6 +236,12 @@ export function DoadorProvider({ children }: { children: React.ReactNode }) {
       setTimeout(async () => {
         if (!mounted) return
         if (session?.user) {
+          // If the user changed (e.g. login with different account), clear cached state
+          if (loadedForUserRef.current && loadedForUserRef.current !== session.user.id) {
+            loadedForUserRef.current = null
+            loadingRef.current = false
+            setDoador(null)
+          }
           await safeLoad(
             session.user.id,
             session.user.email ?? undefined,
@@ -237,6 +249,7 @@ export function DoadorProvider({ children }: { children: React.ReactNode }) {
           )
         } else {
           setDoador(null)
+          loadedForUserRef.current = null
           if (mounted) setIsLoading(false)
         }
       }, 0)
@@ -278,6 +291,8 @@ export function DoadorProvider({ children }: { children: React.ReactNode }) {
       await supabase.auth.signOut()
     } finally {
       setDoador(null)
+      loadedForUserRef.current = null
+      loadingRef.current = false
     }
   }
 
@@ -301,7 +316,8 @@ export function DoadorProvider({ children }: { children: React.ReactNode }) {
     await new Promise(resolve => setTimeout(resolve, 1500))
     const { data: { session } } = await supabase.auth.getSession()
     if (session?.user) {
-      loadingRef.current = false // allow reload
+      loadingRef.current = false
+      loadedForUserRef.current = null // force reload to pick up new donation
       await loadDoadorData(session.user.id)
     }
   }
