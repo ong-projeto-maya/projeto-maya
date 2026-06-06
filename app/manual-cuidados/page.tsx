@@ -5,7 +5,7 @@ import {
   BookOpen, Syringe, Scissors, Utensils, GraduationCap, Phone, Tag,
   ChevronRight, ChevronLeft, AlertTriangle, CheckCircle, XCircle,
   Shield, Bug, Apple, HeartPulse, Info, PawPrint, Home, Star,
-  Lightbulb, Smartphone, Mail, Camera, Check, ShoppingBag, Pill, Ruler, Droplets, Bed,
+  Lightbulb, Mail, Camera, Check, ShoppingBag, Pill, Ruler, Droplets, Bed,
   Download, Zap, Clock, Baby, Dog, Calendar
 } from 'lucide-react'
 
@@ -81,14 +81,6 @@ function EmergencyCard() {
           <span key={s} className="bg-white/20 text-xs px-2 py-1 rounded-full font-medium">{s}</span>
         ))}
       </div>
-      <a
-        href={`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? ''}`}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="flex-shrink-0 bg-white text-red-600 font-bold text-xs px-4 py-2 rounded-xl hover:bg-red-50 transition-colors whitespace-nowrap"
-      >
-        Falar com a Maya
-      </a>
     </div>
   )
 }
@@ -1020,9 +1012,6 @@ function ContatosTab() {
             Projeto Maya
           </SectionTitle>
           <div className="space-y-2">
-            <a href={`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? ''}`} className="flex items-center gap-2 text-sm text-maya-blue hover:underline">
-              <Smartphone size={14} className="flex-shrink-0" /> WhatsApp
-            </a>
             <a href="mailto:projetomaya@outlook.com" className="flex items-center gap-2 text-sm text-maya-blue hover:underline">
               <Mail size={14} className="flex-shrink-0" /> projetomaya@outlook.com
             </a>
