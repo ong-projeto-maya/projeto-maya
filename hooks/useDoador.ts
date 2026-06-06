@@ -48,11 +48,33 @@ export function useDoador() {
 
   const loadDoadorData = useCallback(
     async (userId: string) => {
-      const { data: profile } = await supabase
+      let { data: profile } = await supabase
         .from('doadores')
         .select('*')
         .eq('id', userId)
-        .single()
+        .maybeSingle()
+
+      // Profile missing — auto-create via server route (uses service role)
+      if (!profile) {
+        try {
+          const { data: { session } } = await supabase.auth.getSession()
+          if (session?.access_token) {
+            await fetch('/api/donors/ensure-profile', {
+              method: 'POST',
+              headers: { Authorization: `Bearer ${session.access_token}` },
+            })
+            // Re-fetch after creation
+            const { data: created } = await supabase
+              .from('doadores')
+              .select('*')
+              .eq('id', userId)
+              .maybeSingle()
+            profile = created
+          }
+        } catch {
+          // silently ignore — user will see empty state
+        }
+      }
 
       if (!profile) return
 
