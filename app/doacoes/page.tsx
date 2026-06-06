@@ -6,7 +6,7 @@ import { Heart, DollarSign, CreditCard, Check, Lock } from 'lucide-react'
 
 type DonationType = 'single' | 'monthly'
 
-const presetAmounts = [25, 50, 100, 250]
+const presetAmounts = [10, 25, 50, 100, 250]
 
 export default function DoacoesPage() {
   const [donationType, setDonationType] = useState<DonationType>('single')
@@ -128,7 +128,7 @@ export default function DoacoesPage() {
               <h2 className="font-display text-2xl text-maya-brown dark:text-white mb-4 text-center">
                 Valor da Doação
               </h2>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+              <div className="grid grid-cols-3 md:grid-cols-5 gap-3 mb-4">
                 {presetAmounts.map((amount) => (
                   <button
                     key={amount}
