@@ -97,10 +97,10 @@ export function useAnimals() {
         is_mixed: animal.isMixed,
       })
       .select()
-      .single()
+      .limit(1)
 
     if (error) { console.error('Error adding animal:', error); return null }
-    const newAnimal = mapAnimal(data)
+    const newAnimal = mapAnimal(data?.[0])
     setAnimals(prev => [...prev, newAnimal])
     return newAnimal
   }
