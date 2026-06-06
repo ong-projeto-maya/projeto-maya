@@ -51,7 +51,7 @@ describe('donationStorage', () => {
 
       await expect(
         saveDonation({
-          stripeSessionId: 'cs_test',
+          paymentId: 'ORDER_TEST',
           email: 'a@b.com',
           amount: 50,
           type: 'single',
@@ -65,8 +65,8 @@ describe('donationStorage', () => {
       const chain = makeQueryChain({})
       const row = {
         id: 'uuid-1',
-        stripe_session_id: 'cs_test',
-        stripe_subscription_id: null,
+        pagbank_order_id: 'cs_test',
+        pagbank_subscription_id: null,
         doador_email: 'a@b.com',
         valor: 50,
         tipo: 'single',
@@ -80,7 +80,7 @@ describe('donationStorage', () => {
       fromMock.mockReturnValue(chain)
 
       const result = await saveDonation({
-        stripeSessionId: 'cs_test',
+        paymentId: 'ORDER_TEST',
         email: 'a@b.com',
         amount: 50,
         type: 'single',
@@ -158,7 +158,7 @@ describe('donationStorage', () => {
 
       await updateDonationStatus('cs_test', 'failed')
       expect(updateFn).toHaveBeenCalledWith({ status: 'failed' })
-      expect(eqFn).toHaveBeenCalledWith('stripe_session_id', 'cs_test')
+      expect(eqFn).toHaveBeenCalledWith('pagbank_order_id', 'cs_test')
     })
   })
 
@@ -169,7 +169,7 @@ describe('donationStorage', () => {
       fromMock.mockReturnValue({ update: updateFn })
 
       await updateDonationStatusBySubscription('sub_999', 'failed')
-      expect(eqFn).toHaveBeenCalledWith('stripe_subscription_id', 'sub_999')
+      expect(eqFn).toHaveBeenCalledWith('pagbank_subscription_id', 'sub_999')
     })
   })
 })

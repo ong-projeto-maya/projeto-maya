@@ -1,34 +1,20 @@
 'use client'
 
-import { useEffect, useState, useMemo } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { CreditCard, ArrowLeft, Pause, Play, X, Calendar, DollarSign, CheckCircle, PawPrint, Activity, HeartPulse, Home, Heart } from 'lucide-react'
+import { CreditCard, ArrowLeft, Pause, Play, X, Calendar, DollarSign, CheckCircle, PawPrint, Activity, HeartPulse, Home, Heart, Edit2 } from 'lucide-react'
 import { useDoador } from '@/hooks/useDoador'
-import { createClient } from '@/lib/supabase'
 
 export default function AssinaturaPage() {
   const { doador, isLoading, pauseSubscription, resumeSubscription, cancelSubscription } = useDoador()
   const router = useRouter()
-  const supabase = useMemo(() => createClient(), [])
-  const [showCancelModal, setShowCancelModal] = useState(false)
-  const [portalLoading, setPortalLoading] = useState(false)
-  const [portalError, setPortalError] = useState('')
 
-  const openSubscriptionPortal = async () => {
-    setPortalLoading(true)
-    setPortalError('')
-    const { data: { user } } = await supabase.auth.getUser()
-    const { data: { session } } = await supabase.auth.getSession()
-    if (!user || !session) { setPortalError('Sessão expirada. Faça login novamente.'); setPortalLoading(false); return }
-    const res = await fetch('/api/create-portal-session', {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${session.access_token}` },
-    })
-    const { url, error } = await res.json()
-    if (error || !url) { setPortalError(error ?? 'Erro ao abrir portal Stripe.'); setPortalLoading(false); return }
-    window.location.href = url
-  }
+  const [showCancelModal, setShowCancelModal] = useState(false)
+  const [showChangeAmountModal, setShowChangeAmountModal] = useState(false)
+  const [newAmount, setNewAmount] = useState('')
+  const [actionError, setActionError] = useState('')
+  const [actionLoading, setActionLoading] = useState(false)
 
   useEffect(() => {
     if (!isLoading && !doador) {
@@ -81,34 +67,102 @@ export default function AssinaturaPage() {
   const isPaused = subscription.status === 'paused'
   const isCancelled = subscription.status === 'cancelled'
 
-  const [actionError, setActionError] = useState('')
+  const getSession = async () => {
+    const supabaseClient = (await import('@/lib/supabase')).createClient()
+    const { data: { session } } = await supabaseClient.auth.getSession()
+    return session
+  }
 
   const handlePause = async () => {
     setActionError('')
+    setActionLoading(true)
     try {
+      const session = await getSession()
+      if (!session) throw new Error('Sessão expirada')
+      const res = await fetch('/api/subscription/pause', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${session.access_token}` },
+      })
+      const body = await res.json()
+      if (!res.ok) throw new Error(body.error ?? 'Erro ao pausar')
       await pauseSubscription()
-    } catch {
-      setActionError('Erro ao pausar assinatura. Tente novamente.')
+    } catch (e: unknown) {
+      setActionError(e instanceof Error ? e.message : 'Erro ao pausar assinatura.')
+    } finally {
+      setActionLoading(false)
     }
   }
 
   const handleResume = async () => {
     setActionError('')
+    setActionLoading(true)
     try {
+      const session = await getSession()
+      if (!session) throw new Error('Sessão expirada')
+      const res = await fetch('/api/subscription/resume', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${session.access_token}` },
+      })
+      const body = await res.json()
+      if (!res.ok) throw new Error(body.error ?? 'Erro ao reativar')
       await resumeSubscription()
-    } catch {
-      setActionError('Erro ao reativar assinatura. Tente novamente.')
+    } catch (e: unknown) {
+      setActionError(e instanceof Error ? e.message : 'Erro ao reativar assinatura.')
+    } finally {
+      setActionLoading(false)
     }
   }
 
   const handleCancel = async () => {
     setActionError('')
+    setActionLoading(true)
     try {
+      const session = await getSession()
+      if (!session) throw new Error('Sessão expirada')
+      const res = await fetch('/api/subscription/cancel', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${session.access_token}` },
+      })
+      const body = await res.json()
+      if (!res.ok) throw new Error(body.error ?? 'Erro ao cancelar')
       await cancelSubscription()
       setShowCancelModal(false)
-    } catch {
-      setActionError('Erro ao cancelar assinatura. Tente novamente.')
+    } catch (e: unknown) {
+      setActionError(e instanceof Error ? e.message : 'Erro ao cancelar assinatura.')
       setShowCancelModal(false)
+    } finally {
+      setActionLoading(false)
+    }
+  }
+
+  const handleChangeAmount = async () => {
+    const amount = parseFloat(newAmount)
+    if (!newAmount || isNaN(amount) || amount < 5) {
+      setActionError('Valor mínimo é R$ 5,00')
+      return
+    }
+    setActionError('')
+    setActionLoading(true)
+    try {
+      const session = await getSession()
+      if (!session) throw new Error('Sessão expirada')
+      const res = await fetch('/api/subscription/change-amount', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ amount }),
+      })
+      const body = await res.json()
+      if (!res.ok) throw new Error(body.error ?? 'Erro ao alterar valor')
+      setShowChangeAmountModal(false)
+      setNewAmount('')
+      router.refresh()
+    } catch (e: unknown) {
+      setActionError(e instanceof Error ? e.message : 'Erro ao alterar valor.')
+    } finally {
+      setActionLoading(false)
     }
   }
 
@@ -139,31 +193,30 @@ export default function AssinaturaPage() {
               {actionError}
             </div>
           )}
+
           {/* Status Banner */}
           <div className={`rounded-2xl p-6 mb-8 ${
             isActive ? 'bg-gradient-to-r from-green-500 to-green-600' :
             isPaused ? 'bg-gradient-to-r from-yellow-500 to-yellow-600' :
             'bg-gradient-to-r from-gray-500 to-gray-600'
           } text-white`}>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <div className="w-16 h-16 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur">
-                  {isActive ? <CheckCircle size={32} /> :
-                   isPaused ? <Pause size={32} /> :
-                   <X size={32} />}
-                </div>
-                <div>
-                  <h3 className="text-2xl font-bold mb-1">
-                    {isActive ? 'Assinatura Ativa' :
-                     isPaused ? 'Assinatura Pausada' :
-                     'Assinatura Cancelada'}
-                  </h3>
-                  <p className="text-white/80">
-                    {isActive ? 'Sua doação mensal está ativa e em dia' :
-                     isPaused ? 'Sua assinatura está temporariamente pausada' :
-                     'Sua assinatura foi cancelada'}
-                  </p>
-                </div>
+            <div className="flex items-center gap-4">
+              <div className="w-16 h-16 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur">
+                {isActive ? <CheckCircle size={32} /> :
+                 isPaused ? <Pause size={32} /> :
+                 <X size={32} />}
+              </div>
+              <div>
+                <h3 className="text-2xl font-bold mb-1">
+                  {isActive ? 'Assinatura Ativa' :
+                   isPaused ? 'Assinatura Pausada' :
+                   'Assinatura Cancelada'}
+                </h3>
+                <p className="text-white/80">
+                  {isActive ? 'Sua doação mensal está ativa e em dia' :
+                   isPaused ? 'Sua assinatura está temporariamente pausada' :
+                   'Sua assinatura foi cancelada'}
+                </p>
               </div>
             </div>
           </div>
@@ -230,66 +283,56 @@ export default function AssinaturaPage() {
             </div>
 
             {/* Actions */}
-            <div className="border-t border-gray-200 dark:border-gray-700 pt-8">
-              <h3 className="font-semibold text-lg text-maya-brown dark:text-white mb-4">
-                Ações
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {isActive && (
-                  <>
+            {!isCancelled && (
+              <div className="border-t border-gray-200 dark:border-gray-700 pt-8">
+                <h3 className="font-semibold text-lg text-maya-brown dark:text-white mb-4">
+                  Ações
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {isActive && (
                     <button
                       onClick={handlePause}
-                      className="flex items-center justify-center gap-2 px-6 py-3 bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400 rounded-xl hover:bg-yellow-200 dark:hover:bg-yellow-900/40 transition-colors font-semibold"
+                      disabled={actionLoading}
+                      className="flex items-center justify-center gap-2 px-6 py-3 bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400 rounded-xl hover:bg-yellow-200 dark:hover:bg-yellow-900/40 transition-colors font-semibold disabled:opacity-50"
                     >
                       <Pause size={20} />
-                      Pausar Assinatura
+                      Pausar
                     </button>
-                    <button
-                      onClick={openSubscriptionPortal}
-                      disabled={portalLoading}
-                      className="flex items-center justify-center gap-2 px-6 py-3 bg-maya-green/10 dark:bg-maya-green/20 text-maya-green dark:text-maya-green rounded-xl hover:bg-maya-green/20 dark:hover:bg-maya-green/30 transition-colors font-semibold disabled:opacity-50"
-                    >
-                      <DollarSign size={20} />
-                      {portalLoading ? 'Abrindo...' : 'Alterar Valor'}
-                    </button>
-                    <button
-                      onClick={openSubscriptionPortal}
-                      disabled={portalLoading}
-                      className="flex items-center justify-center gap-2 px-6 py-3 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors font-semibold disabled:opacity-50"
-                    >
-                      <CreditCard size={20} />
-                      {portalLoading ? 'Abrindo...' : 'Atualizar Cart\u00e3o'}
-                    </button>
-                  </>
-                )}
+                  )}
 
-                {isPaused && (
-                  <button
-                    onClick={handleResume}
-                    className="flex items-center justify-center gap-2 px-6 py-3 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded-xl hover:bg-green-200 dark:hover:bg-green-900/40 transition-colors font-semibold"
-                  >
-                    <Play size={20} />
-                    Reativar Assinatura
-                  </button>
-                )}
+                  {isPaused && (
+                    <button
+                      onClick={handleResume}
+                      disabled={actionLoading}
+                      className="flex items-center justify-center gap-2 px-6 py-3 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded-xl hover:bg-green-200 dark:hover:bg-green-900/40 transition-colors font-semibold disabled:opacity-50"
+                    >
+                      <Play size={20} />
+                      Reativar
+                    </button>
+                  )}
 
-                {!isCancelled && (
+                  {isActive && (
+                    <button
+                      onClick={() => { setActionError(''); setShowChangeAmountModal(true) }}
+                      disabled={actionLoading}
+                      className="flex items-center justify-center gap-2 px-6 py-3 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-xl hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors font-semibold disabled:opacity-50"
+                    >
+                      <Edit2 size={20} />
+                      Alterar Valor
+                    </button>
+                  )}
+
                   <button
-                    onClick={() => setShowCancelModal(true)}
-                    className="flex items-center justify-center gap-2 px-6 py-3 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-xl hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors font-semibold"
+                    onClick={() => { setActionError(''); setShowCancelModal(true) }}
+                    disabled={actionLoading}
+                    className="flex items-center justify-center gap-2 px-6 py-3 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-xl hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors font-semibold disabled:opacity-50"
                   >
                     <X size={20} />
-                    Cancelar Assinatura
+                    Cancelar
                   </button>
-                )}
-              </div>
-
-              {portalError && (
-                <div className="mt-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 rounded-xl px-4 py-3 text-red-600 dark:text-red-400 text-sm">
-                  {portalError}
                 </div>
-              )}
-            </div>
+              </div>
+            )}
           </div>
 
           {/* Impact Info */}
@@ -331,20 +374,69 @@ export default function AssinaturaPage() {
               Cancelar Assinatura?
             </h3>
             <p className="text-maya-brown/70 dark:text-gray-300 mb-6">
-              Tem certeza que deseja cancelar sua doação mensal? Você pode reativar a qualquer momento.
+              Tem certeza que deseja cancelar sua doação mensal? Esta ação não pode ser desfeita.
             </p>
             <div className="flex gap-3">
               <button
                 onClick={() => setShowCancelModal(false)}
-                className="flex-1 px-6 py-3 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors font-semibold"
+                disabled={actionLoading}
+                className="flex-1 px-6 py-3 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors font-semibold disabled:opacity-50"
               >
-                Manter Assinatura
+                Manter
               </button>
               <button
                 onClick={handleCancel}
-                className="flex-1 px-6 py-3 bg-red-500 text-white rounded-xl hover:bg-red-600 transition-colors font-semibold"
+                disabled={actionLoading}
+                className="flex-1 px-6 py-3 bg-red-500 text-white rounded-xl hover:bg-red-600 transition-colors font-semibold disabled:opacity-50"
               >
-                Sim, Cancelar
+                {actionLoading ? 'Cancelando...' : 'Sim, Cancelar'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Change Amount Modal */}
+      {showChangeAmountModal && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-3xl p-8 max-w-md w-full">
+            <h3 className="font-display text-2xl text-maya-brown dark:text-white mb-2">
+              Alterar Valor da Doação
+            </h3>
+            <p className="text-maya-brown/70 dark:text-gray-300 mb-6">
+              Atual: <strong>R$ {subscription.amount.toLocaleString('pt-BR')}/mês</strong>
+            </p>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-maya-brown dark:text-gray-300 mb-2">
+                Novo valor mensal (R$)
+              </label>
+              <input
+                type="number"
+                min="5"
+                step="1"
+                value={newAmount}
+                onChange={e => setNewAmount(e.target.value)}
+                placeholder="Ex: 50"
+                className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-maya-brown dark:text-white focus:outline-none focus:ring-2 focus:ring-maya-green"
+              />
+              {actionError && (
+                <p className="mt-2 text-sm text-red-500">{actionError}</p>
+              )}
+            </div>
+            <div className="flex gap-3">
+              <button
+                onClick={() => { setShowChangeAmountModal(false); setNewAmount(''); setActionError('') }}
+                disabled={actionLoading}
+                className="flex-1 px-6 py-3 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors font-semibold disabled:opacity-50"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleChangeAmount}
+                disabled={actionLoading || !newAmount}
+                className="flex-1 px-6 py-3 bg-maya-green text-white rounded-xl hover:bg-maya-green/90 transition-colors font-semibold disabled:opacity-50"
+              >
+                {actionLoading ? 'Salvando...' : 'Confirmar'}
               </button>
             </div>
           </div>

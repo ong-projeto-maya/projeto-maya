@@ -68,11 +68,11 @@ describe('useDoador', () => {
       const { result } = renderHook(() => useDoador())
       await act(async () => {})
 
-      let success: boolean | undefined
+      let success: string | null | undefined
       await act(async () => {
         success = await result.current.login('donor@test.com', 'pass123')
       })
-      expect(success).toBe(true)
+      expect(success).toBeNull()
       expect(client.auth.signInWithPassword).toHaveBeenCalledWith({
         email: 'donor@test.com',
         password: 'pass123',
@@ -85,11 +85,11 @@ describe('useDoador', () => {
       const { result } = renderHook(() => useDoador())
       await act(async () => {})
 
-      let success: boolean | undefined
+      let success: string | null | undefined
       await act(async () => {
         success = await result.current.login('donor@test.com', 'wrongpass')
       })
-      expect(success).toBe(false)
+      expect(success).not.toBeNull()
     })
   })
 

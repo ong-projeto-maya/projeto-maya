@@ -53,8 +53,8 @@ export type Database = {
         Row: {
           id: string
           doador_email: string
-          stripe_session_id: string
-          stripe_subscription_id: string | null
+          pagbank_order_id: string
+          pagbank_subscription_id: string | null
           valor: number
           tipo: 'single' | 'monthly'
           status: 'completed' | 'failed' | 'pending' | 'cancelled'
@@ -66,8 +66,8 @@ export type Database = {
         Insert: {
           id?: string
           doador_email: string
-          stripe_session_id: string
-          stripe_subscription_id?: string | null
+          pagbank_order_id: string
+          pagbank_subscription_id?: string | null
           valor: number
           tipo: 'single' | 'monthly'
           status: 'completed' | 'failed' | 'pending' | 'cancelled'
@@ -79,7 +79,7 @@ export type Database = {
         Update: {
           status?: 'completed' | 'failed' | 'pending' | 'cancelled'
           proximo_pagamento?: string | null
-          stripe_subscription_id?: string | null
+          pagbank_subscription_id?: string | null
         }
         Relationships: []
       }
@@ -87,7 +87,7 @@ export type Database = {
         Row: {
           id: string
           doador_email: string
-          stripe_subscription_id: string
+          pagbank_subscription_id: string
           valor: number
           status: 'active' | 'paused' | 'cancelled'
           proximo_pagamento: string | null
@@ -99,7 +99,7 @@ export type Database = {
         Insert: {
           id?: string
           doador_email: string
-          stripe_subscription_id: string
+          pagbank_subscription_id: string
           valor: number
           status?: 'active' | 'paused' | 'cancelled'
           proximo_pagamento?: string | null

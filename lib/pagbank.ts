@@ -178,6 +178,43 @@ export function validateWebhookSignature(body: string, signature: string | null)
 }
 
 /**
+ * Suspend an active PagBank subscription.
+ * PUT /subscriptions/{id}/suspend
+ */
+export async function suspendSubscription(subscriptionId: string): Promise<void> {
+  await pagbankRequest('PUT', `/subscriptions/${subscriptionId}/suspend`)
+}
+
+/**
+ * Activate (resume) a suspended PagBank subscription.
+ * PUT /subscriptions/{id}/activate
+ */
+export async function activateSubscription(subscriptionId: string): Promise<void> {
+  await pagbankRequest('PUT', `/subscriptions/${subscriptionId}/activate`)
+}
+
+/**
+ * Cancel a PagBank subscription permanently.
+ * PUT /subscriptions/{id}/cancel
+ */
+export async function cancelPagBankSubscription(subscriptionId: string): Promise<void> {
+  await pagbankRequest('PUT', `/subscriptions/${subscriptionId}/cancel`)
+}
+
+/**
+ * Change the amount of an active PagBank subscription.
+ * PATCH /subscriptions/{id}
+ */
+export async function updateSubscriptionAmount(
+  subscriptionId: string,
+  newAmountCentavos: number
+): Promise<void> {
+  await pagbankRequest('PATCH', `/subscriptions/${subscriptionId}`, {
+    amount: { value: newAmountCentavos },
+  })
+}
+
+/**
  * Map a PagBank order status / charge status to our internal donation status.
  */
 export function mapChargeStatus(

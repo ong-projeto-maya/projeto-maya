@@ -85,7 +85,7 @@ describe('POST /api/subscription/pause', () => {
     mockStripeUpdate.mockResolvedValue({})
     mockSupabase = makeSupabase(testUser, {
       id: 'asn-1',
-      stripe_subscription_id: 'sub_abc',
+      pagbank_subscription_id: 'sub_abc',
     })
     vi.resetModules()
     const { POST } = await import('../app/api/subscription/pause/route')
@@ -123,7 +123,7 @@ describe('POST /api/subscription/resume', () => {
     mockStripeUpdate.mockResolvedValue({})
     mockSupabase = makeSupabase(testUser, {
       id: 'asn-2',
-      stripe_subscription_id: 'sub_paused',
+      pagbank_subscription_id: 'sub_paused',
     })
     vi.resetModules()
     const { POST } = await import('../app/api/subscription/resume/route')
@@ -161,7 +161,7 @@ describe('POST /api/subscription/cancel', () => {
     mockStripeUpdate.mockResolvedValue({})
     mockSupabase = makeSupabase(testUser, {
       id: 'asn-3',
-      stripe_subscription_id: 'sub_cancel',
+      pagbank_subscription_id: 'sub_cancel',
     })
     vi.resetModules()
     const { POST } = await import('../app/api/subscription/cancel/route')

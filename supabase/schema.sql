@@ -45,8 +45,8 @@ create trigger doadores_updated_at
 create table if not exists public.doacoes (
   id                      uuid primary key default gen_random_uuid(),
   doador_email            text not null,
-  stripe_session_id       text not null unique,
-  stripe_subscription_id  text,
+  pagbank_order_id        text not null unique,
+  pagbank_subscription_id text,
   valor                   numeric(10,2) not null,
   tipo                    text not null check (tipo in ('single','monthly')),
   status                  text not null default 'pending'
@@ -61,8 +61,8 @@ create index if not exists doacoes_email_idx
   on public.doacoes(doador_email);
 
 create index if not exists doacoes_subscription_idx
-  on public.doacoes(stripe_subscription_id)
-  where stripe_subscription_id is not null;
+  on public.doacoes(pagbank_subscription_id)
+  where pagbank_subscription_id is not null;
 
 -- Trigger: recalculate donor totals after each donation insert/update
 create or replace function public.recalculate_doador_totals()
@@ -104,7 +104,7 @@ create trigger doacoes_recalculate_totals
 create table if not exists public.assinaturas (
   id                      uuid primary key default gen_random_uuid(),
   doador_email            text not null,
-  stripe_subscription_id  text not null unique,
+  pagbank_subscription_id text not null unique,
   valor                   numeric(10,2) not null,
   status                  text not null default 'active'
                             check (status in ('active','paused','cancelled')),
