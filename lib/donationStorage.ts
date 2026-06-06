@@ -89,7 +89,7 @@ export async function saveDonation(
     if (subError) console.error('saveDonation: subscription upsert error:', subError)
   }
 
-  return mapRow(data as Record<string, unknown>)
+  return mapRow((data?.[0] ?? data) as Record<string, unknown>)
 }
 
 export async function updateDonationStatus(
