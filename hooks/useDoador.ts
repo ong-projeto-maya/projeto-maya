@@ -48,32 +48,42 @@ export function useDoador() {
 
   const loadDoadorData = useCallback(
     async (userId: string, userEmail?: string, userName?: string) => {
-      let { data: profile } = await supabase
+      console.log('[useDoador] loadDoadorData called', { userId, userEmail })
+      let { data: profile, error: selectError } = await supabase
         .from('doadores')
         .select('*')
         .eq('id', userId)
         .maybeSingle()
 
+      if (selectError) console.error('[useDoador] SELECT profile failed:', selectError)
+      console.log('[useDoador] profile found:', !!profile)
+
       // Profile missing — create directly (RLS policy allows authenticated users to insert own row)
       if (!profile && userEmail) {
-        try {
-          const nome = userName || userEmail.split('@')[0]
-          await supabase
-            .from('doadores')
-            .insert({ id: userId, email: userEmail, nome })
-          // Re-fetch after creation
-          const { data: created } = await supabase
-            .from('doadores')
-            .select('*')
-            .eq('id', userId)
-            .maybeSingle()
-          profile = created
-        } catch {
-          // silently ignore — server-side trigger may create it
+        const nome = userName || userEmail.split('@')[0]
+        const { error: insertError } = await supabase
+          .from('doadores')
+          .insert({ id: userId, email: userEmail, nome })
+        if (insertError) {
+          console.error('[useDoador] INSERT profile failed:', insertError)
+        } else {
+          console.log('[useDoador] profile created')
         }
+        // Re-fetch after creation attempt
+        const { data: created, error: refetchError } = await supabase
+          .from('doadores')
+          .select('*')
+          .eq('id', userId)
+          .maybeSingle()
+        if (refetchError) console.error('[useDoador] re-fetch profile failed:', refetchError)
+        console.log('[useDoador] profile after insert:', !!created)
+        profile = created
       }
 
-      if (!profile) return
+      if (!profile) {
+        console.error('[useDoador] no profile — aborting')
+        return
+      }
 
       const [{ data: donations }, { data: subscription }] = await Promise.all([
         supabase

@@ -35,12 +35,14 @@ export default function DoadorLoginPage() {
 
     try {
       const errorMsg = await login(email, password)
+      console.log('[login] result:', errorMsg)
       if (errorMsg) {
         setError(errorMsg)
       } else {
         router.push('/doador/dashboard')
       }
-    } catch {
+    } catch (e) {
+      console.error('[login] exception:', e)
       setError('Erro ao entrar. Tente novamente.')
     } finally {
       setIsLoading(false)
