@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { createClient } from '@/lib/supabase'
+import { createClient, isSupabaseConfigured } from '@/lib/supabase'
 import type { Campaign } from '@/data/campaigns'
 
 function mapCampaign(row: Record<string, unknown>): Campaign {
@@ -39,6 +39,10 @@ export function useCampaigns() {
   const [isLoading, setIsLoading] = useState(true)
 
   const fetchCampaigns = useCallback(async () => {
+    if (!isSupabaseConfigured) {
+      setIsLoading(false)
+      return
+    }
     setIsLoading(true)
     const supabase = createClient()
     const { data, error } = await supabase

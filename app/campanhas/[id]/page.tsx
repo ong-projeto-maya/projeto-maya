@@ -57,6 +57,7 @@ export default function CampanhaDetailPage() {
   const [regSubmitted, setRegSubmitted] = useState(false)
   const [regLoading, setRegLoading] = useState(false)
   const [regError, setRegError] = useState('')
+  const [linkCopied, setLinkCopied] = useState(false)
 
   const handleRegistration = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -85,6 +86,17 @@ export default function CampanhaDetailPage() {
 
     setRegSubmitted(true)
     setRegLoading(false)
+  }
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-maya-beige dark:bg-gray-900 py-12 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-maya-green border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-maya-brown/60 dark:text-gray-400">Carregando campanha...</p>
+        </div>
+      </div>
+    )
   }
 
   if (!campaign) {
@@ -146,7 +158,6 @@ export default function CampanhaDetailPage() {
     setIsSubmitting(false)
   }
 
-  const [linkCopied, setLinkCopied] = useState(false)
   const handleShare = () => {
     if (navigator.share) {
       navigator.share({ title: campaign.title, text: campaign.description, url: window.location.href })

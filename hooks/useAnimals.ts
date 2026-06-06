@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback, useMemo } from 'react'
-import { createClient } from '@/lib/supabase'
+import { createClient, isSupabaseConfigured } from '@/lib/supabase'
 
 export interface Animal {
   id: string
@@ -56,6 +56,10 @@ export function useAnimals() {
   const supabase = useMemo(() => createClient(), [])
 
   const fetchAnimals = useCallback(async () => {
+    if (!isSupabaseConfigured) {
+      setIsLoading(false)
+      return
+    }
     setIsLoading(true)
     const { data, error } = await supabase
       .from('animais')
