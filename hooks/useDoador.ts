@@ -47,7 +47,7 @@ export function useDoador() {
   const supabase = useMemo(() => createClient(), [])
 
   const loadDoadorData = useCallback(
-    async (userId: string) => {
+    async (userId: string, accessToken?: string) => {
       let { data: profile } = await supabase
         .from('doadores')
         .select('*')
@@ -55,22 +55,19 @@ export function useDoador() {
         .maybeSingle()
 
       // Profile missing — auto-create via server route (uses service role)
-      if (!profile) {
+      if (!profile && accessToken) {
         try {
-          const { data: { session } } = await supabase.auth.getSession()
-          if (session?.access_token) {
-            await fetch('/api/donors/ensure-profile', {
-              method: 'POST',
-              headers: { Authorization: `Bearer ${session.access_token}` },
-            })
-            // Re-fetch after creation
-            const { data: created } = await supabase
-              .from('doadores')
-              .select('*')
-              .eq('id', userId)
-              .maybeSingle()
-            profile = created
-          }
+          await fetch('/api/donors/ensure-profile', {
+            method: 'POST',
+            headers: { Authorization: `Bearer ${accessToken}` },
+          })
+          // Re-fetch after creation
+          const { data: created } = await supabase
+            .from('doadores')
+            .select('*')
+            .eq('id', userId)
+            .maybeSingle()
+          profile = created
         } catch {
           // silently ignore — user will see empty state
         }
@@ -141,12 +138,12 @@ export function useDoador() {
     let mounted = true
 
     const init = async () => {
-      // getUser() validates JWT server-side; getSession() only reads localStorage
       const {
         data: { user },
       } = await supabase.auth.getUser()
       if (user && mounted) {
-        await loadDoadorData(user.id)
+        const { data: { session } } = await supabase.auth.getSession()
+        await loadDoadorData(user.id, session?.access_token ?? undefined)
       }
       if (mounted) setIsLoading(false)
     }
@@ -157,7 +154,7 @@ export function useDoador() {
       data: { subscription: authSub },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (session?.user) {
-        await loadDoadorData(session.user.id)
+        await loadDoadorData(session.user.id, session.access_token)
       } else {
         setDoador(null)
       }

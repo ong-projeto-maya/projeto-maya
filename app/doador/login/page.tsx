@@ -33,13 +33,16 @@ export default function DoadorLoginPage() {
       return
     }
 
-    const success = await login(email, password)
-    
-    if (!success) {
-      setIsLoading(false)
-      router.push('/doador/dashboard')
-    } else {
-      setError(success)
+    try {
+      const errorMsg = await login(email, password)
+      if (errorMsg) {
+        setError(errorMsg)
+      } else {
+        router.push('/doador/dashboard')
+      }
+    } catch {
+      setError('Erro ao entrar. Tente novamente.')
+    } finally {
       setIsLoading(false)
     }
   }
