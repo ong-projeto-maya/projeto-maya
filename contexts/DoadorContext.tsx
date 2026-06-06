@@ -104,13 +104,18 @@ export function DoadorProvider({ children }: { children: React.ReactNode }) {
       loadingRef.current = true
 
       try {
-        let { data: profile, error: selectError } = await supabase
+        // Use .limit(1) instead of .maybeSingle() to avoid HTTP 406 responses.
+        // .maybeSingle() uses PostgREST single-object mode which returns 406 for 0 rows.
+        // .limit(1) returns a plain array (200 OK), we just take index 0.
+        const { data: profileRows, error: selectError } = await supabase
           .from('doadores')
           .select('*')
           .eq('id', userId)
-          .maybeSingle()
+          .limit(1)
 
         if (selectError) console.error('[DoadorContext] SELECT profile failed:', selectError)
+
+        let profile = profileRows?.[0] ?? null
 
         // Profile missing — create it (RLS policy allows authenticated users to insert own row)
         if (!profile && userEmail) {
@@ -122,17 +127,17 @@ export function DoadorProvider({ children }: { children: React.ReactNode }) {
             // 23505 = unique_violation (profile already exists, created by another instance)
             console.error('[DoadorContext] INSERT profile failed:', insertError)
           }
-          const { data: created } = await supabase
+          const { data: createdRows } = await supabase
             .from('doadores')
             .select('*')
             .eq('id', userId)
-            .maybeSingle()
-          profile = created
+            .limit(1)
+          profile = createdRows?.[0] ?? null
         }
 
         if (!profile) return
 
-        const [{ data: donations }, { data: subscription }] = await Promise.all([
+        const [{ data: donations }, { data: subscriptionRows }] = await Promise.all([
           supabase
             .from('doacoes')
             .select('*')
@@ -144,9 +149,10 @@ export function DoadorProvider({ children }: { children: React.ReactNode }) {
             .eq('doador_id', userId)
             .in('status', ['active', 'paused'])
             .order('created_at', { ascending: false })
-            .limit(1)
-            .maybeSingle(),
+            .limit(1),
         ])
+
+        const subscription = subscriptionRows?.[0] ?? null
 
         const mappedDonations: Donation[] = (donations ?? []).map(d => ({
           id: d.id,
