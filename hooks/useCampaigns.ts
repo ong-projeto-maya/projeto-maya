@@ -89,10 +89,10 @@ export function useCampaigns() {
         registration_requirements: campaign.registrationInfo?.requirements ?? [],
       })
       .select()
-      .single()
+      .limit(1)
 
     if (error) { console.error('Error adding campaign:', error); return null }
-    const newCampaign = mapCampaign(data)
+    const newCampaign = mapCampaign(data?.[0])
     setCampaigns(prev => [newCampaign, ...prev])
     return newCampaign
   }

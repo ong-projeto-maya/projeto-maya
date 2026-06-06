@@ -64,7 +64,7 @@ export async function saveDonation(
       { onConflict: 'pagbank_order_id', ignoreDuplicates: true }
     )
     .select()
-    .single()
+    .limit(1)
 
   if (error) {
     console.error('saveDonation error:', error)
