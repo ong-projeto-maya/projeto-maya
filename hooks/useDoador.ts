@@ -60,12 +60,12 @@ export function useDoador() {
         supabase
           .from('doacoes')
           .select('*')
-          .eq('doador_email', profile.email)
+          .eq('doador_id', userId)
           .order('created_at', { ascending: false }),
         supabase
           .from('assinaturas')
           .select('*')
-          .eq('doador_email', profile.email)
+          .eq('doador_id', userId)
           .in('status', ['active', 'paused'])
           .order('created_at', { ascending: false })
           .limit(1)
@@ -81,8 +81,8 @@ export function useDoador() {
         receipt: undefined,
         campaignId: d.campaign_id ?? undefined,
         campaignName: d.campaign_name ?? undefined,
-        paymentId: d.stripe_session_id ?? undefined,
-        subscriptionId: d.stripe_subscription_id ?? undefined,
+        paymentId: d.pagbank_order_id ?? undefined,
+        subscriptionId: d.pagbank_subscription_id ?? undefined,
         nextBillingDate: d.proximo_pagamento ?? undefined,
       }))
 

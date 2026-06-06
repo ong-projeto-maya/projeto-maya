@@ -37,12 +37,12 @@ function makeRequest(token?: string) {
 function buildSupabase({
   user = { id: 'user-1', email: 'test@example.com' },
   userError = null,
-  activeSubs = [] as { stripe_subscription_id: string }[],
+  activeSubs = [] as { pagbank_subscription_id: string }[],
   deleteError = null,
 }: {
   user?: { id: string; email: string } | null
   userError?: unknown
-  activeSubs?: { stripe_subscription_id: string }[]
+  activeSubs?: { pagbank_subscription_id: string }[]
   deleteError?: unknown
 } = {}) {
   const deleteFn = vi.fn().mockReturnValue({
@@ -103,7 +103,7 @@ describe('DELETE /api/delete-account', () => {
   it('cancels active Stripe subscriptions before deleting account', async () => {
     mockStripeSubscriptionsCancel.mockResolvedValue({})
     mockSupabase = buildSupabase({
-      activeSubs: [{ stripe_subscription_id: 'sub_active_1' }],
+      activeSubs: [{ pagbank_subscription_id: 'sub_active_1' }],
     })
     const res = await callDeleteAccount('valid-token')
     expect(res.status).toBe(200)
@@ -113,7 +113,7 @@ describe('DELETE /api/delete-account', () => {
   it('still deletes account even when Stripe cancel throws', async () => {
     mockStripeSubscriptionsCancel.mockRejectedValue(new Error('Stripe error'))
     mockSupabase = buildSupabase({
-      activeSubs: [{ stripe_subscription_id: 'sub_fail' }],
+      activeSubs: [{ pagbank_subscription_id: 'sub_fail' }],
     })
     const res = await callDeleteAccount('valid-token')
     // Should proceed with deletion despite Stripe error

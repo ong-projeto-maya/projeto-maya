@@ -11,7 +11,6 @@ import {
   LogOut,
   X,
   Award,
-  FileText,
   ChevronRight,
   Heart,
   Sparkles,
@@ -138,18 +137,7 @@ export default function DoadorDashboard() {
       <div className="container mx-auto px-4 py-8 space-y-6">
 
         {/* Navigation Tiles */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <Link href="/doador/doacoes" className="group bg-white dark:bg-gray-900 rounded-2xl p-5 border border-gray-100 dark:border-gray-800 hover:border-maya-green/40 hover:shadow-md transition-all">
-            <div className="flex items-start justify-between mb-4">
-              <div className="w-11 h-11 bg-maya-green/10 rounded-xl flex items-center justify-center">
-                <FileText className="text-maya-green" size={20} />
-              </div>
-              <ChevronRight size={16} className="text-gray-300 dark:text-gray-600 group-hover:text-maya-green group-hover:translate-x-0.5 transition-all mt-1" />
-            </div>
-            <p className="font-semibold text-maya-brown dark:text-white mb-0.5">Histórico</p>
-            <p className="text-xs text-maya-brown/50 dark:text-gray-500">Todas as suas doações</p>
-          </Link>
-
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Link href="/doador/assinatura" className="group bg-white dark:bg-gray-900 rounded-2xl p-5 border border-gray-100 dark:border-gray-800 hover:border-maya-orange/40 hover:shadow-md transition-all">
             <div className="flex items-start justify-between mb-4">
               <div className="w-11 h-11 bg-maya-orange/10 rounded-xl flex items-center justify-center">

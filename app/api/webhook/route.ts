@@ -69,7 +69,8 @@ export async function POST(request: Request) {
       if (donationStatus === 'completed') {
         await saveDonation({
           paymentId: referenceId,
-          email: order.customer?.email ?? '',
+          userId: metadata.userId || undefined,
+          email: metadata.userEmail || order.customer?.email || '',
           amount: (firstCharge.amount.value ?? 0) / 100,
           type: (metadata.donationType as 'single' | 'monthly') ?? 'single',
           status: 'completed',

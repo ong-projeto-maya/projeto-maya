@@ -1,4 +1,6 @@
 import { NextResponse } from 'next/server'
+import { cookies } from 'next/headers'
+import { createServerClient } from '@supabase/ssr'
 import {
   createCheckout,
   generateReferenceId,
@@ -21,6 +23,17 @@ export async function POST(request: Request) {
       log.error('NEXT_PUBLIC_SITE_URL is not configured')
       return NextResponse.json({ error: 'Configuração inválida do servidor' }, { status: 500 })
     }
+
+    // Identify logged-in donor (optional — anonymous donations are allowed)
+    const cookieStore = cookies()
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL ?? '',
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? '',
+      { cookies: { getAll: () => cookieStore.getAll() } }
+    )
+    const { data: { user } } = await supabase.auth.getUser()
+    const userId = user?.id ?? ''
+    const userEmail = user?.email ?? ''
 
     const body = await request.json()
     const { amount, donationType, campaignId, campaignName } = body
@@ -91,6 +104,8 @@ export async function POST(request: Request) {
       metadata: {
         donationType,
         amount: amount.toString(),
+        ...(userId    && { userId }),
+        ...(userEmail && { userEmail }),
         ...(safeCampaignId && { campaignId: safeCampaignId }),
         ...(safeCampaignName && { campaignName: safeCampaignName }),
         cancelUrl: `${siteUrl}${cancelPath}`,
