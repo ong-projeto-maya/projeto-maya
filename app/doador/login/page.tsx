@@ -35,11 +35,11 @@ export default function DoadorLoginPage() {
 
     const success = await login(email, password)
     
-    if (success) {
+    if (!success) {
       setIsLoading(false)
       router.push('/doador/dashboard')
     } else {
-      setError('Email ou senha inválidos')
+      setError(success)
       setIsLoading(false)
     }
   }
@@ -54,8 +54,9 @@ export default function DoadorLoginPage() {
             <Image
               src="/logo.png"
               alt="Projeto Maya"
-              width={96}
-              height={96}
+              width={388}
+              height={141}
+              quality={100}
               className="h-24 w-auto drop-shadow-2xl dark:brightness-0 dark:invert"
             />
           </div>
@@ -173,12 +174,6 @@ export default function DoadorLoginPage() {
           </div>
         </div>
 
-        {/* Info Box */}
-        <div className="mt-6 bg-maya-green/10 dark:bg-maya-green/20 rounded-2xl p-4 text-center">
-          <p className="text-sm text-maya-brown dark:text-white">
-            <strong>Teste:</strong> Use qualquer email e senha com 6+ caracteres
-          </p>
-        </div>
       </div>
     </div>
   )

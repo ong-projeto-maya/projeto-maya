@@ -67,8 +67,9 @@ export default function DoadorRegistroPage() {
             <Image
               src="/logo.png"
               alt="Projeto Maya"
-              width={96}
-              height={96}
+              width={388}
+              height={141}
+              quality={100}
               className="h-24 w-auto drop-shadow-2xl dark:brightness-0 dark:invert"
             />
           </div>
