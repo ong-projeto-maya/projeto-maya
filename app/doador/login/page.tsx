@@ -13,14 +13,32 @@ export default function DoadorLoginPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
-  const { doador, login } = useDoador()
+  const { doador, isLoading: authLoading, login } = useDoador()
   const router = useRouter()
 
   useEffect(() => {
-    if (doador) {
+    if (!authLoading && doador) {
       router.push('/doador/dashboard')
     }
-  }, [doador, router])
+  }, [doador, authLoading, router])
+
+  // Enquanto verifica sessão existente, não mostra o formulário
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="w-8 h-8 border-4 border-green-500 border-t-transparent rounded-full animate-spin" />
+      </div>
+    )
+  }
+
+  // Sessão ativa confirmada — aguarda redirect do useEffect
+  if (doador) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="w-8 h-8 border-4 border-green-500 border-t-transparent rounded-full animate-spin" />
+      </div>
+    )
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

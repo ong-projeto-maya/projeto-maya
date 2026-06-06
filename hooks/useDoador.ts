@@ -49,6 +49,7 @@ export function useDoador() {
   const loadDoadorData = useCallback(
     async (userId: string, userEmail?: string, userName?: string) => {
       console.log('[useDoador] loadDoadorData called', { userId, userEmail })
+
       let { data: profile, error: selectError } = await supabase
         .from('doadores')
         .select('*')
@@ -148,17 +149,22 @@ export function useDoador() {
     let mounted = true
 
     const init = async () => {
-      // getSession() reads localStorage (no network, no mutex) — safe to use in init
-      // getUser() would acquire the auth mutex and block signInWithPassword
-      const { data: { session } } = await supabase.auth.getSession()
-      if (session?.user && mounted) {
-        await loadDoadorData(
-          session.user.id,
-          session.user.email ?? undefined,
-          (session.user.user_metadata?.nome as string | undefined)
-        )
+      try {
+        // getSession() reads localStorage (no network, no mutex) — safe to use in init
+        // getUser() would acquire the auth mutex and block signInWithPassword
+        const { data: { session } } = await supabase.auth.getSession()
+        if (session?.user && mounted) {
+          await loadDoadorData(
+            session.user.id,
+            session.user.email ?? undefined,
+            (session.user.user_metadata?.nome as string | undefined)
+          )
+        }
+      } catch (err) {
+        console.error('[useDoador] init error:', err)
+      } finally {
+        if (mounted) setIsLoading(false)
       }
-      if (mounted) setIsLoading(false)
     }
 
     init()
@@ -166,16 +172,22 @@ export function useDoador() {
     const {
       data: { subscription: authSub },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (session?.user) {
-        await loadDoadorData(
-          session.user.id,
-          session.user.email ?? undefined,
-          (session.user.user_metadata?.nome as string | undefined)
-        )
-      } else {
+      try {
+        if (session?.user) {
+          await loadDoadorData(
+            session.user.id,
+            session.user.email ?? undefined,
+            (session.user.user_metadata?.nome as string | undefined)
+          )
+        } else {
+          setDoador(null)
+        }
+      } catch (err) {
+        console.error('[useDoador] onAuthStateChange error:', err)
         setDoador(null)
+      } finally {
+        if (mounted) setIsLoading(false)
       }
-      if (mounted) setIsLoading(false)
     })
 
     return () => {
