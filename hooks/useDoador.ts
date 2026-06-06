@@ -148,14 +148,14 @@ export function useDoador() {
     let mounted = true
 
     const init = async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser()
-      if (user && mounted) {
+      // getSession() reads localStorage (no network, no mutex) — safe to use in init
+      // getUser() would acquire the auth mutex and block signInWithPassword
+      const { data: { session } } = await supabase.auth.getSession()
+      if (session?.user && mounted) {
         await loadDoadorData(
-          user.id,
-          user.email ?? undefined,
-          (user.user_metadata?.nome as string | undefined)
+          session.user.id,
+          session.user.email ?? undefined,
+          (session.user.user_metadata?.nome as string | undefined)
         )
       }
       if (mounted) setIsLoading(false)
