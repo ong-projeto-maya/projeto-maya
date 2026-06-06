@@ -22,6 +22,11 @@ export const logger = pino({
     service: 'projeto-maya',
     env: process.env.NODE_ENV,
   },
+  // Serialize Error objects under both 'err' and 'error' keys
+  serializers: {
+    err: pino.stdSerializers.err,
+    error: pino.stdSerializers.err,
+  },
   redact: {
     // Never log these fields even if accidentally passed to logger
     paths: ['email', 'password', 'token', 'authorization', '*.access_token', '*.email'],

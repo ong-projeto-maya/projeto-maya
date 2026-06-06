@@ -102,7 +102,8 @@ export async function POST(request: Request) {
     log.info({ referenceId, donationType, amount }, 'PagBank checkout created')
     return NextResponse.json({ checkoutUrl })
   } catch (error: unknown) {
-    log.error({ error }, 'error creating PagBank checkout')
+    const message = error instanceof Error ? error.message : String(error)
+    log.error({ error, errorMessage: message }, 'error creating PagBank checkout')
     return NextResponse.json(
       { error: 'Erro ao processar doação. Tente novamente.' },
       { status: 500 }

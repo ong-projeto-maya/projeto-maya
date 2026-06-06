@@ -82,7 +82,7 @@ function EmergencyCard() {
         ))}
       </div>
       <a
-        href={`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? '5519994128408'}`}
+        href={`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? ''}`}
         target="_blank"
         rel="noopener noreferrer"
         className="flex-shrink-0 bg-white text-red-600 font-bold text-xs px-4 py-2 rounded-xl hover:bg-red-50 transition-colors whitespace-nowrap"
@@ -1020,8 +1020,8 @@ function ContatosTab() {
             Projeto Maya
           </SectionTitle>
           <div className="space-y-2">
-            <a href={`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? '5519994128408'}`} className="flex items-center gap-2 text-sm text-maya-blue hover:underline">
-              <Smartphone size={14} className="flex-shrink-0" /> (19) 99412-8408
+            <a href={`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? ''}`} className="flex items-center gap-2 text-sm text-maya-blue hover:underline">
+              <Smartphone size={14} className="flex-shrink-0" /> WhatsApp
             </a>
             <a href="mailto:projetomaya@outlook.com" className="flex items-center gap-2 text-sm text-maya-blue hover:underline">
               <Mail size={14} className="flex-shrink-0" /> projetomaya@outlook.com

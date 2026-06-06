@@ -52,7 +52,7 @@ export default async function AnimalDetailPage({ params }: { params: { id: strin
   const whatsappMessage = encodeURIComponent(
     `Olá! Tenho interesse em conhecer o(a) ${animal.name}. Gostaria de mais informações sobre adoção.`
   )
-  const whatsappLink = `https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? '5519994128408'}?text=${whatsappMessage}`
+  const whatsappLink = `https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? ''}?text=${whatsappMessage}`
 
   return (
     <div className="min-h-screen bg-maya-beige py-12">

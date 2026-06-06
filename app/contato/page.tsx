@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { Mail, Phone, Send, Check, MessageSquare, AlertTriangle, ExternalLink } from 'lucide-react'
 import { createClient } from '@/lib/supabase'
 
-const WHATSAPP = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? '5519994128408'
+const WHATSAPP = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? ''
 
 export default function ContatoPage() {
   const [formData, setFormData] = useState({
@@ -113,7 +113,7 @@ export default function ContatoPage() {
                 Telefone/WhatsApp
               </h3>
               <a href={`tel:+${WHATSAPP}`} className="text-maya-brown/70 dark:text-gray-300 hover:text-maya-green">
-                (19) 99412-8408
+                WhatsApp
               </a>
             </div>
 
