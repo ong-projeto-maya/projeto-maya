@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { AlertTriangle, Phone, Mail, MapPin, Camera, Send, Check, MessageCircle } from 'lucide-react'
+import { AlertTriangle, Mail, MapPin, Camera, Send } from 'lucide-react'
 
 export default function ReportarResgatePage() {
   const [formData, setFormData] = useState({
@@ -12,35 +12,12 @@ export default function ReportarResgatePage() {
     description: '',
     urgency: 'media',
   })
-  const [submitted, setSubmitted] = useState(false)
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setFormData(prev => ({
       ...prev,
       [e.target.name]: e.target.value
     }))
-  }
-
-  const buildWhatsAppMessage = () => {
-    const urgencyLabels: Record<string, string> = {
-      baixa: 'Baixa',
-      media: 'Média',
-      alta: 'Alta - Animal em perigo',
-      critica: 'Crítica - Risco de vida',
-    }
-    const message = [
-      '🚨 *REPORTAR RESGATE*',
-      '',
-      `*Nome:* ${formData.name}`,
-      `*Telefone:* ${formData.phone}`,
-      `*Animal:* ${formData.animalType === 'cachorro' ? 'Cachorro' : formData.animalType === 'gato' ? 'Gato' : 'Outro'}`,
-      `*Localização:* ${formData.location}`,
-      `*Urgência:* ${urgencyLabels[formData.urgency]}`,
-      '',
-      `*Descrição:*`,
-      formData.description,
-    ].join('\n')
-    return encodeURIComponent(message)
   }
 
   const buildEmailBody = () => {
@@ -67,8 +44,9 @@ export default function ReportarResgatePage() {
 
   const isFormValid = formData.name && formData.phone && formData.location && formData.description
 
-  const whatsappLink = `https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? ''}?text=${buildWhatsAppMessage()}`
-  const emailLink = `mailto:resgate@projetomaya.org?subject=${encodeURIComponent(`Reportar Resgate - ${formData.urgency === 'critica' ? 'URGENTE' : formData.urgency === 'alta' ? 'URGENTE' : 'Novo Caso'}`)}&body=${buildEmailBody()}`
+  const isUrgent = formData.urgency === 'alta' || formData.urgency === 'critica'
+  const emailSubject = encodeURIComponent(`Reportar Resgate - ${isUrgent ? 'URGENTE' : 'Novo Caso'}`)
+  const emailLink = `mailto:resgate@projetomaya.org?subject=${emailSubject}&body=${buildEmailBody()}`
 
   return (
     <div className="min-h-screen bg-maya-beige dark:bg-gray-900 py-12">
@@ -80,7 +58,7 @@ export default function ReportarResgatePage() {
             Reportar Resgate
           </h1>
           <p className="text-xl text-maya-brown/70 dark:text-gray-300 max-w-2xl mx-auto">
-            Encontrou um animal em situação de risco? Preencha as informações abaixo e envie por WhatsApp ou e-mail.
+            Encontrou um animal em situação de risco? Preencha as informações abaixo e envie por e-mail para nossa equipe.
           </p>
         </div>
 
@@ -95,31 +73,46 @@ export default function ReportarResgatePage() {
                 Urgência?
               </h3>
               <p className="text-maya-brown/70 dark:text-gray-300 text-sm">
-                Se o animal está em risco de vida, ligue diretamente ou envie via WhatsApp para resposta imediata.
+                Selecione o nível de urgência corretamente — casos críticos são priorizados pela nossa equipe.
               </p>
             </div>
 
             <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg">
-              <div className="w-12 h-12 bg-maya-green/10 rounded-xl flex items-center justify-center mb-4">
-                <Phone className="w-6 h-6 text-maya-green" />
+              <div className="w-12 h-12 bg-maya-blue/10 rounded-xl flex items-center justify-center mb-4">
+                <Mail className="w-6 h-6 text-maya-blue" />
               </div>
               <h3 className="font-display text-lg text-maya-brown dark:text-white mb-2">
-                Ligue Direto
+                E-mail direto
               </h3>
-              <a href={`tel:+${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? ''}`} className="text-maya-green font-semibold hover:text-maya-green/80 transition-colors">
-                (19) 9 9422-4336
+              <a
+                href="mailto:resgate@projetomaya.org"
+                className="text-maya-blue font-semibold hover:text-maya-blue/80 transition-colors text-sm break-all"
+              >
+                resgate@projetomaya.org
               </a>
             </div>
 
             <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg">
-              <div className="w-12 h-12 bg-maya-blue/10 rounded-xl flex items-center justify-center mb-4">
-                <Camera className="w-6 h-6 text-maya-blue" />
+              <div className="w-12 h-12 bg-maya-green/10 rounded-xl flex items-center justify-center mb-4">
+                <Camera className="w-6 h-6 text-maya-green" />
               </div>
               <h3 className="font-display text-lg text-maya-brown dark:text-white mb-2">
                 Dica
               </h3>
               <p className="text-maya-brown/70 dark:text-gray-300 text-sm">
-                Se possível, tire fotos do animal e da localização. Você poderá anexá-las ao enviar pelo WhatsApp.
+                Se possível, tire fotos do animal e da localização e anexe-as ao e-mail após enviá-lo.
+              </p>
+            </div>
+
+            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg">
+              <div className="w-12 h-12 bg-maya-orange/10 rounded-xl flex items-center justify-center mb-4">
+                <MapPin className="w-6 h-6 text-maya-orange" />
+              </div>
+              <h3 className="font-display text-lg text-maya-brown dark:text-white mb-2">
+                Localização
+              </h3>
+              <p className="text-maya-brown/70 dark:text-gray-300 text-sm">
+                Quanto mais detalhada a localização (rua, número, ponto de referência), mais rápido chegamos.
               </p>
             </div>
           </div>
@@ -228,41 +221,27 @@ export default function ReportarResgatePage() {
                 </div>
 
                 {/* Urgency Warning */}
-                {(formData.urgency === 'alta' || formData.urgency === 'critica') && (
+                {isUrgent && (
                   <div className="bg-red-50 dark:bg-red-900/20 border-2 border-red-200 dark:border-red-800 rounded-xl p-4 flex items-start gap-3">
                     <AlertTriangle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
                     <p className="text-red-700 dark:text-red-300 text-sm">
-                      Para casos urgentes, recomendamos enviar por <strong>WhatsApp</strong> para uma resposta mais rápida.
+                      Caso urgente: após enviar o e-mail, acompanhe sua caixa de entrada para nossa resposta.
                     </p>
                   </div>
                 )}
 
-                {/* Submit Buttons */}
-                <div className="flex flex-col sm:flex-row gap-3 pt-4">
-                  <a
-                    href={isFormValid ? whatsappLink : '#'}
-                    target={isFormValid ? '_blank' : undefined}
-                    rel="noopener noreferrer"
-                    onClick={(e) => !isFormValid && e.preventDefault()}
-                    className={`flex-1 inline-flex items-center justify-center gap-2 px-6 py-4 rounded-xl font-bold transition-all ${
-                      isFormValid
-                        ? 'bg-green-500 text-white hover:bg-green-600 hover:-translate-y-0.5 shadow-lg'
-                        : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                    }`}
-                  >
-                    <MessageCircle size={20} />
-                    Enviar por WhatsApp
-                  </a>
+                {/* Submit Button */}
+                <div className="pt-4">
                   <a
                     href={isFormValid ? emailLink : '#'}
                     onClick={(e) => !isFormValid && e.preventDefault()}
-                    className={`flex-1 inline-flex items-center justify-center gap-2 px-6 py-4 rounded-xl font-bold transition-all ${
+                    className={`w-full inline-flex items-center justify-center gap-2 px-6 py-4 rounded-xl font-bold transition-all ${
                       isFormValid
                         ? 'bg-maya-blue text-white hover:bg-maya-blue/90 hover:-translate-y-0.5 shadow-lg'
                         : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                     }`}
                   >
-                    <Mail size={20} />
+                    <Send size={20} />
                     Enviar por E-mail
                   </a>
                 </div>
