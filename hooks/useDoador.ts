@@ -148,9 +148,17 @@ export function useDoador() {
     }
   }, [supabase, loadDoadorData])
 
-  const login = async (email: string, password: string): Promise<boolean> => {
+  const login = async (email: string, password: string): Promise<string | null> => {
     const { error } = await supabase.auth.signInWithPassword({ email, password })
-    return !error
+    if (!error) return null
+    const msg = error.message.toLowerCase()
+    if (msg.includes('email not confirmed')) {
+      return 'Confirme seu e-mail antes de entrar. Verifique sua caixa de entrada.'
+    }
+    if (msg.includes('invalid login credentials') || msg.includes('invalid email or password')) {
+      return 'Email ou senha inválidos.'
+    }
+    return 'Erro ao entrar. Tente novamente.'
   }
 
   /**
