@@ -6,6 +6,7 @@ import Footer from './Footer'
 import ScrollProgressBar from './ScrollProgressBar'
 import ScrollToTop from './ScrollToTop'
 import Breadcrumbs from './Breadcrumbs'
+import { DoadorProvider } from '@/contexts/DoadorContext'
 
 export default function ConditionalLayout({
   children,
@@ -22,7 +23,7 @@ export default function ConditionalLayout({
   }
 
   return (
-    <>
+    <DoadorProvider>
       <ScrollProgressBar />
       <Header />
       <Breadcrumbs />
@@ -31,6 +32,6 @@ export default function ConditionalLayout({
       </main>
       <Footer />
       <ScrollToTop />
-    </>
+    </DoadorProvider>
   )
 }
