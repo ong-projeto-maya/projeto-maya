@@ -171,23 +171,29 @@ export function useDoador() {
 
     const {
       data: { subscription: authSub },
-    } = supabase.auth.onAuthStateChange(async (event, session) => {
-      try {
-        if (session?.user) {
-          await loadDoadorData(
-            session.user.id,
-            session.user.email ?? undefined,
-            (session.user.user_metadata?.nome as string | undefined)
-          )
-        } else {
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      // IMPORTANT: this callback runs inside the auth lock held by getSession().
+      // Calling supabase.from(...) here (which internally calls getSession()) would
+      // deadlock because getSession() tries to re-acquire the same lock.
+      // setTimeout(0) defers to the next event loop tick, after the lock is released.
+      setTimeout(async () => {
+        try {
+          if (session?.user) {
+            await loadDoadorData(
+              session.user.id,
+              session.user.email ?? undefined,
+              (session.user.user_metadata?.nome as string | undefined)
+            )
+          } else {
+            setDoador(null)
+          }
+        } catch (err) {
+          console.error('[useDoador] onAuthStateChange error:', err)
           setDoador(null)
+        } finally {
+          if (mounted) setIsLoading(false)
         }
-      } catch (err) {
-        console.error('[useDoador] onAuthStateChange error:', err)
-        setDoador(null)
-      } finally {
-        if (mounted) setIsLoading(false)
-      }
+      }, 0)
     })
 
     return () => {
