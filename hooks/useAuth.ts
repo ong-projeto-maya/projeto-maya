@@ -19,11 +19,12 @@ export function useAuth() {
   const supabase = useMemo(() => createAdminClient(), [])
 
   const resolveAdminUser = useCallback(async (userId: string): Promise<User | null> => {
-    const { data } = await supabase
+    const { data: rows } = await supabase
       .from('admin_users')
       .select('id, username, role')
       .eq('id', userId)
-      .single()
+      .limit(1)
+    const data = rows?.[0] ?? null
     if (!data || data.role !== 'admin') return null
     return { username: data.username, role: 'admin' }
   }, [supabase])
