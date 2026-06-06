@@ -47,20 +47,20 @@ export function useDoador() {
   const supabase = useMemo(() => createClient(), [])
 
   const loadDoadorData = useCallback(
-    async (userId: string, accessToken?: string) => {
+    async (userId: string, userEmail?: string, userName?: string) => {
       let { data: profile } = await supabase
         .from('doadores')
         .select('*')
         .eq('id', userId)
         .maybeSingle()
 
-      // Profile missing — auto-create via server route (uses service role)
-      if (!profile && accessToken) {
+      // Profile missing — create directly (RLS policy allows authenticated users to insert own row)
+      if (!profile && userEmail) {
         try {
-          await fetch('/api/donors/ensure-profile', {
-            method: 'POST',
-            headers: { Authorization: `Bearer ${accessToken}` },
-          })
+          const nome = userName || userEmail.split('@')[0]
+          await supabase
+            .from('doadores')
+            .insert({ id: userId, email: userEmail, nome })
           // Re-fetch after creation
           const { data: created } = await supabase
             .from('doadores')
@@ -69,7 +69,7 @@ export function useDoador() {
             .maybeSingle()
           profile = created
         } catch {
-          // silently ignore — user will see empty state
+          // silently ignore — server-side trigger may create it
         }
       }
 
@@ -142,8 +142,11 @@ export function useDoador() {
         data: { user },
       } = await supabase.auth.getUser()
       if (user && mounted) {
-        const { data: { session } } = await supabase.auth.getSession()
-        await loadDoadorData(user.id, session?.access_token ?? undefined)
+        await loadDoadorData(
+          user.id,
+          user.email ?? undefined,
+          (user.user_metadata?.nome as string | undefined)
+        )
       }
       if (mounted) setIsLoading(false)
     }
@@ -154,7 +157,11 @@ export function useDoador() {
       data: { subscription: authSub },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (session?.user) {
-        await loadDoadorData(session.user.id, session.access_token)
+        await loadDoadorData(
+          session.user.id,
+          session.user.email ?? undefined,
+          (session.user.user_metadata?.nome as string | undefined)
+        )
       } else {
         setDoador(null)
       }
