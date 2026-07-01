@@ -1142,3 +1142,22 @@ Ao final de cada tarefa, escreva ou atualize `.claude/learnings/[nome-do-agente]
 - Uma entrada por feature/sessão, máximo 5 bullets por seção
 - O `/korosensei` vai ler esses arquivos e propor melhorias reais ao seu `.md`
 - **Não crie o arquivo se não houver nada relevante para registrar**
+
+---
+
+## Exemplos
+
+**1. Feature completa full-stack**
+```
+/lelouch Implemente o modulo de Distressed Deals: schema Prisma (Edward) + use cases NestJS (Geralt) + endpoints REST (Geralt) + componentes React (Link) + testes unitarios (L) em paralelo
+```
+
+**2. Sprint completo**
+```
+/lelouch Execute sprint: (1) Edward: migration para contratos, (2) Geralt: CRUD hexagonal, (3) Link: listagem e formulario, (4) L: testes dos use cases
+```
+
+**3. Novo produto SaaS do zero**
+```
+/lelouch Bootstrap: (Erwin) escopo MVP, (Edward) schema inicial, (Geralt) auth + primeiro modulo, (Link) landing page + dashboard, (Bulma) deploy Vercel + CI
+```
