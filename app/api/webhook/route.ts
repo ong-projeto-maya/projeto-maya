@@ -3,7 +3,7 @@ import { headers } from 'next/headers'
 import {
   validateWebhookSignature,
   mapChargeStatus,
-  findOrderByReference,
+  retrieveOrder,
   type PagBankWebhookPayload,
 } from '@/lib/pagbank'
 import { createRouteLogger } from '@/lib/logger'
@@ -48,18 +48,31 @@ export async function POST(request: Request) {
 
     if (eventType === 'CHARGE' || eventType === 'ORDER') {
       const referenceId = payload.data?.reference_id
+      const pagbankOrderId = payload.data?.id
 
-      if (!referenceId) {
-        log.warn({ payload }, 'webhook missing reference_id, skipping')
+      if (!referenceId && !pagbankOrderId) {
+        log.warn({ payload }, 'webhook missing reference_id and order id, skipping')
         return NextResponse.json({ received: true })
       }
 
-      // Fetch full order details from PagBank to get metadata and amounts
-      const order = await findOrderByReference(referenceId)
+      // Use the PagBank order ID from the payload directly (GET /orders/{id})
+      // Avoids the unsupported GET /orders?reference_id=... query in sandbox.
+      let order = null
+      if (pagbankOrderId) {
+        try {
+          order = await retrieveOrder(pagbankOrderId)
+        } catch (err) {
+          log.warn({ pagbankOrderId, err }, 'could not retrieve order by id')
+        }
+      }
+
       if (!order) {
-        log.warn({ referenceId }, 'order not found for reference, skipping')
+        log.warn({ referenceId, pagbankOrderId }, 'order not found, skipping')
         return NextResponse.json({ received: true })
       }
+
+      // Use reference_id from payload or from the fetched order
+      const resolvedReferenceId = referenceId ?? order.reference_id
 
       const firstCharge = order.charges?.[0]
       if (!firstCharge) {
@@ -72,7 +85,7 @@ export async function POST(request: Request) {
 
       if (donationStatus === 'completed') {
         await saveDonation({
-          paymentId: referenceId,
+          paymentId: resolvedReferenceId,
           userId: metadata.userId || undefined,
           email: metadata.userEmail || order.customer?.email || '',
           amount: (firstCharge.amount.value ?? 0) / 100,
@@ -82,10 +95,10 @@ export async function POST(request: Request) {
           campaignName: metadata.campaignName,
           createdAt: new Date().toISOString(),
         })
-        log.info({ referenceId }, 'donation saved')
+        log.info({ resolvedReferenceId }, 'donation saved')
       } else if (donationStatus === 'failed' || donationStatus === 'cancelled') {
-        await updateDonationStatus(referenceId, donationStatus)
-        log.warn({ referenceId, donationStatus }, 'donation failed or cancelled')
+        await updateDonationStatus(resolvedReferenceId, donationStatus)
+        log.warn({ resolvedReferenceId, donationStatus }, 'donation failed or cancelled')
       }
     }
 

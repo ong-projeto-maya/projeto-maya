@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { findOrderByReference, mapChargeStatus } from '@/lib/pagbank'
+import { getDonationByReference } from '@/lib/donationStorage'
 import { createRouteLogger } from '@/lib/logger'
 
 const log = createRouteLogger('confirm-session')
@@ -13,27 +13,24 @@ export async function GET(request: Request) {
   }
 
   try {
-    const order = await findOrderByReference(ref)
+    // Query our own database (populated by create-checkout-session and updated by webhook)
+    const donation = await getDonationByReference(ref)
 
-    if (!order) {
+    if (!donation) {
       return NextResponse.json({ error: 'Pedido não encontrado' }, { status: 404 })
     }
 
-    const firstCharge = order.charges?.[0]
-    const chargeStatus = firstCharge ? mapChargeStatus(firstCharge) : 'pending'
-    const metadata = order.metadata ?? {}
-
     return NextResponse.json({
       id: ref,
-      status: chargeStatus,
-      amount: firstCharge ? firstCharge.amount.value / 100 : 0,
+      status: donation.status,
+      amount: donation.amount,
       currency: 'BRL',
-      customerEmail: order.customer?.email ?? null,
-      donationType: (metadata.donationType as 'single' | 'monthly') ?? 'single',
-      campaignId: metadata.campaignId ?? null,
-      campaignName: metadata.campaignName ?? null,
-      subscriptionId: null,
-      nextBillingDate: null,
+      customerEmail: donation.email !== 'anonymous@projetomaya.org' ? donation.email : null,
+      donationType: donation.type,
+      campaignId: donation.campaignId ?? null,
+      campaignName: donation.campaignName ?? null,
+      subscriptionId: donation.subscriptionId ?? null,
+      nextBillingDate: donation.nextBillingDate ?? null,
     })
   } catch (error) {
     log.error({ error }, 'confirm-session failed')

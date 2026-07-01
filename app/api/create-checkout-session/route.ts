@@ -6,6 +6,7 @@ import {
   generateReferenceId,
   getCheckoutUrl,
 } from '@/lib/pagbank'
+import { saveDonation } from '@/lib/donationStorage'
 import { createRouteLogger } from '@/lib/logger'
 
 const log = createRouteLogger('create-checkout-session')
@@ -113,6 +114,26 @@ export async function POST(request: Request) {
     })
 
     const checkoutUrl = getCheckoutUrl(checkout)
+
+    // Save a pending donation record immediately so we can track it
+    // even if the webhook is delayed or fails. The webhook will update
+    // the status to 'completed' when payment is confirmed.
+    try {
+      await saveDonation({
+        paymentId: referenceId,
+        userId: userId || undefined,
+        email: userEmail || 'anonymous@projetomaya.org',
+        amount,
+        type: donationType as 'single' | 'monthly',
+        status: 'pending',
+        campaignId: safeCampaignId,
+        campaignName: safeCampaignName,
+        createdAt: new Date().toISOString(),
+      })
+    } catch (saveErr) {
+      // Non-fatal: log but don't block the checkout
+      log.warn({ saveErr, referenceId }, 'could not pre-save pending donation')
+    }
 
     log.info({ referenceId, donationType, amount }, 'PagBank checkout created')
     return NextResponse.json({ checkoutUrl })

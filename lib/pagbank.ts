@@ -62,7 +62,7 @@ export interface PagBankOrder {
   created_at: string
   customer?: { name: string; email: string; tax_id?: string }
   charges: PagBankCharge[]
-  metadata?: Record<string, string>
+  metadata?: Record<string, string | undefined>
 }
 
 export interface PagBankWebhookPayload {
