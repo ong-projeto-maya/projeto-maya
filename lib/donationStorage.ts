@@ -61,7 +61,7 @@ export async function saveDonation(
         created_at: donation.createdAt,
         proximo_pagamento: donation.nextBillingDate ?? null,
       },
-      { onConflict: 'pagbank_order_id', ignoreDuplicates: true }
+      { onConflict: 'pagbank_order_id', ignoreDuplicates: false }
     )
     .select()
     .limit(1)
@@ -102,6 +102,21 @@ export async function updateDonationStatus(
     .update({ status })
     .eq('pagbank_order_id', paymentId)
   if (error) console.error('updateDonationStatus error:', error)
+}
+
+export async function getDonationByReference(referenceId: string): Promise<StoredDonation | null> {
+  const supabase = createServiceClient()
+  const { data, error } = await supabase
+    .from('doacoes')
+    .select('*')
+    .eq('pagbank_order_id', referenceId)
+    .limit(1)
+  if (error) {
+    console.error('getDonationByReference error:', error)
+    return null
+  }
+  const row = data?.[0]
+  return row ? mapRow(row as Record<string, unknown>) : null
 }
 
 export async function getDonationsByEmail(email: string): Promise<StoredDonation[]> {
