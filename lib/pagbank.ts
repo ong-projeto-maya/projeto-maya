@@ -167,12 +167,14 @@ export function validateWebhookSignature(body: string, signature: string | null)
     return process.env.NODE_ENV !== 'production'
   }
 
-  const expected = createHmac('sha256', webhookToken).update(body).digest('hex')
-
+  // PagBank sends the webhook token directly in the x-pagbank-signature header (not HMAC).
+  // Compare using timingSafeEqual to prevent timing attacks.
   try {
-    return timingSafeEqual(Buffer.from(signature), Buffer.from(expected))
+    const sigBuf = Buffer.from(signature)
+    const tokBuf = Buffer.from(webhookToken)
+    if (sigBuf.length !== tokBuf.length) return false
+    return timingSafeEqual(sigBuf, tokBuf)
   } catch {
-    // Buffer lengths differ — signatures cannot match
     return false
   }
 }

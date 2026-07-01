@@ -23,8 +23,12 @@ export async function POST(request: Request) {
     const headerList = headers()
     const signature = headerList.get('x-pagbank-signature')
 
+    // Temporary: log signature header so we can configure PAGBANK_WEBHOOK_TOKEN correctly
+    // Remove this log once the token is confirmed and set in environment variables
+    log.info({ signatureReceived: signature ?? '(none)', bodyLength: body.length }, 'webhook raw headers')
+
     if (!validateWebhookSignature(body, signature)) {
-      log.error('webhook signature verification failed')
+      log.error({ signatureReceived: signature ?? '(none)' }, 'webhook signature verification failed')
       return NextResponse.json({ error: 'Webhook signature invalid' }, { status: 400 })
     }
 
