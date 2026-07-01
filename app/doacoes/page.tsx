@@ -6,7 +6,7 @@ import { Heart, DollarSign, CreditCard, Check, Lock } from 'lucide-react'
 
 type DonationType = 'single' | 'monthly'
 
-const presetAmounts = [10, 25, 50, 100, 250]
+const presetAmounts = [5, 10, 25, 50, 100, 250]
 
 export default function DoacoesPage() {
   const [donationType, setDonationType] = useState<DonationType>('single')

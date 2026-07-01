@@ -22,6 +22,16 @@ export interface PagBankCheckoutItem {
   unit_amount: number // in centavos (e.g. R$50,00 = 5000)
 }
 
+export interface PagBankRecurrencePlan {
+  name: string
+  interval: {
+    unit: 'DAY' | 'MONTH' | 'YEAR'
+    length: number
+  }
+  /** Number of billing cycles. Omit for indefinite (no expiration). */
+  billing_cycles?: number
+}
+
 export interface PagBankCheckoutRequest {
   reference_id: string
   expiration_date: string
@@ -30,6 +40,8 @@ export interface PagBankCheckoutRequest {
   redirect_url: string
   notification_urls: string[]
   metadata?: Record<string, string>
+  /** Include to create a Checkout Recorrente (recurring subscription). Credit card only. */
+  recurrence_plan?: PagBankRecurrencePlan
 }
 
 export interface PagBankCheckoutResponse {
