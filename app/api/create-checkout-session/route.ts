@@ -81,6 +81,8 @@ export async function POST(request: Request) {
 
     const cancelPath = safeCampaignId ? `/campanhas/${safeCampaignId}` : '/doacoes'
 
+    const isMonthly = donationType === 'monthly'
+
     const checkout = await createCheckout({
       reference_id: referenceId,
       expiration_date: expirationDate,
@@ -92,14 +94,16 @@ export async function POST(request: Request) {
           unit_amount: Math.round(amount * 100), // centavos
         },
       ],
-      // Accept all available payment methods (PIX, credit card, boleto, debit)
-      payment_methods: [
-        { type: 'CREDIT_CARD' },
-        { type: 'DEBIT_CARD' },
-        { type: 'PIX' },
-        { type: 'BOLETO' },
-      ],
-      // Embed the referenceId in the return URL so the success page can confirm
+      // Recurring checkout only supports credit card.
+      // Single donations accept all payment methods.
+      payment_methods: isMonthly
+        ? [{ type: 'CREDIT_CARD' }]
+        : [
+            { type: 'CREDIT_CARD' },
+            { type: 'DEBIT_CARD' },
+            { type: 'PIX' },
+            { type: 'BOLETO' },
+          ],
       redirect_url: `${siteUrl}/doacoes/sucesso?ref=${encodeURIComponent(referenceId)}${safeCampaignId ? `&campaign=${safeCampaignId}` : ''}`,
       notification_urls: [`${siteUrl}/api/webhook`],
       metadata: {
@@ -111,6 +115,17 @@ export async function POST(request: Request) {
         ...(safeCampaignName && { campaignName: safeCampaignName }),
         cancelUrl: `${siteUrl}${cancelPath}`,
       },
+      // Checkout Recorrente: PagBank creates the subscription automatically
+      // after the first payment. Requires a PJ (CNPJ) account on production.
+      // Note: billing_cycles is omitted so the subscription never expires.
+      ...(isMonthly && {
+        recurrence_plan: {
+          name: safeCampaignName
+            ? `Doação Mensal - ${safeCampaignName}`
+            : 'Doação Mensal - Projeto Maya',
+          interval: { unit: 'MONTH', length: 1 },
+        },
+      }),
     })
 
     const checkoutUrl = getCheckoutUrl(checkout)
