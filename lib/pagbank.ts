@@ -100,7 +100,7 @@ async function pagbankRequest<T>(
   const token = getToken()
   const url = `${BASE_URL}${path}`
 
-  // Temporary: log which API is being called to confirm sandbox vs production
+  // Temporary: log full request/response for PagBank homologation evidence
   console.log(`[PagBank] ${method} ${url} (env=${process.env.PAGBANK_ENVIRONMENT ?? 'not set'})`)
 
   const response = await fetch(url, {
@@ -112,12 +112,16 @@ async function pagbankRequest<T>(
     body: body !== undefined ? JSON.stringify(body) : undefined,
   })
 
+  const responseText = await response.text()
+
+  // Log for homologation evidence — remove after approval
+  console.log(`[PagBank] Response ${response.status}: ${responseText.slice(0, 2000)}`)
+
   if (!response.ok) {
-    const text = await response.text()
-    throw new Error(`PagBank API error ${response.status}: ${text}`)
+    throw new Error(`PagBank API error ${response.status}: ${responseText}`)
   }
 
-  return response.json() as Promise<T>
+  return JSON.parse(responseText) as T
 }
 
 // ─── Public API ──────────────────────────────────────────────────────────────
