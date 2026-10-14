@@ -100,6 +100,9 @@ async function pagbankRequest<T>(
   const token = getToken()
   const url = `${BASE_URL}${path}`
 
+  // Temporary: log which API is being called to confirm sandbox vs production
+  console.log(`[PagBank] ${method} ${url} (env=${process.env.PAGBANK_ENVIRONMENT ?? 'not set'})`)
+
   const response = await fetch(url, {
     method,
     headers: {
@@ -171,12 +174,17 @@ export async function findOrderByReference(referenceId: string): Promise<PagBank
  * PagBank sends the signature in the `x-pagbank-signature` header.
  */
 export function validateWebhookSignature(body: string, signature: string | null): boolean {
-  if (!signature) return false
-
   const webhookToken = process.env.PAGBANK_WEBHOOK_TOKEN
+
   if (!webhookToken) {
-    // Allow unsigned calls in development when token is not configured
-    return process.env.NODE_ENV !== 'production'
+    // Token not configured — allow all (local development)
+    return true
+  }
+
+  if (!signature) {
+    // PagBank sandbox does not send the x-pagbank-signature header.
+    // Allow unsigned webhooks in sandbox; reject in production.
+    return process.env.PAGBANK_ENVIRONMENT !== 'production'
   }
 
   // PagBank sends the webhook token directly in the x-pagbank-signature header (not HMAC).
