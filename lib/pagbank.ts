@@ -101,7 +101,10 @@ async function pagbankRequest<T>(
   const url = `${BASE_URL}${path}`
 
   // Temporary: log full request/response for PagBank homologation evidence
-  console.log(`[PagBank] ${method} ${url} (env=${process.env.PAGBANK_ENVIRONMENT ?? 'not set'})`)
+  console.log(`[PagBank] REQUEST ${method} ${url}`)
+  if (body !== undefined) {
+    console.log(`[PagBank] REQUEST BODY: ${JSON.stringify(body)}`)
+  }
 
   const response = await fetch(url, {
     method,
