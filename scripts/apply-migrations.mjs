@@ -9,9 +9,13 @@
  *   node scripts/apply-migrations.mjs
  *   node scripts/apply-migrations.mjs --seed
  *
- * Required environment variables:
- *   SUPABASE_URL              (or falls back to the hard-coded project URL)
+ * Required environment variables (both, no defaults):
+ *   SUPABASE_URL
  *   SUPABASE_SERVICE_ROLE_KEY
+ *
+ * SUPABASE_URL used to default to the production project, so running
+ * `npm run db:migrate:seed` with no env set would seed production with example
+ * data. There is no default any more: say which database you mean.
  */
 
 import { readFileSync, readdirSync } from 'node:fs'
@@ -21,8 +25,15 @@ import { fileURLToPath } from 'node:url'
 const __dirname = fileURLToPath(new URL('.', import.meta.url))
 const ROOT = resolve(__dirname, '..')
 
-const SUPABASE_URL = process.env.SUPABASE_URL ?? 'https://lnyzamgkxeyxgyoqpjmj.supabase.co'
+const SUPABASE_URL = process.env.SUPABASE_URL
 const SERVICE_KEY  = process.env.SUPABASE_SERVICE_ROLE_KEY
+
+if (!SUPABASE_URL) {
+  console.error('ERROR: SUPABASE_URL env var is required — name the database explicitly.')
+  console.error('       Local:      SUPABASE_URL=http://127.0.0.1:54321')
+  console.error('       Production: the project URL, and only on purpose.')
+  process.exit(1)
+}
 
 if (!SERVICE_KEY) {
   console.error('ERROR: SUPABASE_SERVICE_ROLE_KEY env var is required.')

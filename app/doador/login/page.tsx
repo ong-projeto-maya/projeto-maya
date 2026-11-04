@@ -1,13 +1,14 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Image from 'next/image'
 import { LogIn, Mail, Lock, Eye, EyeOff, Heart } from 'lucide-react'
 import { useDoador } from '@/hooks/useDoador'
+import { safeRedirectPath } from '@/lib/safeRedirect'
 
-export default function DoadorLoginPage() {
+function DoadorLoginForm() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
@@ -15,12 +16,22 @@ export default function DoadorLoginPage() {
   const [isLoading, setIsLoading] = useState(false)
   const { doador, isLoading: authLoading, login } = useDoador()
   const router = useRouter()
+  const searchParams = useSearchParams()
+
+  // The middleware records the page that sent the visitor here, so sign-in can
+  // return them to it instead of always dropping them on the dashboard. The
+  // value comes from the URL, so safeRedirectPath keeps it inside /doador.
+  const destination = safeRedirectPath(
+    searchParams.get('redirectTo'),
+    '/doador/',
+    '/doador/dashboard'
+  )
 
   useEffect(() => {
     if (!authLoading && doador) {
-      router.push('/doador/dashboard')
+      router.push(destination)
     }
-  }, [doador, authLoading, router])
+  }, [doador, authLoading, router, destination])
 
   // Enquanto verifica sessão existente, não mostra o formulário
   if (authLoading) {
@@ -56,7 +67,7 @@ export default function DoadorLoginPage() {
       if (errorMsg) {
         setError(errorMsg)
       } else {
-        router.push('/doador/dashboard')
+        router.push(destination)
       }
     } catch (e) {
       console.error('[login] exception:', e)
@@ -198,5 +209,18 @@ export default function DoadorLoginPage() {
 
       </div>
     </div>
+  )
+}
+
+/**
+ * useSearchParams suspends, and this page is statically prerendered, so the
+ * part that reads the URL has to sit inside a Suspense boundary — without it
+ * `next build` fails to export the page.
+ */
+export default function DoadorLoginPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-maya-beige dark:bg-gray-900" />}>
+      <DoadorLoginForm />
+    </Suspense>
   )
 }

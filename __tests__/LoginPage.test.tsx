@@ -10,8 +10,12 @@ import DoadorLoginPage from '../app/doador/login/page'
 
 // ---- Next.js mocks ----
 const mockPush = vi.fn()
+// The page reads ?redirectTo to return the donor to the page that sent them
+// here, so useSearchParams has to be mocked too. Empty params = the fallback.
+let mockSearchParams = new URLSearchParams()
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: mockPush }),
+  useSearchParams: () => mockSearchParams,
 }))
 vi.mock('next/link', () => ({
   default: ({ children, href }: { children: React.ReactNode; href: string }) => (
@@ -38,6 +42,7 @@ describe('DoadorLoginPage', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     mockDoador = null
+    mockSearchParams = new URLSearchParams()
   })
 
   it('renders email and password fields', () => {
@@ -103,6 +108,38 @@ describe('DoadorLoginPage', () => {
 
     expect(screen.getByText(/email ou senha inválidos/i)).toBeDefined()
     expect(mockPush).not.toHaveBeenCalled()
+  })
+
+  it('returns the donor to the page that sent them here', async () => {
+    mockSearchParams = new URLSearchParams('redirectTo=/doador/perfil')
+    mockLogin.mockResolvedValue(null)
+    render(<DoadorLoginPage />)
+
+    fireEvent.change(screen.getByRole('textbox', { name: /email/i }), {
+      target: { value: 'donor@test.com' },
+    })
+    fireEvent.change(document.querySelector('input[type="password"]')!, {
+      target: { value: 'pass123' },
+    })
+    await act(async () => { fireEvent.click(screen.getByRole('button', { name: /entrar/i })) })
+
+    expect(mockPush).toHaveBeenCalledWith('/doador/perfil')
+  })
+
+  it('ignores a redirectTo pointing at another site', async () => {
+    mockSearchParams = new URLSearchParams('redirectTo=https://evil.example.com')
+    mockLogin.mockResolvedValue(null)
+    render(<DoadorLoginPage />)
+
+    fireEvent.change(screen.getByRole('textbox', { name: /email/i }), {
+      target: { value: 'donor@test.com' },
+    })
+    fireEvent.change(document.querySelector('input[type="password"]')!, {
+      target: { value: 'pass123' },
+    })
+    await act(async () => { fireEvent.click(screen.getByRole('button', { name: /entrar/i })) })
+
+    expect(mockPush).toHaveBeenCalledWith('/doador/dashboard')
   })
 
   it('redirects to dashboard when doador is already logged in', async () => {

@@ -1,6 +1,20 @@
 -- =====================================================================
 -- Projeto Maya — Supabase Schema
--- Run this script in the Supabase SQL Editor (dashboard.supabase.com)
+--
+-- ⚠️  DESATUALIZADO. NÃO É A FONTE DA VERDADE.
+--
+-- Este arquivo é uma cópia antiga da primeira migration e ficou para trás:
+-- não tem as tabelas de conteúdo (animais, campanhas, eventos, mensagens...),
+-- não tem a coluna doador_id, ainda usa os nomes do Stripe e carrega políticas
+-- de RLS que já foram corrigidas.
+--
+-- O estado real do banco é a soma de supabase/migrations/, em ordem de nome
+-- de arquivo. Para montar um banco do zero:
+--
+--     SUPABASE_URL=... SUPABASE_SERVICE_ROLE_KEY=... npm run db:migrate
+--
+-- Mantido só como referência histórica. Rodar isto no editor SQL instala um
+-- esquema errado.
 -- =====================================================================
 
 -- Enable UUID generation

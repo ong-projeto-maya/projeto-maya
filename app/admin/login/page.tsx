@@ -1,11 +1,12 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, useEffect, Suspense } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { Lock, User, Eye, EyeOff, AlertCircle, PawPrint } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
+import { safeRedirectPath } from '@/lib/safeRedirect'
 
-export default function AdminLoginPage() {
+function AdminLoginForm() {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
@@ -13,14 +14,19 @@ export default function AdminLoginPage() {
   const [isLoading, setIsLoading] = useState(false)
   
   const router = useRouter()
+  const searchParams = useSearchParams()
   const { login, isAuthenticated, loading } = useAuth()
+
+  // Same as the donor login: the middleware saved where the admin was going.
+  // safeRedirectPath keeps the target inside /admin.
+  const destination = safeRedirectPath(searchParams.get('redirectTo'), '/admin', '/admin')
 
   useEffect(() => {
     // Se já está autenticado, redirecionar para dashboard
     if (!loading && isAuthenticated) {
-      router.push('/admin')
+      router.push(destination)
     }
-  }, [isAuthenticated, loading, router])
+  }, [isAuthenticated, loading, router, destination])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -30,7 +36,7 @@ export default function AdminLoginPage() {
     const success = await login(username, password)
 
     if (success) {
-      router.push('/admin')
+      router.push(destination)
     } else {
       setError('Usuário ou senha incorretos')
       setIsLoading(false)
@@ -170,5 +176,17 @@ export default function AdminLoginPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+/**
+ * Same reason as the donor login: useSearchParams suspends, and this page is
+ * statically prerendered, so the form goes inside a Suspense boundary.
+ */
+export default function AdminLoginPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-maya-beige dark:bg-gray-900" />}>
+      <AdminLoginForm />
+    </Suspense>
   )
 }
