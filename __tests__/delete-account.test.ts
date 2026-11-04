@@ -34,14 +34,26 @@ function makeRequest(token?: string) {
 
 /** Records every table the route deleted from, so the cascade can be asserted. */
 let deletedFrom: string[] = []
+/** Records the (table, column) pairs the route looked the donor's rows up by. */
+let lookedUpBy: string[] = []
 
+/**
+ * The route makes three shapes of call, and the mock has to answer all three:
+ *
+ *   select('id').eq('doador_id' | 'doador_email', …)      → which rows are mine
+ *   select(…).in('id', …).in('status', …)                 → which are still live
+ *   update(…).in('id', …).in('status', …) / delete().in() → act on those rows
+ */
 function buildSupabase({
   user = { id: 'user-1', email: 'test@example.com' } as { id: string; email: string } | null,
   userError = null as unknown,
   activeSubs = [] as { pagbank_subscription_id: string }[],
   deleteError = null as unknown,
+  ownRows = [{ id: 'row-1' }] as { id: string }[],
+  lookupError = null as unknown,
 } = {}) {
   deletedFrom = []
+  lookedUpBy = []
 
   return {
     auth: {
@@ -51,21 +63,31 @@ function buildSupabase({
       },
     },
     from: vi.fn().mockImplementation((table: string) => ({
-      // .select().eq().in() — the lookup of subscriptions still running
-      select: vi.fn().mockReturnValue({
-        eq: vi.fn().mockReturnValue({
+      select: vi.fn().mockImplementation(() => ({
+        // ownership lookup: resolves straight after .eq()
+        eq: vi.fn().mockImplementation((column: string) => {
+          lookedUpBy.push(`${table}.${column}`)
+          return Promise.resolve({
+            data: lookupError ? null : ownRows,
+            error: lookupError,
+          })
+        }),
+        // live-subscription lookup: .in('id').in('status')
+        in: vi.fn().mockReturnValue({
           in: vi.fn().mockResolvedValue({ data: activeSubs, error: null }),
         }),
-      }),
-      // .update().eq().in() — mirroring the cancellation locally
+      })),
       update: vi.fn().mockReturnValue({
-        eq: vi.fn().mockReturnValue({
+        in: vi.fn().mockReturnValue({
           in: vi.fn().mockResolvedValue({ data: [], error: null }),
         }),
       }),
       delete: vi.fn().mockImplementation(() => {
         deletedFrom.push(table)
-        return { eq: vi.fn().mockResolvedValue({ data: [], error: null }) }
+        return {
+          eq: vi.fn().mockResolvedValue({ data: [], error: null }),
+          in: vi.fn().mockResolvedValue({ data: [], error: null }),
+        }
       }),
     })),
   }
@@ -130,6 +152,29 @@ describe('DELETE /api/delete-account', () => {
     const res = await callDeleteAccount('valid-token')
     expect(res.status).toBe(200)
     expect(mockCancelPagBank).not.toHaveBeenCalled()
+  })
+
+  it('looks the donor up by account id as well as e-mail', async () => {
+    // E-mail alone missed rows saved as anonymous@projetomaya.org, or under an
+    // e-mail the donor has since changed — those kept being charged.
+    mockCancelPagBank.mockResolvedValue({})
+    mockSupabase = buildSupabase({ activeSubs: [{ pagbank_subscription_id: 'sub_1' }] })
+    await callDeleteAccount('valid-token')
+    expect(lookedUpBy).toEqual(
+      expect.arrayContaining([
+        'assinaturas.doador_id',
+        'assinaturas.doador_email',
+        'doacoes.doador_id',
+        'doacoes.doador_email',
+      ])
+    )
+  })
+
+  it('still erases the account when the ownership lookup fails', async () => {
+    mockSupabase = buildSupabase({ lookupError: { message: 'connection reset' } })
+    const res = await callDeleteAccount('valid-token')
+    expect(res.status).toBe(200)
+    expect(deletedFrom).toContain('doadores')
   })
 
   it('skips rows with no PagBank subscription id', async () => {
