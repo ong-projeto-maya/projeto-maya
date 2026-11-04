@@ -11,8 +11,9 @@ import {
   saveDonation,
   updateDonationStatus,
   updateDonationStatusBySubscription,
-  cancelSubscriptionByStripeId,
+  cancelSubscriptionById,
   syncSubscriptionStatus,
+  getSubscriptionDonor,
 } from '@/lib/donationStorage'
 
 const log = createRouteLogger('webhook')
@@ -23,12 +24,9 @@ export async function POST(request: Request) {
     const headerList = headers()
     const signature = headerList.get('x-pagbank-signature')
 
-    // Temporary: log signature header so we can configure PAGBANK_WEBHOOK_TOKEN correctly
-    // Remove this log once the token is confirmed and set in environment variables
-    log.info({ signatureReceived: signature ?? '(none)', bodyLength: body.length }, 'webhook raw headers')
-
     if (!validateWebhookSignature(body, signature)) {
-      log.error({ signatureReceived: signature ?? '(none)' }, 'webhook signature verification failed')
+      // Never log the signature itself — it is the shared secret.
+      log.error({ hasSignature: signature !== null }, 'webhook signature verification failed')
       return NextResponse.json({ error: 'Webhook signature invalid' }, { status: 400 })
     }
 
@@ -113,18 +111,17 @@ export async function POST(request: Request) {
       }
 
       if (status === 'SUSPENDED' || status === 'CANCELED') {
-        await cancelSubscriptionByStripeId(subscriptionId)
+        await cancelSubscriptionById(subscriptionId)
         log.info({ subscriptionId, status }, 'subscription cancelled')
       } else {
         const dbStatus =
           status === 'ACTIVE' ? 'active' :
           status === 'SUSPENDED' ? 'paused' :
           'cancelled'
-        await syncSubscriptionStatus({
-          id: subscriptionId,
-          status: dbStatus,
-          current_period_end: 0,
-        })
+        // current_period_end is omitted on purpose: the SUBSCRIPTION webhook
+        // does not carry the next billing date, and writing a placeholder
+        // would overwrite the real one.
+        await syncSubscriptionStatus({ id: subscriptionId, status: dbStatus })
         log.info({ subscriptionId, status }, 'subscription status synced')
       }
     }
@@ -139,16 +136,25 @@ export async function POST(request: Request) {
       const subscriptionId = payload.data?.id
 
       if (charge.status === 'PAID' && subscriptionId) {
+        // Recurring charges carry no metadata, so the donor has to be looked up
+        // from the subscription. Without this the donation is saved with no
+        // doador_id and no email, and never shows up in the donor's history.
+        const donor = await getSubscriptionDonor(subscriptionId)
+        if (!donor) {
+          log.warn({ subscriptionId }, 'recurring charge: donor not resolved, saving unlinked')
+        }
+
         await saveDonation({
           paymentId: charge.id,
           subscriptionId,
-          email: '',
+          userId: donor?.doadorId,
+          email: donor?.email ?? '',
           amount: (charge.amount.value ?? 0) / 100,
           type: 'monthly',
           status: 'completed',
           createdAt: new Date().toISOString(),
         })
-        log.info({ chargeId: charge.id, subscriptionId }, 'recurring charge saved')
+        log.info({ chargeId: charge.id, subscriptionId, linked: Boolean(donor) }, 'recurring charge saved')
       } else if (charge.status === 'DECLINED' && subscriptionId) {
         await updateDonationStatusBySubscription(subscriptionId, 'failed')
         log.warn({ chargeId: charge.id }, 'recurring charge failed')

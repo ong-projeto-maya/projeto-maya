@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 
 // GET /api/health — lightweight liveness probe used by Vercel cron and uptime monitors.
-// Checks that the process can respond; does NOT check upstream dependencies (Supabase/Stripe)
+// Checks that the process can respond; does NOT check upstream dependencies (Supabase/PagBank)
 // to avoid false alarms on transient third-party outages.
 export async function GET() {
   return NextResponse.json(

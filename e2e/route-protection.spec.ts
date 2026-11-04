@@ -35,15 +35,18 @@ test.describe('Protected routes – redirect to login', () => {
 })
 
 test.describe('Login pages are publicly accessible', () => {
+  // The page's own heading is named, not just "some heading": the footer has
+  // headings of its own, so a bare getByRole('heading') matches several and
+  // fails on strict mode rather than proving the page rendered.
   test('/doador/login renders without redirect', async ({ page }) => {
     await page.goto('/doador/login')
     await expect(page).toHaveURL(/\/doador\/login/)
-    await expect(page.getByRole('heading')).toBeVisible()
+    await expect(page.getByRole('heading', { name: /área do doador/i })).toBeVisible()
   })
 
   test('/admin/login renders without redirect', async ({ page }) => {
     await page.goto('/admin/login')
     await expect(page).toHaveURL(/\/admin\/login/)
-    await expect(page.getByRole('heading')).toBeVisible()
+    await expect(page.getByRole('heading', { name: /acesso administrativo/i })).toBeVisible()
   })
 })

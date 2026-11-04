@@ -1,7 +1,9 @@
 /**
  * Browser-side Supabase client for admin authentication.
- * Uses a separate storageKey so the admin session is
- * completely isolated from the donor session.
+ *
+ * NOTE: the admin session is NOT isolated from the donor session, despite
+ * what this comment used to claim — see lib/supabase.ts for why and for what
+ * separating them would take.
  */
 import { createBrowserClient } from '@supabase/ssr'
 import type { Database } from './database.types'

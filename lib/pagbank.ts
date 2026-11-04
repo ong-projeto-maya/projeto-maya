@@ -100,12 +100,6 @@ async function pagbankRequest<T>(
   const token = getToken()
   const url = `${BASE_URL}${path}`
 
-  // Temporary: log full request/response for PagBank homologation evidence
-  console.log(`[PagBank] REQUEST ${method} ${url}`)
-  if (body !== undefined) {
-    console.log(`[PagBank] REQUEST BODY: ${JSON.stringify(body)}`)
-  }
-
   const response = await fetch(url, {
     method,
     headers: {
@@ -117,8 +111,10 @@ async function pagbankRequest<T>(
 
   const responseText = await response.text()
 
-  // Log for homologation evidence — remove after approval
-  console.log(`[PagBank] Response ${response.status}: ${responseText.slice(0, 2000)}`)
+  // Never log the request body or the response body: both carry donor data.
+  // A GET /orders response includes customer.name, customer.email and
+  // customer.tax_id (CPF). Method, path and status are enough to trace a call.
+  console.log(`[PagBank] ${method} ${path} -> ${response.status}`)
 
   if (!response.ok) {
     throw new Error(`PagBank API error ${response.status}: ${responseText}`)
@@ -181,17 +177,21 @@ export async function findOrderByReference(referenceId: string): Promise<PagBank
  * PagBank sends the signature in the `x-pagbank-signature` header.
  */
 export function validateWebhookSignature(body: string, signature: string | null): boolean {
+  const isProduction = process.env.PAGBANK_ENVIRONMENT === 'production'
   const webhookToken = process.env.PAGBANK_WEBHOOK_TOKEN
 
   if (!webhookToken) {
-    // Token not configured — allow all (local development)
-    return true
+    // In production an unconfigured token must never mean "accept everything":
+    // this endpoint is public, unauthenticated and writes with the service role
+    // key. Fail closed. Outside production, allow it so local dev and the
+    // sandbox keep working without a token.
+    return !isProduction
   }
 
   if (!signature) {
     // PagBank sandbox does not send the x-pagbank-signature header.
     // Allow unsigned webhooks in sandbox; reject in production.
-    return process.env.PAGBANK_ENVIRONMENT !== 'production'
+    return !isProduction
   }
 
   // PagBank sends the webhook token directly in the x-pagbank-signature header (not HMAC).

@@ -5,7 +5,17 @@
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { renderHook, act } from '@testing-library/react'
+import { createElement, type ReactNode } from 'react'
 import { useDoador } from '../hooks/useDoador'
+import { DoadorProvider } from '../contexts/DoadorContext'
+
+// useDoador is a proxy to useDoadorContext: all the state lives in a single
+// provider so that several components share one Supabase session. It therefore
+// throws unless it is rendered inside DoadorProvider, which is what this
+// wrapper supplies. This file is .ts, so the element is built by hand.
+function wrapper({ children }: { children: ReactNode }) {
+  return createElement(DoadorProvider, null, children)
+}
 
 // ---- mock browser Supabase client ----
 let mockClient: Record<string, unknown>
@@ -54,7 +64,7 @@ describe('useDoador', () => {
 
   it('initializes with isLoading=true, then false after no session', async () => {
     mockClient = makeClient()
-    const { result } = renderHook(() => useDoador())
+    const { result } = renderHook(() => useDoador(), { wrapper })
     expect(result.current.isLoading).toBe(true)
     await act(async () => {})
     expect(result.current.isLoading).toBe(false)
@@ -65,7 +75,7 @@ describe('useDoador', () => {
     it('returns true on successful sign-in', async () => {
       const client = makeClient({ authUser: { id: 'u1', email: 'donor@test.com' } })
       mockClient = client
-      const { result } = renderHook(() => useDoador())
+      const { result } = renderHook(() => useDoador(), { wrapper })
       await act(async () => {})
 
       let success: string | null | undefined
@@ -82,7 +92,7 @@ describe('useDoador', () => {
     it('returns false when signInWithPassword returns an error', async () => {
       const client = makeClient({ signInError: { message: 'Invalid login credentials' } })
       mockClient = client
-      const { result } = renderHook(() => useDoador())
+      const { result } = renderHook(() => useDoador(), { wrapper })
       await act(async () => {})
 
       let success: string | null | undefined
@@ -97,7 +107,7 @@ describe('useDoador', () => {
     it('returns null on successful registration', async () => {
       const client = makeClient({ authUser: { id: 'u2', email: 'new@test.com' } })
       mockClient = client
-      const { result } = renderHook(() => useDoador())
+      const { result } = renderHook(() => useDoador(), { wrapper })
       await act(async () => {})
 
       let err: string | null = 'sentinel'
@@ -117,7 +127,7 @@ describe('useDoador', () => {
         signUpError: { message: 'User already registered' },
       })
       mockClient = client
-      const { result } = renderHook(() => useDoador())
+      const { result } = renderHook(() => useDoador(), { wrapper })
       await act(async () => {})
 
       let err: string | null = null
@@ -132,7 +142,7 @@ describe('useDoador', () => {
         signUpError: { message: 'Network error' },
       })
       mockClient = client
-      const { result } = renderHook(() => useDoador())
+      const { result } = renderHook(() => useDoador(), { wrapper })
       await act(async () => {})
 
       let err: string | null = null
@@ -147,7 +157,7 @@ describe('useDoador', () => {
     it('calls signOut and clears doador state', async () => {
       const client = makeClient()
       mockClient = client
-      const { result } = renderHook(() => useDoador())
+      const { result } = renderHook(() => useDoador(), { wrapper })
       await act(async () => {})
 
       await act(async () => { await result.current.logout() })

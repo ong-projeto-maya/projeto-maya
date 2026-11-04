@@ -57,8 +57,10 @@ describe('DoadorLoginPage', () => {
     expect(mockLogin).not.toHaveBeenCalled()
   })
 
+  // useDoador's login() resolves to null on success, or to the message to show
+  // the donor. It is not a boolean: a truthy value means the login FAILED.
   it('calls login() with email and password on submit', async () => {
-    mockLogin.mockResolvedValue(true)
+    mockLogin.mockResolvedValue(null)
     render(<DoadorLoginPage />)
 
     fireEvent.change(screen.getByRole('textbox', { name: /email/i }), {
@@ -73,7 +75,7 @@ describe('DoadorLoginPage', () => {
   })
 
   it('redirects to dashboard on successful login', async () => {
-    mockLogin.mockResolvedValue(true)
+    mockLogin.mockResolvedValue(null)
     render(<DoadorLoginPage />)
 
     fireEvent.change(screen.getByRole('textbox', { name: /email/i }), {
@@ -87,8 +89,8 @@ describe('DoadorLoginPage', () => {
     expect(mockPush).toHaveBeenCalledWith('/doador/dashboard')
   })
 
-  it('shows error message on failed login', async () => {
-    mockLogin.mockResolvedValue(false)
+  it('shows the message login() returned on a failed attempt', async () => {
+    mockLogin.mockResolvedValue('Email ou senha inválidos')
     render(<DoadorLoginPage />)
 
     fireEvent.change(screen.getByRole('textbox', { name: /email/i }), {
