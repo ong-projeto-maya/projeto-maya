@@ -10,7 +10,10 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
-  workers: process.env.CI ? 1 : undefined,
+  // One worker everywhere. Locally the suite runs against `next dev`, which
+  // compiles each route on first request: parallel workers all wait on the
+  // same cold compile and time out, which looks like a broken test.
+  workers: 1,
   reporter: [['html', { open: 'never' }], ['list']],
 
   use: {

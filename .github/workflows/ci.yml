@@ -30,10 +30,10 @@ jobs:
       - name: Run tests
         run: npm test
         env:
-          # Stub env vars so lib/stripe.ts and lib/logger.ts don't throw at import time.
-          # Real secrets are never needed for unit tests — all Stripe/Supabase calls are mocked.
-          STRIPE_SECRET_KEY: sk_test_ci_placeholder
-          STRIPE_WEBHOOK_SECRET: whsec_ci_placeholder
+          # Stub env vars so lib/logger.ts does not throw at import time.
+          # Real secrets are never needed for unit tests — every PagBank and
+          # Supabase call is mocked. (The old STRIPE_* stubs are gone: the site
+          # moved to PagBank and lib/stripe.ts no longer exists.)
           NEXT_PUBLIC_SUPABASE_URL: https://placeholder.supabase.co
           NEXT_PUBLIC_SUPABASE_ANON_KEY: placeholder_anon_key
           # Sentry disabled in CI (no DSN = init is skipped)
@@ -43,17 +43,14 @@ jobs:
       - name: Build
         run: npm run build
         env:
-          STRIPE_SECRET_KEY: sk_test_ci_placeholder
-          STRIPE_WEBHOOK_SECRET: whsec_ci_placeholder
           NEXT_PUBLIC_SUPABASE_URL: https://placeholder.supabase.co
           NEXT_PUBLIC_SUPABASE_ANON_KEY: placeholder_anon_key
           NEXT_PUBLIC_SITE_URL: https://placeholder.example.com
           NEXT_PUBLIC_SENTRY_DSN: ""
           SENTRY_DSN: ""
-          UPSTASH_REDIS_REST_URL: ""
-          UPSTASH_REDIS_REST_TOKEN: ""
           # No SENTRY_AUTH_TOKEN → source map upload is skipped gracefully
           # No Upstash vars → rate limiter uses in-memory fallback
+          # No PAGBANK_TOKEN → it is only read inside a request, not at build time
           UPSTASH_REDIS_REST_URL: ""
           UPSTASH_REDIS_REST_TOKEN: ""
 
@@ -84,8 +81,6 @@ jobs:
       - name: Start Next.js server
         run: npm run build && npm start &
         env:
-          STRIPE_SECRET_KEY: sk_test_ci_placeholder
-          STRIPE_WEBHOOK_SECRET: whsec_ci_placeholder
           NEXT_PUBLIC_SUPABASE_URL: https://placeholder.supabase.co
           NEXT_PUBLIC_SUPABASE_ANON_KEY: placeholder_anon_key
           NEXT_PUBLIC_SITE_URL: http://localhost:3000

@@ -1,10 +1,17 @@
 /**
  * Supabase-backed donation storage.
- * Used exclusively in server-side API routes and the Stripe webhook.
+ * Used exclusively in server-side API routes and the PagBank webhook.
  * All writes use the service role key for unrestricted access.
  */
 
 import { createServiceClient } from './supabase-server'
+
+/**
+ * Placeholder e-mail written for donations made without a logged-in account
+ * (app/api/create-checkout-session/route.ts). It identifies nobody, so it must
+ * never be used to link a donation to a donor.
+ */
+const ANONYMOUS_EMAIL = 'anonymous@projetomaya.org'
 
 export interface StoredDonation {
   id: string
@@ -160,6 +167,60 @@ export async function getAllDonations(): Promise<StoredDonation[]> {
   return (data ?? []).map(row => mapRow(row as Record<string, unknown>))
 }
 
+/**
+ * Resolve which donor a recurring charge belongs to.
+ *
+ * Recurring charges (PagBank's SUBSCRIPTION_CHARGE) arrive without metadata,
+ * so the webhook has no userId and no email — only the subscription id. The
+ * donor's identity was recorded on the `assinaturas` row when the first
+ * payment went through, in `doador_id` and `doador_email`.
+ *
+ * Returns null when the donor cannot be resolved, which the caller treats as
+ * "save the donation unlinked". Being unlinked can be fixed later with a
+ * script, since the subscription id is kept on the donation row; linking a
+ * donation to the wrong person cannot.
+ */
+export async function getSubscriptionDonor(
+  subscriptionId: string
+): Promise<{ doadorId?: string; email: string } | null> {
+  const supabase = createServiceClient()
+
+  const { data, error } = await supabase
+    .from('assinaturas')
+    .select('doador_id, doador_email')
+    .eq('pagbank_subscription_id', subscriptionId)
+    .limit(1)
+    .maybeSingle()
+
+  if (error) {
+    console.error('getSubscriptionDonor error:', error)
+    return null
+  }
+
+  // No row for this subscription. Happens when a recurring charge arrives
+  // before the first one was processed, or when the subscription was created
+  // straight in PagBank. Save the charge unlinked; the subscription id stays on
+  // the donation row, so it can be linked later by script.
+  if (!data) return null
+
+  const doadorId = (data.doador_id as string | null) ?? undefined
+  const email = ((data.doador_email as string | null) ?? '').trim()
+
+  // An account is the only identity we trust. Link by it whenever it is there,
+  // even if the e-mail on the row is missing or the anonymous placeholder.
+  if (doadorId) return { doadorId, email }
+
+  // No account: the e-mail is all there is. It is enough, because the donor
+  // dashboard also looks donations up by e-mail (getDonationsByEmail).
+  // ANONYMOUS_EMAIL is the literal the checkout writes when nobody is logged
+  // in — it belongs to no one, so linking by it would pile unrelated donors
+  // into a single history. Leaving a charge unlinked is fixable; attributing it
+  // to the wrong person is not.
+  if (!email || email.toLowerCase() === ANONYMOUS_EMAIL) return null
+
+  return { email }
+}
+
 export async function updateDonationStatusBySubscription(
   subscriptionId: string,
   status: StoredDonation['status']
@@ -172,7 +233,7 @@ export async function updateDonationStatusBySubscription(
   if (error) console.error('updateDonationStatusBySubscription error:', error)
 }
 
-export async function cancelSubscriptionByStripeId(
+export async function cancelSubscriptionById(
   subscriptionId: string
 ): Promise<void> {
   const supabase = createServiceClient()
@@ -186,27 +247,38 @@ export async function cancelSubscriptionByStripeId(
       .update({ status: 'cancelled' })
       .eq('pagbank_subscription_id', subscriptionId),
   ])
-  if (donError) console.error('cancelSubscriptionByStripeId: doacoes error:', donError)
-  if (subError) console.error('cancelSubscriptionByStripeId: assinaturas error:', subError)
+  if (donError) console.error('cancelSubscriptionById: doacoes error:', donError)
+  if (subError) console.error('cancelSubscriptionById: assinaturas error:', subError)
 }
 
 export async function syncSubscriptionStatus(
-  subscription: { id: string; status: string; current_period_end: number }
+  subscription: { id: string; status: string; current_period_end?: number }
 ): Promise<void> {
   const supabase = createServiceClient()
-  const stripeStatus = subscription.status
-  // Map Stripe status to our DB status
+  const incoming = subscription.status
   const dbStatus =
-    stripeStatus === 'active' ? 'active' :
-    stripeStatus === 'paused' ? 'paused' :
-    stripeStatus === 'canceled' ? 'cancelled' :
-    stripeStatus === 'cancelled' ? 'cancelled' :
-    stripeStatus === 'past_due' ? 'paused' :
+    incoming === 'active' ? 'active' :
+    incoming === 'paused' ? 'paused' :
+    incoming === 'canceled' ? 'cancelled' :
+    incoming === 'cancelled' ? 'cancelled' :
+    incoming === 'past_due' ? 'paused' :
     'cancelled'
-  const nextBilling = new Date(subscription.current_period_end * 1000).toISOString().split('T')[0]
+
+  const updates: Record<string, unknown> = { status: dbStatus }
+
+  // Only touch proximo_pagamento when we actually know the next billing date.
+  // Callers that do not have it must omit current_period_end — passing 0 used
+  // to write 1970-01-01 over the real date, which then showed up in the
+  // donor's dashboard.
+  if (typeof subscription.current_period_end === 'number' && subscription.current_period_end > 0) {
+    updates.proximo_pagamento = new Date(subscription.current_period_end * 1000)
+      .toISOString()
+      .split('T')[0]
+  }
+
   const { error } = await supabase
     .from('assinaturas')
-    .update({ status: dbStatus, proximo_pagamento: nextBilling })
+    .update(updates)
     .eq('pagbank_subscription_id', subscription.id)
   if (error) console.error('syncSubscriptionStatus error:', error)
 }

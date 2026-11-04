@@ -17,7 +17,7 @@ import {
   saveDonation,
   updateDonationStatus,
   updateDonationStatusBySubscription,
-  cancelSubscriptionByStripeId,
+  cancelSubscriptionById,
   syncSubscriptionStatus,
   updateNextBillingDate,
   getDonationsByEmail,
@@ -42,8 +42,9 @@ describe('donationStorage', () => {
 
   describe('saveDonation', () => {
     it('throws when supabase returns an error on insert', async () => {
-      const chain = makeQueryChain({})
-      ;(chain.single as ReturnType<typeof vi.fn>).mockResolvedValue({
+      // saveDonation awaits the chain itself (.upsert().select().limit(1)),
+      // so the error has to come from the chain's result, not from .single().
+      const chain = makeQueryChain({
         data: null,
         error: { message: 'insert failed', code: '23505' },
       })
@@ -62,7 +63,6 @@ describe('donationStorage', () => {
     })
 
     it('returns mapped donation on success', async () => {
-      const chain = makeQueryChain({})
       const row = {
         id: 'uuid-1',
         pagbank_order_id: 'cs_test',
@@ -76,8 +76,8 @@ describe('donationStorage', () => {
         created_at: '2024-01-01T00:00:00Z',
         proximo_pagamento: null,
       }
-      ;(chain.single as ReturnType<typeof vi.fn>).mockResolvedValue({ data: row, error: null })
-      fromMock.mockReturnValue(chain)
+      // .limit(1) resolves to an array of rows; saveDonation maps data[0].
+      fromMock.mockReturnValue(makeQueryChain({ data: [row], error: null }))
 
       const result = await saveDonation({
         paymentId: 'ORDER_TEST',
@@ -93,7 +93,7 @@ describe('donationStorage', () => {
     })
   })
 
-  describe('cancelSubscriptionByStripeId', () => {
+  describe('cancelSubscriptionById', () => {
     it('logs errors for doacoes update failure without throwing', async () => {
       const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
       const donChain = makeQueryChain({ error: { message: 'doacoes fail' }, data: null })
@@ -105,7 +105,7 @@ describe('donationStorage', () => {
         return subChain
       })
 
-      await cancelSubscriptionByStripeId('sub_test')
+      await cancelSubscriptionById('sub_test')
       expect(consoleSpy).toHaveBeenCalledWith(
         expect.stringContaining('doacoes error'),
         expect.anything()
@@ -119,13 +119,13 @@ describe('donationStorage', () => {
       })
       fromMock.mockReturnValue({ update: updateSpy })
 
-      await cancelSubscriptionByStripeId('sub_abc')
+      await cancelSubscriptionById('sub_abc')
       expect(updateSpy).toHaveBeenCalledWith({ status: 'cancelled' })
     })
   })
 
   describe('syncSubscriptionStatus', () => {
-    it('maps stripe status to db status correctly', async () => {
+    it('maps the incoming status to the db status correctly', async () => {
       const updateSpy = vi.fn().mockReturnValue({
         eq: vi.fn().mockResolvedValue({ data: [], error: null }),
       })

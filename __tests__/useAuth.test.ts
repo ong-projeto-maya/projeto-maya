@@ -35,7 +35,12 @@ function makeClient({
     from: vi.fn().mockReturnValue({
       select: vi.fn().mockReturnThis(),
       eq: vi.fn().mockReturnThis(),
-      single: vi.fn().mockResolvedValue({ data: adminRow, error: adminRow ? null : { message: 'not found' } }),
+      // useAuth reads the admin row with .limit(1) and takes rows[0], not
+      // .single(), so the mock has to resolve to an array.
+      limit: vi.fn().mockResolvedValue({
+        data: adminRow ? [adminRow] : [],
+        error: null,
+      }),
     }),
   }
 }

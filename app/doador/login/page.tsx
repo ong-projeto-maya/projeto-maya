@@ -53,7 +53,6 @@ export default function DoadorLoginPage() {
 
     try {
       const errorMsg = await login(email, password)
-      console.log('[login] result:', errorMsg)
       if (errorMsg) {
         setError(errorMsg)
       } else {

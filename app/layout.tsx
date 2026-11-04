@@ -3,6 +3,10 @@ import './globals.css'
 import ConditionalLayout from '@/components/ConditionalLayout'
 
 export const metadata: Metadata = {
+  // Without this, the relative image paths below (/logo.png) are resolved
+  // against http://localhost:3000, so the WhatsApp and Facebook link previews
+  // point at an image nobody can load. Next warns about it on every build.
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? 'https://projetomaya.org'),
   title: 'Projeto Maya - Do resgate, à adoção',
   description: 'ONG dedicada ao resgate e adoção responsável de animais. Venha fazer parte dessa causa!',
   keywords: 'adoção, animais, ong, cachorros, gatos, resgate, adoção responsável, animais abandonados, doação',

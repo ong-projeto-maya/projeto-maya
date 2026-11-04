@@ -1,6 +1,12 @@
 /**
  * TypeScript types for the Supabase database schema.
  * Run `supabase gen types typescript` to regenerate from your live schema.
+ *
+ * This file is hand-maintained and had drifted: doador_id was added to doacoes
+ * and assinaturas by the migration 20240203000000_link_donations_to_users.sql
+ * but never reached here, so reading that column did not type-check.
+ * Regenerate from the live schema once there is access to it, instead of
+ * patching this by hand again.
  */
 
 export type Database = {
@@ -52,6 +58,7 @@ export type Database = {
       doacoes: {
         Row: {
           id: string
+          doador_id: string | null
           doador_email: string
           pagbank_order_id: string
           pagbank_subscription_id: string | null
@@ -65,6 +72,7 @@ export type Database = {
         }
         Insert: {
           id?: string
+          doador_id?: string | null
           doador_email: string
           pagbank_order_id: string
           pagbank_subscription_id?: string | null
@@ -77,6 +85,7 @@ export type Database = {
           created_at?: string
         }
         Update: {
+          doador_id?: string | null
           status?: 'completed' | 'failed' | 'pending' | 'cancelled'
           proximo_pagamento?: string | null
           pagbank_subscription_id?: string | null
@@ -86,6 +95,7 @@ export type Database = {
       assinaturas: {
         Row: {
           id: string
+          doador_id: string | null
           doador_email: string
           pagbank_subscription_id: string
           valor: number
@@ -98,6 +108,7 @@ export type Database = {
         }
         Insert: {
           id?: string
+          doador_id?: string | null
           doador_email: string
           pagbank_subscription_id: string
           valor: number
@@ -109,6 +120,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          doador_id?: string | null
           status?: 'active' | 'paused' | 'cancelled'
           proximo_pagamento?: string | null
           metodo_pagamento?: string | null

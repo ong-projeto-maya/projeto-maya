@@ -15,10 +15,20 @@ const RATE_LIMIT_RULES: [string, number, number][] = [
   ['/api/subscription/pause',       5, 60],
   ['/api/subscription/resume',      5, 60],
   ['/api/subscription/cancel',      5, 60],
+  ['/api/subscription/change-amount', 5, 60],
   ['/api/delete-account',           3, 60],
-  ['/doador/login',                10, 60],   // brute-force protection
+  // These two limit how often the login PAGE can be loaded, not how often a
+  // password can be tried: the sign-in call goes from the browser straight to
+  // Supabase Auth and never passes through this middleware. Real brute-force
+  // protection is Supabase's own auth rate limiting, configured in the
+  // dashboard. This only slows down someone hammering the page itself.
+  ['/doador/login',                10, 60],
   ['/admin/login',                 10, 60],
 ]
+
+// A rule only takes effect if its path is also in `config.matcher` below:
+// outside the matcher the middleware never runs for that request. Add a rule
+// and its matcher entry together.
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
@@ -134,9 +144,13 @@ export const config = {
     '/api/subscription/pause',
     '/api/subscription/resume',
     '/api/subscription/cancel',
+    '/api/subscription/change-amount',
     '/api/delete-account',
     // Auth-protected page routes
     '/admin/:path*',
+    // The donor login page: rate-limited against password guessing. It was
+    // missing here, so its rule above did nothing.
+    '/doador/login',
     '/doador/dashboard/:path*',
     '/doador/perfil/:path*',
     '/doador/assinatura/:path*',
