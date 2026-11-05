@@ -56,15 +56,26 @@ export async function middleware(request: NextRequest) {
             { status: 429, headers: { 'Retry-After': '60', 'Content-Type': 'application/json' } }
           )
         }
+        // Nao da para mostrar o aviso dentro da tela de login, em vermelho
+        // acima dos campos: o middleware barra ANTES de a pagina existir, entao
+        // nao ha React rodando para desenhar nada. Deixar passar so para exibir
+        // o aviso anularia o limite. Entao a saida e esta pagina, com a cara do
+        // site em vez de cara de erro de servidor. Cores de tailwind.config.ts;
+        // middleware roda no Edge e nao enxerga o CSS do app.
         return new NextResponse(
           `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8">` +
           `<meta name="viewport" content="width=device-width,initial-scale=1">` +
-          `<title>Muitas requisições</title></head>` +
-          `<body style="font-family:system-ui,sans-serif;max-width:32rem;margin:4rem auto;padding:0 1rem;color:#3d2b1f">` +
-          `<h1 style="font-size:1.5rem">Calma aí</h1>` +
-          `<p>${mensagem}</p>` +
-          `<p><a href="${pathname}" style="color:#2f7a4f">Tentar de novo</a></p>` +
-          `</body></html>`,
+          `<title>Muitas tentativas · Projeto Maya</title></head>` +
+          `<body style="margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;` +
+          `background:#D9D3D3;color:#564334;font-family:system-ui,-apple-system,sans-serif;padding:1.5rem">` +
+          `<main style="background:#fff;border-radius:1rem;padding:2.5rem 2rem;max-width:26rem;width:100%;` +
+          `text-align:center;box-shadow:0 10px 25px rgba(86,67,52,.12)">` +
+          `<p style="font-size:2.5rem;margin:0 0 .5rem">🐾</p>` +
+          `<h1 style="font-size:1.35rem;margin:0 0 .75rem;font-weight:700">Calma aí</h1>` +
+          `<p style="margin:0 0 1.75rem;line-height:1.5;opacity:.85">${mensagem}</p>` +
+          `<a href="${pathname}" style="display:inline-block;background:#B2C09D;color:#564334;` +
+          `text-decoration:none;font-weight:600;padding:.75rem 1.75rem;border-radius:1rem">Tentar de novo</a>` +
+          `</main></body></html>`,
           { status: 429, headers: { 'Retry-After': '60', 'Content-Type': 'text/html; charset=utf-8' } }
         )
       }
