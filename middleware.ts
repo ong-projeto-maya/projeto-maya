@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { checkRateLimit, getClientIp } from '@/lib/rate-limit'
+import { getPublishableKey } from '@/lib/supabaseKeys'
 
 // Routes that require donor authentication
 const DONOR_ROUTES = ['/doador/dashboard', '/doador/perfil', '/doador/assinatura', '/doador/doacoes']
@@ -99,14 +100,15 @@ export async function middleware(request: NextRequest) {
 
   if (isAdminRoute && !isAdminPublic) {
     // Fail-safe: if Supabase credentials are missing, redirect to login
-    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    const publishableKey = getPublishableKey()
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !publishableKey) {
       const loginUrl = new URL('/admin/login', request.url)
       loginUrl.searchParams.set('redirectTo', pathname)
       return NextResponse.redirect(loginUrl)
     }
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+      publishableKey,
       {
         cookies: {
           getAll() { return request.cookies.getAll() },
@@ -146,14 +148,15 @@ export async function middleware(request: NextRequest) {
 
   if (isDonorRoute) {
     // Fail-safe: if Supabase credentials are missing, redirect to login
-    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    const publishableKey = getPublishableKey()
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !publishableKey) {
       const loginUrl = new URL('/doador/login', request.url)
       loginUrl.searchParams.set('redirectTo', pathname)
       return NextResponse.redirect(loginUrl)
     }
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+      publishableKey,
       {
         cookies: {
           getAll() { return request.cookies.getAll() },

@@ -13,15 +13,16 @@
  */
 import { createBrowserClient } from '@supabase/ssr'
 import type { Database } from './database.types'
+import { getPublishableKey } from './supabaseKeys'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? ''
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? ''
+const publishableKey = getPublishableKey() ?? ''
 
-export const isSupabaseConfigured = Boolean(supabaseUrl && supabaseAnonKey)
+export const isSupabaseConfigured = Boolean(supabaseUrl && publishableKey)
 
 export const createClient = () =>
   createBrowserClient<Database>(
     supabaseUrl || 'https://placeholder.supabase.co',
-    supabaseAnonKey || 'placeholder-anon-key',
+    publishableKey || 'placeholder-publishable-key',
     {}
   )

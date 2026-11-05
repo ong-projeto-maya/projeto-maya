@@ -8,6 +8,7 @@ import {
 } from '@/lib/pagbank'
 import { saveDonation } from '@/lib/donationStorage'
 import { createRouteLogger } from '@/lib/logger'
+import { getPublishableKey } from '@/lib/supabaseKeys'
 
 const log = createRouteLogger('create-checkout-session')
 
@@ -29,7 +30,7 @@ export async function POST(request: Request) {
     const cookieStore = cookies()
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL ?? '',
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? '',
+      getPublishableKey() ?? '',
       { cookies: { getAll: () => cookieStore.getAll() } }
     )
     const { data: { user } } = await supabase.auth.getUser()

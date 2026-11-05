@@ -51,7 +51,7 @@ async function callCheckout(body: JsonBody, env: Record<string, string> = {}) {
   const allEnv = {
     NEXT_PUBLIC_SITE_URL: 'http://localhost:3000',
     NEXT_PUBLIC_SUPABASE_URL: 'http://localhost:54321',
-    NEXT_PUBLIC_SUPABASE_ANON_KEY: 'anon-key',
+    NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: 'publishable-key',
     ...env,
   }
   for (const [k, v] of Object.entries(allEnv)) {

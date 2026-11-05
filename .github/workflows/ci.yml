@@ -38,7 +38,7 @@ jobs:
           # Supabase call is mocked. (The old STRIPE_* stubs are gone: the site
           # moved to PagBank and lib/stripe.ts no longer exists.)
           NEXT_PUBLIC_SUPABASE_URL: https://placeholder.supabase.co
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: placeholder_anon_key
+          NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: sb_publishable_placeholder
           # Sentry disabled in CI (no DSN = init is skipped)
           NEXT_PUBLIC_SENTRY_DSN: ""
           SENTRY_DSN: ""
@@ -47,7 +47,7 @@ jobs:
         run: npm run build
         env:
           NEXT_PUBLIC_SUPABASE_URL: https://placeholder.supabase.co
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: placeholder_anon_key
+          NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: sb_publishable_placeholder
           NEXT_PUBLIC_SITE_URL: https://placeholder.example.com
           NEXT_PUBLIC_SENTRY_DSN: ""
           SENTRY_DSN: ""
@@ -94,7 +94,7 @@ jobs:
         run: npm run build
         env:
           NEXT_PUBLIC_SUPABASE_URL: https://placeholder.supabase.co
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: placeholder_anon_key
+          NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: sb_publishable_placeholder
           NEXT_PUBLIC_SITE_URL: http://localhost:3000
           NEXT_PUBLIC_SENTRY_DSN: ""
           SENTRY_DSN: ""
@@ -103,7 +103,7 @@ jobs:
         run: npm start &
         env:
           NEXT_PUBLIC_SUPABASE_URL: https://placeholder.supabase.co
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: placeholder_anon_key
+          NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: sb_publishable_placeholder
           NEXT_PUBLIC_SITE_URL: http://localhost:3000
           NEXT_PUBLIC_SENTRY_DSN: ""
           SENTRY_DSN: ""
