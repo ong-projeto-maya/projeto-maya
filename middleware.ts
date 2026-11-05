@@ -22,8 +22,14 @@ const RATE_LIMIT_RULES: [string, number, number][] = [
   // Supabase Auth and never passes through this middleware. Real brute-force
   // protection is Supabase's own auth rate limiting, configured in the
   // dashboard. This only slows down someone hammering the page itself.
-  ['/doador/login',                10, 60],
-  ['/admin/login',                 10, 60],
+  //
+  // 60/min, not 10. These pages receive every redirect from an expired
+  // session, so a single person clicking around while logged out reaches 10
+  // easily — and on mobile, thousands of people share one carrier IP through
+  // CGNAT, so one visitor's browsing locks out everyone else behind it. The
+  // e2e suite tripped this on its own, which is how it was caught.
+  ['/doador/login',                60, 60],
+  ['/admin/login',                 60, 60],
 ]
 
 // A rule only takes effect if its path is also in `config.matcher` below:
@@ -40,9 +46,26 @@ export async function middleware(request: NextRequest) {
       const ip = getClientIp(request)
       const blocked = await checkRateLimit(ip, prefix, max, windowSeconds)
       if (blocked) {
-        return NextResponse.json(
-          { error: 'Muitas requisições. Tente novamente em instantes.' },
-          { status: 429, headers: { 'Retry-After': '60', 'Content-Type': 'application/json' } }
+        const mensagem = 'Muitas requisições. Tente novamente em instantes.'
+        // Uma página bloqueada devolvia o JSON de erro como corpo da navegação,
+        // então a pessoa via `{"error":"..."}` cru na tela. Rota de API continua
+        // em JSON, que é o que quem a chama sabe ler.
+        if (pathname.startsWith('/api/')) {
+          return NextResponse.json(
+            { error: mensagem },
+            { status: 429, headers: { 'Retry-After': '60', 'Content-Type': 'application/json' } }
+          )
+        }
+        return new NextResponse(
+          `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8">` +
+          `<meta name="viewport" content="width=device-width,initial-scale=1">` +
+          `<title>Muitas requisições</title></head>` +
+          `<body style="font-family:system-ui,sans-serif;max-width:32rem;margin:4rem auto;padding:0 1rem;color:#3d2b1f">` +
+          `<h1 style="font-size:1.5rem">Calma aí</h1>` +
+          `<p>${mensagem}</p>` +
+          `<p><a href="${pathname}" style="color:#2f7a4f">Tentar de novo</a></p>` +
+          `</body></html>`,
+          { status: 429, headers: { 'Retry-After': '60', 'Content-Type': 'text/html; charset=utf-8' } }
         )
       }
       // API routes: no auth check needed — return after rate-limit pass
