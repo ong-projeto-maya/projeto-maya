@@ -48,7 +48,6 @@ interface MockDoador {
   donationCount: number
   firstDonation: string
   level: 'bronze'
-  animalsHelped: number
   donations: never[]
 }
 
@@ -74,7 +73,6 @@ const baseDoador: MockDoador = {
   donationCount: 2,
   firstDonation: '2024-01-01',
   level: 'bronze',
-  animalsHelped: 3,
   donations: [],
 }
 

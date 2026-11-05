@@ -35,7 +35,6 @@ export interface Doador {
   donationCount: number
   firstDonation: string
   level: 'bronze' | 'silver' | 'gold' | 'diamond'
-  animalsHelped: number
   subscription?: Subscription
   donations: Donation[]
 }
@@ -189,7 +188,6 @@ export function DoadorProvider({ children }: { children: React.ReactNode }) {
           donationCount: profile.contagem_doacoes ?? 0,
           firstDonation: profile.primeira_doacao ?? new Date().toISOString().split('T')[0],
           level: getLevelByDate(profile.primeira_doacao ?? new Date().toISOString().split('T')[0]),
-          animalsHelped: profile.animais_ajudados ?? 0,
           subscription: mappedSubscription,
           donations: mappedDonations,
         })

@@ -9,7 +9,7 @@ interface User {
 }
 
 // Admin accounts live in Supabase Auth with email: <username>@admin.projetomaya.br
-// See supabase/schema.sql for setup instructions.
+// See supabase/migrations/ for the schema, and SETUP_SUPABASE.md for setup.
 const usernameToEmail = (username: string) =>
   `${username.toLowerCase()}@admin.projetomaya.br`
 

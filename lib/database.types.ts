@@ -23,7 +23,6 @@ export type Database = {
           contagem_doacoes: number
           primeira_doacao: string | null
           nivel: string
-          animais_ajudados: number
           created_at: string
           updated_at: string
         }
@@ -37,7 +36,6 @@ export type Database = {
           contagem_doacoes?: number
           primeira_doacao?: string | null
           nivel?: string
-          animais_ajudados?: number
           created_at?: string
           updated_at?: string
         }
@@ -50,7 +48,6 @@ export type Database = {
           contagem_doacoes?: number
           primeira_doacao?: string | null
           nivel?: string
-          animais_ajudados?: number
           updated_at?: string
         }
         Relationships: []

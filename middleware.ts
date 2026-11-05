@@ -3,7 +3,7 @@ import { createServerClient } from '@supabase/ssr'
 import { checkRateLimit, getClientIp } from '@/lib/rate-limit'
 
 // Routes that require donor authentication
-const DONOR_ROUTES = ['/doador/dashboard', '/doador/perfil', '/doador/assinatura', '/doador/doacoes', '/doador/animais']
+const DONOR_ROUTES = ['/doador/dashboard', '/doador/perfil', '/doador/assinatura', '/doador/doacoes']
 // Routes that require admin authentication
 const ADMIN_ROUTES = ['/admin']
 // Admin routes that are publicly accessible (login page)
@@ -155,6 +155,5 @@ export const config = {
     '/doador/perfil/:path*',
     '/doador/assinatura/:path*',
     '/doador/doacoes/:path*',
-    '/doador/animais/:path*',
   ],
 }

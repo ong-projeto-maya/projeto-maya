@@ -12,7 +12,6 @@ test.describe('Protected routes – redirect to login', () => {
     '/doador/perfil',
     '/doador/assinatura',
     '/doador/doacoes',
-    '/doador/animais',
   ]
 
   const ADMIN_PROTECTED = ['/admin']

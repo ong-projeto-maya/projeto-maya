@@ -3,7 +3,7 @@
 import { useEffect, useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft, Users, Search, DollarSign, PawPrint, Award, Heart, Mail } from 'lucide-react'
+import { ArrowLeft, Users, Search, DollarSign, Award, Heart, Mail } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { createAdminClient } from '@/lib/supabase-admin'
 
@@ -15,7 +15,6 @@ interface Doador {
   nivel: 'bronze' | 'silver' | 'gold' | 'diamond'
   total_doado: number
   contagem_doacoes: number
-  animais_ajudados: number
   primeira_doacao: string | null
   created_at: string
 }
@@ -50,7 +49,7 @@ export default function AdminDoadoresPage() {
       setIsLoading(true)
       const { data } = await supabase
         .from('doadores')
-        .select('id, nome, email, telefone, nivel, total_doado, contagem_doacoes, animais_ajudados, primeira_doacao, created_at')
+        .select('id, nome, email, telefone, nivel, total_doado, contagem_doacoes, primeira_doacao, created_at')
         .order('total_doado', { ascending: false })
       setDoadores((data ?? []) as Doador[])
       setIsLoading(false)
@@ -75,7 +74,6 @@ export default function AdminDoadoresPage() {
     })
 
   const totalArrecadado = doadores.reduce((s, d) => s + (d.total_doado ?? 0), 0)
-  const totalAnimais = doadores.reduce((s, d) => s + (d.animais_ajudados ?? 0), 0)
 
   return (
     <div className="min-h-screen bg-maya-beige dark:bg-gray-900 py-12">
@@ -117,15 +115,6 @@ export default function AdminDoadoresPage() {
                 R$ {totalArrecadado.toLocaleString('pt-BR')}
               </p>
               <p className="text-sm text-maya-brown/60 dark:text-gray-400">Total Arrecadado</p>
-            </div>
-          </div>
-          <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg flex items-center gap-4">
-            <div className="w-12 h-12 bg-maya-blue/10 rounded-xl flex items-center justify-center">
-              <PawPrint className="text-maya-blue" size={24} />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-maya-brown dark:text-white">{totalAnimais}</p>
-              <p className="text-sm text-maya-brown/60 dark:text-gray-400">Animais Impactados</p>
             </div>
           </div>
         </div>
@@ -196,7 +185,6 @@ export default function AdminDoadoresPage() {
                     <th className="px-6 py-4 text-left text-sm font-semibold text-maya-brown dark:text-white">Nível</th>
                     <th className="px-6 py-4 text-left text-sm font-semibold text-maya-brown dark:text-white">Total Doado</th>
                     <th className="px-6 py-4 text-left text-sm font-semibold text-maya-brown dark:text-white">Doações</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-maya-brown dark:text-white">Animais</th>
                     <th className="px-6 py-4 text-left text-sm font-semibold text-maya-brown dark:text-white">Desde</th>
                     <th className="px-6 py-4 text-left text-sm font-semibold text-maya-brown dark:text-white">Ações</th>
                   </tr>
@@ -225,12 +213,6 @@ export default function AdminDoadoresPage() {
                           <div className="flex items-center gap-1.5 text-maya-brown dark:text-white">
                             <Heart size={14} className="text-maya-pink" />
                             {d.contagem_doacoes ?? 0}
-                          </div>
-                        </td>
-                        <td className="px-6 py-4">
-                          <div className="flex items-center gap-1.5 text-maya-brown dark:text-white">
-                            <PawPrint size={14} className="text-maya-blue" />
-                            {d.animais_ajudados ?? 0}
                           </div>
                         </td>
                         <td className="px-6 py-4 text-sm text-maya-brown/70 dark:text-gray-400">
