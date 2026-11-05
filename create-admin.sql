@@ -5,18 +5,22 @@
 -- pelo painel do Supabase (Authentication > Add user) ou pela Admin API —
 -- ver SETUP_SUPABASE.md, passo 5.1.
 --
--- O login do painel monta o e-mail a partir do usuário digitado:
---     <usuário>@admin.projetomaya.br      (hooks/useAuth.ts)
--- Então, para entrar como "eduardo", o e-mail em auth.users precisa ser
--- eduardo@admin.projetomaya.br. O domínio é interno e não precisa existir.
+-- O login do painel (hooks/useAuth.ts) aceita os dois formatos:
+--   * e-mail de verdade, usado como digitado  -> use este
+--   * nome de usuário sozinho, que vira <usuário>@admin.projetomaya.br
+--
+-- Prefira e-mail de verdade: o domínio interno não recebe mensagem, então
+-- com ele a recuperação de senha do Supabase nunca chega a ninguém.
+--
+-- O `username` abaixo é só o nome exibido no painel, não serve para entrar.
 --
 -- Troque os dois valores marcados abaixo e execute.
 -- =============================================================================
 
 insert into public.admin_users (id, username, role)
-select id, 'admin', 'admin'                    -- <<< username usado no login
+select id, 'admin', 'admin'                 -- <<< nome exibido no painel
 from auth.users
-where email = 'admin@admin.projetomaya.br'     -- <<< e-mail criado em auth.users
+where email = 'troque@pelo-seu-email.com'   -- <<< e-mail criado em auth.users
 on conflict (id) do nothing;
 
 -- -----------------------------------------------------------------------------

@@ -38,7 +38,7 @@ function AdminLoginForm() {
     if (success) {
       router.push(destination)
     } else {
-      setError('Usuário ou senha incorretos')
+      setError('E-mail ou senha incorretos')
       setIsLoading(false)
       // Limpar senha por segurança
       setPassword('')
@@ -97,7 +97,7 @@ function AdminLoginForm() {
             {/* Campo Usuário */}
             <div>
               <label className="block text-sm font-semibold text-maya-brown dark:text-white mb-2">
-                Usuário
+                E-mail ou usuário
               </label>
               <div className="relative">
                 <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-maya-brown/40 dark:text-gray-400" />
@@ -108,7 +108,7 @@ function AdminLoginForm() {
                   required
                   autoComplete="username"
                   className="w-full pl-10 pr-4 py-3 border-2 border-maya-green/20 dark:border-gray-600 rounded-xl focus:border-maya-green dark:focus:border-maya-green focus:outline-none bg-white dark:bg-gray-700 text-maya-brown dark:text-white"
-                  placeholder="Digite seu usuário"
+                  placeholder="seu@email.com"
                   disabled={isLoading}
                 />
               </div>

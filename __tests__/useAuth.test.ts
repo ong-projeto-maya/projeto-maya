@@ -130,6 +130,26 @@ describe('useAuth', () => {
       expect(result.current.isAuthenticated).toBe(true)
     })
 
+    it('uses a real e-mail as typed, without gluing a domain on it', async () => {
+      // Conta de admin com e-mail de verdade: é o que faz "esqueci minha senha"
+      // funcionar, já que o domínio interno não recebe e-mail nenhum.
+      const user = { id: 'u5' }
+      const adminRow = { id: 'u5', username: 'eduardo', role: 'admin' }
+      const client = makeClient({ authUser: user, adminRow })
+      client.auth.signInWithPassword = vi.fn().mockResolvedValue({ data: { user }, error: null })
+      mockClient = client
+      const { result } = renderHook(() => useAuth())
+      await act(async () => {})
+
+      await act(async () => {
+        await result.current.login('  Eduardo@Exemplo.com ', 'pass')
+      })
+      expect(client.auth.signInWithPassword).toHaveBeenCalledWith({
+        email: 'eduardo@exemplo.com',
+        password: 'pass',
+      })
+    })
+
     it('converts username to admin email format', async () => {
       const user = { id: 'u4' }
       const adminRow = { id: 'u4', username: 'testadmin', role: 'admin' }

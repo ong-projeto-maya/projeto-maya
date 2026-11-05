@@ -8,10 +8,23 @@ interface User {
   role: 'admin'
 }
 
-// Admin accounts live in Supabase Auth with email: <username>@admin.projetomaya.br
-// See supabase/migrations/ for the schema, and SETUP_SUPABASE.md for setup.
-const usernameToEmail = (username: string) =>
-  `${username.toLowerCase()}@admin.projetomaya.br`
+/**
+ * O campo de login aceita e-mail de verdade OU o nome de usuário antigo.
+ *
+ * A versão original colava sempre `@admin.projetomaya.br`, um domínio interno
+ * que não existe. Funciona para entrar, mas quebra a recuperação de senha: o
+ * Supabase manda o e-mail para um endereço que ninguém recebe, então quem
+ * esquece a senha depende de alguém editar o usuário no painel do Supabase.
+ *
+ * Agora: se o que foi digitado tem '@', vale como e-mail. Senão, mantém a
+ * convenção antiga, para as contas criadas daquele jeito continuarem entrando.
+ */
+const LEGACY_ADMIN_DOMAIN = 'admin.projetomaya.br'
+
+const toEmail = (usernameOrEmail: string) => {
+  const input = usernameOrEmail.trim().toLowerCase()
+  return input.includes('@') ? input : `${input}@${LEGACY_ADMIN_DOMAIN}`
+}
 
 export function useAuth() {
   const [user, setUser] = useState<User | null>(null)
@@ -91,8 +104,8 @@ export function useAuth() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [supabase, resolveAdminUser])
 
-  const login = async (username: string, password: string): Promise<boolean> => {
-    const email = usernameToEmail(username)
+  const login = async (usernameOrEmail: string, password: string): Promise<boolean> => {
+    const email = toEmail(usernameOrEmail)
     const { data, error } = await supabase.auth.signInWithPassword({ email, password })
     if (error || !data.user) return false
 
