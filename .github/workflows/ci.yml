@@ -84,8 +84,23 @@ jobs:
       - name: Install Playwright Chromium
         run: npx playwright install chromium --with-deps
 
+      # Build e start em passos separados. Juntos, como
+      # `npm run build && npm start &`, o shell manda a corrente inteira para
+      # segundo plano: o passo termina na hora, o wait-on comeca a contar
+      # enquanto o build ainda roda, e 60s nao bastam para um build de 1 a 2
+      # minutos. Separados, o build precisa terminar antes do start comecar, e
+      # um erro de build aparece como erro de build.
+      - name: Build
+        run: npm run build
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: https://placeholder.supabase.co
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: placeholder_anon_key
+          NEXT_PUBLIC_SITE_URL: http://localhost:3000
+          NEXT_PUBLIC_SENTRY_DSN: ""
+          SENTRY_DSN: ""
+
       - name: Start Next.js server
-        run: npm run build && npm start &
+        run: npm start &
         env:
           NEXT_PUBLIC_SUPABASE_URL: https://placeholder.supabase.co
           NEXT_PUBLIC_SUPABASE_ANON_KEY: placeholder_anon_key
@@ -95,7 +110,7 @@ jobs:
           PORT: 3000
 
       - name: Wait for server
-        run: npx wait-on http://localhost:3000 --timeout 60000
+        run: npx wait-on http://localhost:3000 --timeout 120000
 
       - name: Run E2E tests
         run: npm run test:e2e
