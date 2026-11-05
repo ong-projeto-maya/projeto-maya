@@ -9,7 +9,10 @@ on:
 jobs:
   ci:
     name: Type-check, Test & Build
-    runs-on: ubuntu-latest
+    # Versao fixa, nao 'ubuntu-latest'. O 'latest' virou Ubuntu 26.04 e quebrou
+    # o job de e2e sem ninguem ter mexido em nada; o mesmo pode acontecer aqui.
+    # CI deve quebrar quando o codigo muda, nao quando a imagem do runner muda.
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Checkout
@@ -59,7 +62,10 @@ jobs:
   # ---------------------------------------------------------------------------
   e2e:
     name: E2E tests (Playwright)
-    runs-on: ubuntu-latest
+    # O Playwright 1.59.1 nao instala Chromium no Ubuntu 26.04:
+    #   "Playwright does not support chromium on ubuntu26.04-x64"
+    # Falhava em ~40s, antes de rodar teste nenhum.
+    runs-on: ubuntu-24.04
     needs: ci
 
     steps:
