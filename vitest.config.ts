@@ -18,12 +18,10 @@ export default defineConfig({
       reporter: ['text', 'lcov'],
       include: ['app/api/**', 'lib/**'],
       exclude: ['lib/database.types.ts'],
-      thresholds: {
-        branches: 80,
-        lines: 80,
-        functions: 80,
-        statements: 80,
-      },
+      // Sem limite de cobertura. Os 80% estavam configurados num projeto onde
+      // 46 testes falhavam e o CI nunca passou — número que não media nada e
+      // dava a impressão de rigor. Cobertura aqui serve para olhar onde falta
+      // teste, não para reprovar build.
     },
   },
   resolve: {

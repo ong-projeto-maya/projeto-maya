@@ -39,12 +39,12 @@ await runSQL('handle_new_donor function', `
   create or replace function public.handle_new_donor()
   returns trigger language plpgsql security definer set search_path = public as $$
   begin
-    insert into public.doadores (id, email, nome, nivel, total_doado, contagem_doacoes, animais_ajudados, created_at, updated_at)
+    insert into public.doadores (id, email, nome, nivel, total_doado, contagem_doacoes, created_at, updated_at)
     values (
       new.id,
       new.email,
       coalesce(new.raw_user_meta_data->>'nome', split_part(new.email, '@', 1)),
-      'bronze', 0, 0, 0, now(), now()
+      'bronze', 0, 0, now(), now()
     )
     on conflict (id) do nothing;
     return new;

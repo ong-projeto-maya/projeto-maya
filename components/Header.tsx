@@ -95,7 +95,10 @@ export default function Header() {
       submenu: [
         { href: '/doacoes', label: 'Fazer Doação', icon: Heart },
         { href: '/campanhas', label: 'Campanhas Ativas', icon: Target },
-        { href: '/voluntariado', label: 'Seja Voluntário', icon: HandHeart },
+        // A página /voluntariado era um "em breve" com lista de features que ninguém
+        // pediu. A página de contato já encaminha para o WhatsApp da ONG ao enviar,
+        // que é como o card da home sempre tratou voluntariado.
+        { href: '/contato', label: 'Seja Voluntário', icon: HandHeart },
       ]
     },
     { 

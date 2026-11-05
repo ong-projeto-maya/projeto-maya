@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { PawPrint, Heart, Users, DollarSign, TrendingUp, Plus, Edit, Trash2, Dog, Cat, LogOut, Target, X, BarChart3, ClipboardList, HandHeart, Mail, Pencil, Save, ChevronDown, ChevronUp } from 'lucide-react'
+import { PawPrint, Heart, Users, DollarSign, TrendingUp, Plus, Edit, Trash2, Dog, Cat, LogOut, Target, X, BarChart3, ClipboardList, Mail, Pencil, Save, ChevronDown, ChevronUp } from 'lucide-react'
 import { useAnimals } from '@/hooks/useAnimals'
 import { useAuth } from '@/hooks/useAuth'
 import { createAdminClient } from '@/lib/supabase-admin'
@@ -407,16 +407,9 @@ export default function AdminDashboard() {
                     Gerenciar Eventos
                   </p>
                 </Link>
-                <Link
-                  href="/admin/voluntarios"
-                  className="p-4 bg-maya-sand/10 hover:bg-maya-sand/20 rounded-xl transition-colors text-left"
-                >
-                  <HandHeart className="w-6 h-6 text-maya-sand mb-2" />
-                  <p className="font-semibold text-maya-brown dark:text-white text-sm">
-                    Voluntários
-                  </p>
-                  <span className="text-xs text-maya-orange font-semibold">Em breve</span>
-                </Link>
+                {/* O atalho de Voluntários saiu junto com a tela: era um "em breve"
+                    prometendo escala, relatório de horas e certificado digital.
+                    Volta quando o módulo existir de verdade. */}
                 <Link
                   href="/admin/adotantes"
                   className="p-4 bg-maya-blue/10 hover:bg-maya-blue/20 rounded-xl transition-colors text-left"
