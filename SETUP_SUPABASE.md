@@ -1,9 +1,7 @@
 # 🚀 Supabase Local Setup — Projeto Maya
 
-**Agente:** Bulma (DevOps Engineer)  
 **Data:** 2026-05-01  
 **SO:** Windows 10/11 com Docker Desktop instalado  
-**Projeto:** `c:\git\pessoal\projeto-maya`  
 
 ---
 
@@ -152,7 +150,7 @@ Esperado: 1 linha com `username='admin'`, `role='admin'`.
 
 ## 🔐 PASSO 6: Configurar Variáveis de Ambiente
 
-O arquivo `.env.local` foi criado automaticamente por Bulma com placeholders.
+O arquivo `.env.local` precisa ser criado a partir do `.env.example`.
 
 **Edite `c:\git\pessoal\projeto-maya\.env.local` e substitua:**
 
@@ -314,9 +312,3 @@ Após concluir todos os passos:
 
 - **Documentação oficial:** https://supabase.com/docs/guides/cli
 - **Discord Supabase:** https://discord.supabase.com
-- **Bulma (DevOps):** Para problemas de infra, Docker ou CI/CD
-
----
-
-**⚡ Setup criado por Bulma — MGR Solutions Squad**  
-*"Se tem Docker e internet, eu faço funcionar!" 🔧*

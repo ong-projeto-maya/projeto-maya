@@ -134,11 +134,8 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="border-t border-white/10 mt-10 pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-white/40 text-sm">
+        <div className="border-t border-white/10 mt-10 pt-8 flex items-center justify-center text-white/40 text-sm">
           <p>&copy; 2026 Projeto Maya. Todos os direitos reservados.</p>
-          <p className="flex items-center gap-2">
-            Feito por <a href="https://mgrsolutions.com.br" target="_blank" rel="noopener noreferrer" className="text-maya-green hover:text-maya-green/80 font-semibold transition-colors">MGR Solutions</a>
-          </p>
         </div>
       </div>
     </footer>

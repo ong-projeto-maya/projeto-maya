@@ -44,7 +44,7 @@
 ### Instalacao
 
 ```bash
-git clone https://github.com/marcelogourod/projeto-maya.git
+git clone https://github.com/ong-projeto-maya/projeto-maya.git
 cd projeto-maya
 pnpm install
 cp .env.example .env.local   # configurar SUPABASE_URL, STRIPE_KEY
@@ -53,4 +53,4 @@ pnpm dev
 
 ---
 
-<div align="center">Desenvolvido por <strong><a href="https://mgrsolutions.com.br">MGR Solutions</a></strong></div>
+<div align="center">Projeto Maya</div>
