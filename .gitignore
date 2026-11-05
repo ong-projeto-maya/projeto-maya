@@ -29,8 +29,11 @@ yarn-debug.log*
 yarn-error.log*
 
 # local env files
-.env*.local
-.env
+# Ignora QUALQUER .env e abre excecao so para o exemplo. Antes era uma lista
+# ('.env' e '.env*.local'), entao um arquivo como .env.migrate ou .env.producao
+# passava batido e podia ser commitado com credencial dentro.
+.env*
+!.env.example
 
 # vercel
 .vercel
