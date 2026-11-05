@@ -47,6 +47,7 @@ export async function middleware(request: NextRequest) {
       const blocked = await checkRateLimit(ip, prefix, max, windowSeconds)
       if (blocked) {
         const mensagem = 'Muitas requisições. Tente novamente em instantes.'
+        const whatsapp = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER
         // Uma página bloqueada devolvia o JSON de erro como corpo da navegação,
         // então a pessoa via `{"error":"..."}` cru na tela. Rota de API continua
         // em JSON, que é o que quem a chama sabe ler.
@@ -75,6 +76,13 @@ export async function middleware(request: NextRequest) {
           `<p style="margin:0 0 1.75rem;line-height:1.5;opacity:.85">${mensagem}</p>` +
           `<a href="${pathname}" style="display:inline-block;background:#B2C09D;color:#564334;` +
           `text-decoration:none;font-weight:600;padding:.75rem 1.75rem;border-radius:1rem">Tentar de novo</a>` +
+          // Quem foi barrado de verdade precisa de uma saida que nao dependa do
+          // site. Sem numero configurado, o bloco nao aparece em vez de virar
+          // um link quebrado para wa.me/
+          (whatsapp
+            ? `<p style="margin:1.75rem 0 0;font-size:.9rem;opacity:.75">Precisa falar com a gente?<br>` +
+              `<a href="https://wa.me/${whatsapp}" style="color:#564334;font-weight:600">Chamar no WhatsApp</a></p>`
+            : '') +
           `</main></body></html>`,
           { status: 429, headers: { 'Retry-After': '60', 'Content-Type': 'text/html; charset=utf-8' } }
         )
