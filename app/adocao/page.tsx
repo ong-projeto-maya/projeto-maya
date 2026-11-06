@@ -389,7 +389,7 @@ export default function AdocaoPageEnhanced() {
               </div>
               <h4 className="font-semibold text-maya-brown dark:text-white mb-2">Entre em contato</h4>
               <p className="text-sm text-maya-brown/70 dark:text-gray-300">
-                Converse conosco pelo WhatsApp para agendar uma visita
+                Escreva para a gente por e-mail para agendar uma visita
               </p>
             </div>
             <div className="text-center">

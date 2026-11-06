@@ -326,7 +326,7 @@ export default function CampanhaDetailPage() {
                       </div>
                       <div>
                         <label className="block text-sm font-semibold text-maya-brown dark:text-white mb-1">
-                          Telefone/WhatsApp *
+                          Telefone *
                         </label>
                         <div className="relative">
                           <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-maya-brown/40" />

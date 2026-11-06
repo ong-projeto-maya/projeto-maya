@@ -2,7 +2,8 @@ import { notFound } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
 import { createServiceClient } from '@/lib/supabase-server'
-import { ArrowLeft, Heart, MessageCircle, Share2, Dog, Cat, Ruler, Cake } from 'lucide-react'
+import { ArrowLeft, Heart, Mail, Share2, Dog, Cat, Ruler, Cake } from 'lucide-react'
+import { mailto } from '@/lib/contato'
 
 export const dynamic = 'force-dynamic'
 
@@ -55,10 +56,12 @@ export default async function AnimalDetailPage({ params }: { params: { id: strin
 
   const otherAnimals = (otherRows ?? []).map(mapAnimal)
 
-  const whatsappMessage = encodeURIComponent(
-    `Olá! Tenho interesse em conhecer o(a) ${animal.name}. Gostaria de mais informações sobre adoção.`
+  // O contato da ONG é por e-mail. O assunto já vem preenchido com o nome do
+  // animal para a equipe saber de qual ficha veio a mensagem.
+  const linkContato = mailto(
+    `Adoção: ${animal.name}`,
+    `Olá! Tenho interesse em conhecer o(a) ${animal.name} e gostaria de mais informações sobre a adoção.\n\nMeu nome:\nCidade:\nTelefone:`
   )
-  const whatsappLink = `https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? ''}?text=${whatsappMessage}`
 
   return (
     <div className="min-h-screen bg-maya-cream py-12">
@@ -200,12 +203,10 @@ export default async function AnimalDetailPage({ params }: { params: { id: strin
             {/* CTA Buttons */}
             <div className="space-y-4">
               <a
-                href={whatsappLink}
-                target="_blank"
-                rel="noopener noreferrer"
+                href={linkContato}
                 className="btn-primary w-full text-center inline-flex items-center justify-center gap-2"
               >
-                <MessageCircle size={20} />
+                <Mail size={20} />
                 Quero Conhecer {animal.name}
               </a>
               <button className="btn-outline w-full inline-flex items-center justify-center gap-2">

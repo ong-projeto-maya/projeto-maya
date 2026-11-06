@@ -1,10 +1,9 @@
 'use client'
 
-import { useState } from 'react'
-import { Mail, Phone, Send, Check, MessageSquare, AlertTriangle, ExternalLink } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { Mail, Instagram, Send, Check, MessageSquare, AlertTriangle } from 'lucide-react'
 import { createClient } from '@/lib/supabase'
-
-const WHATSAPP = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? ''
+import { EMAIL_CONTATO } from '@/lib/contato'
 
 export default function ContatoPage() {
   const [formData, setFormData] = useState({
@@ -17,7 +16,6 @@ export default function ContatoPage() {
   const [submitted, setSubmitted] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const [whatsappUrl, setWhatsappUrl] = useState('')
 
   const subjectLabels: Record<string, string> = {
     adocao: 'Interesse em Adoção',
@@ -28,20 +26,16 @@ export default function ContatoPage() {
     outro: 'Outro',
   }
 
-  const buildWhatsappUrl = (data: typeof formData) => {
-    const text = [
-      `Olá! Enviei uma mensagem pelo site do Projeto Maya.`,
-      ``,
-      `*Nome:* ${data.name}`,
-      `*E-mail:* ${data.email}`,
-      data.phone ? `*Telefone:* ${data.phone}` : null,
-      `*Assunto:* ${subjectLabels[data.subject] ?? data.subject}`,
-      ``,
-      `*Mensagem:*`,
-      data.message,
-    ].filter(line => line !== null).join('\n')
-    return `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(text)}`
-  }
+  // Quem chega de /contato?assunto=voluntario já encontra o assunto escolhido.
+  // Lido do window em vez de useSearchParams para não exigir um <Suspense> em
+  // volta da página inteira. Só aceita assunto que existe na lista acima.
+  useEffect(() => {
+    const assunto = new URLSearchParams(window.location.search).get('assunto')
+    if (assunto && assunto in subjectLabels) {
+      setFormData(prev => ({ ...prev, subject: assunto }))
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -63,11 +57,8 @@ export default function ContatoPage() {
       return
     }
 
-    const url = buildWhatsappUrl(formData)
-    setWhatsappUrl(url)
-    // Abre WhatsApp automaticamente em nova aba
-    window.open(url, '_blank', 'noopener,noreferrer')
-
+    // A mensagem fica salva na tabela `mensagens` e aparece em /admin/mensagens.
+    // Antes daqui também abria uma janela do WhatsApp; a equipe pediu para tirar.
     setSubmitted(true)
     setLoading(false)
     setFormData({ name: '', email: '', phone: '', subject: 'adocao', message: '' })
@@ -102,18 +93,27 @@ export default function ContatoPage() {
               <h3 className="font-display text-xl text-maya-brown dark:text-white mb-2">
                 Email
               </h3>
-              <a href="mailto:projetomaya@outlook.com" className="text-maya-brown/70 dark:text-gray-300 hover:text-maya-green">
-                projetomaya@outlook.com
+              <a href={`mailto:${EMAIL_CONTATO}`} className="text-maya-brown/70 dark:text-gray-300 hover:text-maya-green break-all">
+                {EMAIL_CONTATO}
               </a>
+              <p className="text-sm text-maya-brown/60 dark:text-gray-400 mt-2">
+                É por aqui que respondemos. Pode escrever direto ou usar o
+                formulário ao lado.
+              </p>
             </div>
 
             <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg">
-              <Phone className="w-8 h-8 text-maya-green mb-4" />
+              <Instagram className="w-8 h-8 text-maya-green mb-4" />
               <h3 className="font-display text-xl text-maya-brown dark:text-white mb-2">
-                Telefone/WhatsApp
+                Instagram
               </h3>
-              <a href={`tel:+${WHATSAPP}`} className="text-maya-brown/70 dark:text-gray-300 hover:text-maya-green">
-                WhatsApp
+              <a
+                href="https://instagram.com/projeto.maya"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-maya-brown/70 dark:text-gray-300 hover:text-maya-green"
+              >
+                @projeto.maya
               </a>
             </div>
 
@@ -156,16 +156,15 @@ export default function ContatoPage() {
                     <div className="flex-1">
                       <p className="font-semibold text-green-800 dark:text-green-300 mb-1">Mensagem enviada com sucesso!</p>
                       <p className="text-sm text-green-700 dark:text-green-400 mb-3">
-                        Uma janela do WhatsApp foi aberta para você continuar a conversa conosco.
+                        Recebemos sua mensagem e respondemos por e-mail. Se preferir,
+                        pode escrever direto para {EMAIL_CONTATO}.
                       </p>
                       <a
-                        href={whatsappUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
+                        href={`mailto:${EMAIL_CONTATO}`}
                         className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-semibold rounded-lg transition-colors"
                       >
-                        <ExternalLink size={14} />
-                        Abrir WhatsApp
+                        <Mail size={14} />
+                        Escrever um e-mail
                       </a>
                     </div>
                   </div>
