@@ -63,7 +63,7 @@ export default function AdocaoPageEnhanced() {
     searchQuery !== ''
 
   return (
-    <div className="min-h-screen bg-maya-beige dark:bg-gray-900 py-12">
+    <div className="min-h-screen bg-maya-cream py-12">
       <div className="container mx-auto px-4">
         {/* Header */}
         <div className="text-center mb-12">

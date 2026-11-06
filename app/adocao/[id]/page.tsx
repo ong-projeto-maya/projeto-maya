@@ -61,7 +61,7 @@ export default async function AnimalDetailPage({ params }: { params: { id: strin
   const whatsappLink = `https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? ''}?text=${whatsappMessage}`
 
   return (
-    <div className="min-h-screen bg-maya-beige py-12">
+    <div className="min-h-screen bg-maya-cream py-12">
       <div className="container mx-auto px-4">
         {/* Back Button */}
         <Link 
