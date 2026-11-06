@@ -123,7 +123,7 @@ export default function Header() {
   return (
     <>
       <header 
-        className={`bg-white/95 dark:bg-gray-800/95 backdrop-blur-md shadow-md sticky top-0 z-50 transition-all duration-500 ease-out ${
+        className={`bg-maya-cream/95 dark:bg-gray-800/95 backdrop-blur-md shadow-md sticky top-0 z-50 transition-all duration-500 ease-out ${
           isScrolled ? 'py-2 shadow-lg' : 'py-4'
         }`}
       >
@@ -186,7 +186,7 @@ export default function Header() {
                                 href={sublink.href}
                                 className={`flex items-center gap-3 px-4 py-2.5 text-sm transition-colors ${
                                   subActive
-                                    ? 'bg-maya-green/10 text-maya-green dark:bg-maya-green/20'
+                                    ? 'bg-maya-green/25 text-maya-green-dark dark:bg-maya-green/20 dark:text-maya-green'
                                     : 'text-maya-brown dark:text-white hover:bg-maya-green/5 dark:hover:bg-gray-700'
                                 }`}
                               >
@@ -208,7 +208,7 @@ export default function Header() {
                     href={link.href!}
                     className={`relative flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-200 text-sm font-medium ${
                       active
-                        ? 'bg-maya-green/10 text-maya-green dark:bg-maya-green/20'
+                        ? 'bg-maya-green/25 text-maya-green-dark dark:bg-maya-green/20 dark:text-maya-green'
                         : 'text-maya-brown dark:text-white hover:bg-maya-green/5 dark:hover:bg-gray-700'
                     }`}
                   >
@@ -242,7 +242,7 @@ export default function Header() {
                 >
                   <Heart size={20} />
                   {favorites.length > 0 && (
-                    <span className="absolute -top-1 -right-1 bg-maya-green text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold">
+                    <span className="absolute -top-1 -right-1 bg-maya-orange-dark text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold">
                       {favorites.length}
                     </span>
                   )}
@@ -286,7 +286,7 @@ export default function Header() {
               ) : doador ? (
                   <Link
                     href="/doador/dashboard"
-                    className="flex items-center gap-2 px-3 py-2 bg-maya-green/10 dark:bg-maya-green/20 text-maya-green dark:text-maya-green rounded-lg hover:bg-maya-green/20 dark:hover:bg-maya-green/30 transition-colors ml-2"
+                    className="flex items-center gap-2 px-3 py-2 bg-maya-green/25 dark:bg-maya-green/20 text-maya-green-dark dark:text-maya-green rounded-lg hover:bg-maya-green/40 dark:hover:bg-maya-green/30 transition-colors ml-2"
                   >
                     <User size={16} />
                     <span className="text-sm font-medium">Minha Conta</span>
@@ -294,7 +294,7 @@ export default function Header() {
                 ) : (
                   <Link 
                     href="/doador/login" 
-                    className="flex items-center gap-2 px-3 py-2 border-2 border-maya-green text-maya-green dark:text-maya-green rounded-lg hover:bg-maya-green hover:text-white dark:hover:bg-maya-green dark:hover:text-white transition-colors ml-2 font-medium"
+                    className="flex items-center gap-2 px-3 py-2 border-2 border-maya-green-dark text-maya-green-dark dark:border-maya-green dark:text-maya-green rounded-lg hover:bg-maya-green-dark hover:text-maya-cream dark:hover:bg-maya-green dark:hover:text-gray-900 transition-colors ml-2 font-medium"
                 >
                   <User size={16} />
                   <span className="text-sm">Área do Doador</span>
@@ -313,7 +313,7 @@ export default function Header() {
                 >
                   <Heart size={20} />
                   {favorites.length > 0 && (
-                    <span className="absolute -top-1 -right-1 bg-maya-green text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold">
+                    <span className="absolute -top-1 -right-1 bg-maya-orange-dark text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold">
                       {favorites.length}
                     </span>
                   )}
@@ -430,8 +430,8 @@ export default function Header() {
                               href={sublink.href}
                               className={`flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all text-sm ${
                                 subActive
-                                  ? 'bg-maya-green text-white'
-                                  : 'text-maya-brown/80 dark:text-white/80 hover:bg-maya-green/5 dark:hover:bg-gray-700'
+                                  ? 'bg-maya-green text-maya-brown'
+                                  : 'text-maya-brown dark:text-white/80 hover:bg-maya-green/10 dark:hover:bg-gray-700'
                               }`}
                               onClick={() => setIsMenuOpen(false)}
                             >
@@ -452,7 +452,7 @@ export default function Header() {
                   href={link.href!}
                   className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
                     active
-                      ? 'bg-maya-green text-white'
+                      ? 'bg-maya-green text-maya-brown'
                       : 'text-maya-brown dark:text-white hover:bg-maya-green/10 dark:hover:bg-gray-700'
                   }`}
                   onClick={() => setIsMenuOpen(false)}
@@ -493,7 +493,7 @@ export default function Header() {
             ) : doador ? (
               <Link
                 href="/doador/dashboard"
-                className="flex items-center justify-center gap-2 w-full px-4 py-3 bg-maya-green/10 dark:bg-maya-green/20 text-maya-green dark:text-maya-green rounded-xl hover:bg-maya-green/20 dark:hover:bg-maya-green/30 transition-colors"
+                className="flex items-center justify-center gap-2 w-full px-4 py-3 bg-maya-green/25 dark:bg-maya-green/20 text-maya-green-dark dark:text-maya-green rounded-xl hover:bg-maya-green/40 dark:hover:bg-maya-green/30 transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
                 <User size={20} />
@@ -503,7 +503,7 @@ export default function Header() {
               <>
                 <Link
                   href="/doador/login"
-                  className="flex items-center justify-center gap-2 w-full px-4 py-3 border-2 border-maya-green text-maya-green dark:text-maya-green rounded-xl hover:bg-maya-green hover:text-white dark:hover:bg-maya-green dark:hover:text-white transition-colors"
+                  className="flex items-center justify-center gap-2 w-full px-4 py-3 border-2 border-maya-green-dark text-maya-green-dark dark:border-maya-green dark:text-maya-green rounded-xl hover:bg-maya-green-dark hover:text-maya-cream dark:hover:bg-maya-green dark:hover:text-gray-900 transition-colors"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   <User size={20} />

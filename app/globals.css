@@ -25,7 +25,7 @@
   }
 
   body {
-    @apply bg-maya-beige text-maya-brown font-body;
+    @apply bg-maya-cream text-maya-brown font-body;
     @apply dark:bg-gray-900 dark:text-gray-100;
   }
 
@@ -52,45 +52,67 @@
     }
   }
 
-  h1, h2, h3, h4, h5, h6 {
+  /* Caprasimo é uma display pesada, feita para chamada grande. O brandbook a
+     reserva para títulos; nos títulos pequenos ele próprio usa Nunito
+     ExtraBold. Por isso ela para no h2. */
+  h1, h2 {
     @apply font-display;
   }
 
-  /* Dark mode adjustments */
-  .dark {
-    .card {
-      @apply bg-gray-800 text-gray-100;
-    }
-    
-    .btn-outline {
-      @apply border-maya-green text-maya-green hover:bg-maya-green hover:text-gray-900;
-    }
+  h3, h4, h5, h6 {
+    @apply font-body font-extrabold;
+  }
+
+  /* Modo escuro.
+     ATENÇÃO: estas regras eram escritas aninhadas (`.dark { .card { … } }`).
+     O projeto não tem o plugin `tailwindcss/nesting` no postcss.config.js, e o
+     Tailwind compilava o @apply descartando o `.dark` de fora — o CSS que ia
+     para produção tinha duas regras `.card` soltas e a do escuro nunca pegava.
+     Escritas assim, planas, funcionam. */
+  .dark .card {
+    @apply bg-gray-800 text-gray-100;
+  }
+
+  .dark .btn-outline {
+    @apply border-maya-green text-maya-green hover:bg-maya-green hover:text-gray-900;
   }
 }
 
 @layer components {
+  /* Botões.
+     O primário era verde com texto branco: 1,92:1, ilegível. Marrom com texto
+     creme é o par que o brandbook mais usa e dá 8,17:1. */
   .btn-primary {
-    @apply bg-maya-green hover:bg-maya-green text-white font-semibold py-3 px-8 rounded-2xl transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-0.5;
+    @apply bg-maya-brown hover:bg-maya-brown/90 text-maya-cream font-semibold py-3 px-8 rounded-2xl transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-0.5;
   }
 
+  /* Secundário em verde da marca com texto marrom: 4,86:1. */
   .btn-secondary {
-    @apply bg-maya-blue hover:bg-opacity-90 text-white font-semibold py-3 px-8 rounded-2xl transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-0.5;
+    @apply bg-maya-green hover:bg-maya-green/90 text-maya-brown font-semibold py-3 px-8 rounded-2xl transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-0.5;
   }
 
   .btn-outline {
-    @apply border-2 border-maya-green text-maya-green hover:bg-maya-green hover:text-white font-semibold py-3 px-8 rounded-2xl transition-all duration-300;
+    @apply border-2 border-maya-brown text-maya-brown hover:bg-maya-brown hover:text-maya-cream font-semibold py-3 px-8 rounded-2xl transition-all duration-300;
   }
 
   .card {
-    @apply bg-white rounded-2xl shadow-lg p-6 transition-all duration-300 hover:shadow-xl;
+    @apply bg-white border border-maya-line rounded-2xl shadow-lg p-6 transition-all duration-300 hover:shadow-xl;
   }
 
   .section-title {
-    @apply text-4xl md:text-5xl font-bold text-maya-brown mb-4;
+    @apply font-display text-4xl md:text-5xl text-maya-brown mb-4;
   }
 
+  /* Era text-maya-brown com opacity-80, o que baixa o contraste de todo o
+     bloco. O areia escuro dá o mesmo ar de texto secundário com 4,56:1. */
   .section-subtitle {
-    @apply text-lg md:text-xl text-maya-brown opacity-80 max-w-2xl mx-auto;
+    @apply text-lg md:text-xl text-maya-sand-dark max-w-2xl mx-auto;
+  }
+
+  /* Estado vazio: usado onde uma lista ainda não tem conteúdo cadastrado.
+     Antes a seção simplesmente não renderizava nada e ficava um buraco. */
+  .estado-vazio {
+    @apply max-w-md mx-auto text-center bg-white/70 border border-dashed border-maya-line rounded-2xl px-6 py-10;
   }
 
   .wave-divider {
@@ -104,7 +126,7 @@
     left: 0;
     width: 100%;
     height: 100px;
-    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120' preserveAspectRatio='none'%3E%3Cpath d='M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z' fill='%23F5F5DC'/%3E%3C/svg%3E") no-repeat;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120' preserveAspectRatio='none'%3E%3Cpath d='M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z' fill='%23F4EFE8'/%3E%3C/svg%3E") no-repeat;
     background-size: cover;
   }
 
@@ -343,7 +365,7 @@
   }
 
   .text-shimmer {
-    background: linear-gradient(90deg, #D5934F 0%, #DA5F75 25%, #D5934F 50%, #B2C09D 75%, #D5934F 100%);
+    background: linear-gradient(90deg, #D5934F 0%, #E99797 25%, #D5934F 50%, #B2C09D 75%, #D5934F 100%);
     background-size: 200% auto;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;

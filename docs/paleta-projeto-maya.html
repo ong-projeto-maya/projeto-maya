@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Paleta Projeto Maya</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caprasimo&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* Layout: coluna editorial estreita, com os blocos de amostra ocupando a largura toda.
+   Cores retiradas do Brandbook_ProjetoMaya.pdf, nov. 2025. */
+:root {
+  color-scheme: light;
+  --bege:    #D9D3D3;
+  --marrom:  #564334;
+  --verde:   #B2C09D;
+  --azul:    #96B6D3;
+  --laranja: #D5934F;
+  --areia:   #978062;
+  --rosa:    #E99797;
+
+  --fundo:   #F4EFE8;
+  --papel:   #FFFFFF;
+  --tinta:   #564334;
+  --tinta-fraca: #7A6450;
+  --linha:   #DFD5C8;
+
+  --display: 'Caprasimo', Georgia, serif;
+  --corpo:   'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  background: var(--fundo);
+  color: var(--tinta);
+  font-family: var(--corpo);
+  font-size: 17px;
+  line-height: 1.62;
+  -webkit-font-smoothing: antialiased;
+}
+.wrap { max-width: 1080px; margin: 0 auto; padding: 0 16px 96px; }
+.col  { max-width: 64ch; }
+
+h1, h2, h3 { text-wrap: balance; margin: 0; }
+h1 { font-family: var(--display); font-size: clamp(2.1rem, 5.5vw, 3.4rem); line-height: 1.08; font-weight: 400; }
+h2 { font-family: var(--display); font-size: clamp(1.5rem, 3.4vw, 2.1rem); line-height: 1.15; font-weight: 400; margin-top: 4.5rem; }
+h3 { font-size: 1.05rem; font-weight: 800; letter-spacing: .01em; margin-top: 2.5rem; }
+p  { margin: 1rem 0; }
+.lead { font-size: 1.12rem; color: var(--tinta-fraca); }
+small { font-size: .8rem; color: var(--tinta-fraca); }
+
+header.topo { padding: 72px 0 8px; }
+.eyebrow {
+  font-size: .72rem; font-weight: 800; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--areia); margin: 0 0 14px;
+}
+hr { border: 0; border-top: 1px solid var(--linha); margin: 3rem 0 0; }
+
+/* ---- paleta oficial, com a proporção do brandbook ---- */
+.paleta {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-areas: "bege marrom" "verde azul" "rosa laranja";
+  gap: 4px; margin-top: 1.75rem;
+  border-radius: 10px; overflow: hidden;
+}
+.sw { padding: 14px 16px; display: flex; flex-direction: column; justify-content: space-between; min-height: 92px; }
+.sw b { font-size: .72rem; letter-spacing: .12em; text-transform: uppercase; font-weight: 800; }
+.sw code { font-family: var(--corpo); font-weight: 700; font-size: .82rem; opacity: .85; }
+.sw.alto { min-height: 148px; }
+.sw-bege   { grid-area: bege;    background: var(--bege);    color: #4A3B2E; }
+.sw-marrom { grid-area: marrom;  background: var(--marrom);  color: #E8E0D6; }
+.sw-verde  { grid-area: verde;   background: var(--verde);   color: #3D4733; }
+.sw-azul   { grid-area: azul;    background: var(--azul);    color: #2B3F52; }
+.sw-rosa   { grid-area: rosa;    background: var(--rosa);    color: #5A2B2B; }
+.sw-lar    { grid-area: laranja; background: var(--laranja); color: #46290A; }
+
+/* ---- tabela ---- */
+.tabela { width: 100%; border-collapse: collapse; margin-top: 1.5rem; font-size: .93rem; }
+.tabela th, .tabela td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--linha); vertical-align: middle; }
+.tabela th { font-size: .72rem; letter-spacing: .1em; text-transform: uppercase; color: var(--areia); font-weight: 800; }
+.tabela td.num { text-align: right; font-variant-numeric: tabular-nums; font-weight: 800; white-space: nowrap; }
+.rolagem { overflow-x: auto; }
+.tag { display: inline-block; padding: 2px 9px; border-radius: 999px; font-size: .74rem; font-weight: 800; letter-spacing: .02em; }
+.falha { background: #F3D4D4; color: #8E2B2B; }
+.passa { background: #DCE5CF; color: #42562C; }
+
+.amostra { display: inline-block; padding: 3px 12px; border-radius: 6px; font-weight: 700; white-space: nowrap; }
+
+/* ---- comparativo das opções ---- */
+.opcoes { display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 22px; margin-top: 2rem; }
+.opcao { border: 1px solid var(--linha); border-radius: 14px; overflow: hidden; background: var(--papel); display: flex; flex-direction: column; }
+.opcao > figcaption { padding: 16px 18px 20px; }
+.opcao h3 { margin: 0 0 6px; font-size: 1.12rem; }
+.opcao p  { margin: 0; font-size: .9rem; color: var(--tinta-fraca); line-height: 1.5; }
+.recomendada { border-color: var(--marrom); border-width: 2px; }
+.selo {
+  display: inline-block; background: var(--marrom); color: #F4EFE8;
+  font-size: .66rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase;
+  padding: 3px 9px; border-radius: 999px; margin-bottom: 8px;
+}
+
+/* a maquete dentro de cada opção */
+.mock { font-size: 14px; }
+.mock .hero { padding: 26px 20px 30px; }
+.mock .hero .titulo { font-family: var(--display); font-size: 1.5rem; line-height: 1.1; margin: 0 0 6px; }
+.mock .hero .sub { font-size: .82rem; margin: 0 0 16px; opacity: .92; }
+.mock .btns { display: flex; gap: 8px; flex-wrap: wrap; }
+.mock .b { padding: 8px 16px; border-radius: 999px; font-weight: 800; font-size: .8rem; border: 2px solid transparent; }
+.mock .corpo { padding: 20px; }
+.mock .cartao { border-radius: 12px; padding: 14px 16px; }
+.mock .cartao .t { font-weight: 800; margin: 0 0 4px; font-size: .9rem; }
+.mock .cartao .d { margin: 0; font-size: .78rem; opacity: .8; line-height: 1.45; }
+.mock .link { display: inline-block; margin-top: 12px; font-weight: 800; font-size: .8rem; }
+
+ul.limpa { padding-left: 1.1rem; margin: 1rem 0; }
+ul.limpa li { margin: .45rem 0; }
+
+.aviso {
+  margin-top: 1.75rem; padding: 14px 18px; border-radius: 10px;
+  background: #E8EBE2; border-left: 4px solid #607344;
+  font-size: .95rem; max-width: 64ch;
+}
+footer { margin-top: 5rem; padding-top: 1.5rem; border-top: 1px solid var(--linha); }
+@media (max-width: 480px) { .paleta { grid-template-columns: 1fr; grid-template-areas: "bege" "marrom" "verde" "azul" "rosa" "laranja"; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="topo">
+    <p class="eyebrow">Revisão de cor · 5 de novembro de 2026</p>
+    <h1>A paleta está certa.<br>A proporção, não.</h1>
+    <p class="lead col">As seis cores do site batem com o brandbook de novembro de 2025. O que mudou
+    foi o peso de cada uma: o azul, que no brandbook é secundário, virou a cor dominante da home, e
+    o fundo virou branco puro, que não está na paleta.</p>
+
+    <p class="aviso"><strong>Aplicado.</strong> A opção A está implementada na branch local
+    <code>design/cores-e-contraste</code>. A home passou de 7 falhas de contraste para zero.
+    <strong>Produção continua como está</strong> &mdash; nada foi publicado.</p>
+  </header>
+
+  <hr>
+
+  <h2>O que o brandbook define</h2>
+  <p class="col">A página 16 representa a proporção de uso pelo tamanho dos retângulos. Bege e
+  marrom ocupam a metade de cima; verde e azul vêm em tamanho médio; rosa e laranja são faixas
+  finas. É esta a hierarquia que o site precisa recuperar.</p>
+
+  <div class="paleta">
+    <div class="sw sw-bege alto"><b>Bege</b><code>#D9D3D3</code></div>
+    <div class="sw sw-marrom alto"><b>Marrom</b><code>#564334</code></div>
+    <div class="sw sw-verde"><b>Verde</b><code>#B2C09D</code></div>
+    <div class="sw sw-azul"><b>Azul</b><code>#96B6D3</code></div>
+    <div class="sw sw-rosa"><b>Rosa · só urgência</b><code>#E99797</code></div>
+    <div class="sw sw-lar"><b>Laranja</b><code>#D5934F</code></div>
+  </div>
+  <p><small>O areia <code>#978062</code> completa a paleta como a menor faixa. O rosa tem regra
+  própria no brandbook: usar apenas em situações de urgência.</small></p>
+
+  <h2>O que não está dando certo hoje</h2>
+  <p class="col">Medido na página no ar, em 1440×900. O mínimo da norma WCAG AA é 4,5 para texto
+  comum e 3,0 para texto grande.</p>
+
+  <div class="rolagem">
+  <table class="tabela">
+    <thead><tr><th>Onde</th><th>Como aparece</th><th class="num">Contraste</th><th></th></tr></thead>
+    <tbody>
+      <tr>
+        <td>Título da home, 2ª linha</td>
+        <td><span class="amostra" style="background:#96B6D3;color:#D5934F;font-family:var(--display)">o amor transforma.</span></td>
+        <td class="num">1,22</td><td><span class="tag falha">falha</span></td>
+      </tr>
+      <tr>
+        <td>Cards no modo escuro</td>
+        <td><span class="amostra" style="background:#1F2937;color:#564334">Doação Mensal</span></td>
+        <td class="num">1,57</td><td><span class="tag falha">falha</span></td>
+      </tr>
+      <tr>
+        <td>Botão “Ver Todos os Animais”</td>
+        <td><span class="amostra" style="background:#B2C09D;color:#FFFFFF">Ver Todos os Animais</span></td>
+        <td class="num">1,92</td><td><span class="tag falha">falha</span></td>
+      </tr>
+      <tr>
+        <td>Título “Campanhas Especiais”</td>
+        <td><span class="amostra" style="background:#96B6D3;color:#FFFFFF;font-family:var(--display)">Campanhas Especiais</span></td>
+        <td class="num">2,12</td><td><span class="tag falha">falha</span></td>
+      </tr>
+      <tr>
+        <td>Botão “Quero Adotar” (hero)</td>
+        <td><span class="amostra" style="background:#B2C09D;color:#564334">Quero Adotar</span></td>
+        <td class="num">4,86</td><td><span class="tag passa">passa</span></td>
+      </tr>
+      <tr>
+        <td>Rodapé</td>
+        <td><span class="amostra" style="background:#564334;color:#FFFFFF">Projeto Maya</span></td>
+        <td class="num">9,34</td><td><span class="tag passa">passa</span></td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p class="col">O padrão se repete: <strong>verde, azul e laranja são cores claras</strong>.
+  Funcionam como fundo, não como texto, e não aceitam branco em cima. O mesmo botão verde aparece
+  com texto marrom no hero e com texto branco na seção de animais &mdash; um passa, o outro não.</p>
+
+  <h2>Três caminhos</h2>
+  <p class="col">Nenhum troca a identidade. Todos separam duas coisas que hoje estão misturadas: a
+  cor da marca, que vem do brandbook e não muda, e o token de interface, que é a mesma matiz
+  escurecida até dar para ler. Nos três, o fundo branco puro dá lugar a um off-white quente
+  <code>#F4EFE8</code>, e o bege <code>#D9D3D3</code> passa de fundo de página a borda e card.</p>
+
+  <div class="opcoes">
+
+    <figure class="opcao recomendada" style="margin:0">
+      <div class="mock">
+        <div class="hero" style="background:#564334;color:#F4EFE8">
+          <p class="titulo">Nós acreditamos que o amor transforma.</p>
+          <p class="sub">Do resgate, à adoção.</p>
+          <div class="btns">
+            <span class="b" style="background:#F4EFE8;color:#564334">Quero Adotar</span>
+            <span class="b" style="border-color:#F4EFE8;color:#F4EFE8">Quero Doar</span>
+          </div>
+        </div>
+        <div class="corpo" style="background:#F4EFE8">
+          <div class="cartao" style="background:#FFFFFF;border:1px solid #DFD5C8">
+            <p class="t" style="color:#564334">Doação Mensal</p>
+            <p class="d" style="color:#564334">Torne-se apoiador e garanta sustentabilidade ao projeto.</p>
+          </div>
+          <span class="link" style="color:#677C48">Ser Apoiador &rarr;</span>
+        </div>
+      </div>
+      <figcaption>
+        <span class="selo">Recomendada</span>
+        <h3>A · Terroso</h3>
+        <p>Devolve ao marrom e ao bege o peso que o brandbook dá a eles. Verde e azul viram detalhe.
+        É o rodapé de hoje, que já é a melhor parte do site, aplicado ao resto. Par principal em
+        8,17:1.</p>
+      </figcaption>
+    </figure>
+
+    <figure class="opcao" style="margin:0">
+      <div class="mock">
+        <div class="hero" style="background:#E8EBE2;color:#3B4A2C">
+          <p class="titulo">Nós acreditamos que o amor transforma.</p>
+          <p class="sub">Do resgate, à adoção.</p>
+          <div class="btns">
+            <span class="b" style="background:#677C48;color:#FFFFFF">Quero Adotar</span>
+            <span class="b" style="border-color:#677C48;color:#3B4A2C">Quero Doar</span>
+          </div>
+        </div>
+        <div class="corpo" style="background:#F4EFE8">
+          <div class="cartao" style="background:#FFFFFF;border:1px solid #DFD5C8">
+            <p class="t" style="color:#564334">Doação Mensal</p>
+            <p class="d" style="color:#564334">Torne-se apoiador e garanta sustentabilidade ao projeto.</p>
+          </div>
+          <span class="link" style="color:#677C48">Ser Apoiador &rarr;</span>
+        </div>
+      </div>
+      <figcaption>
+        <h3>B · Verde natureza</h3>
+        <p>Dá ao verde o papel de cor assinatura, num tom que aguenta texto: <code>#677C48</code> é a
+        mesma matiz do verde da marca, só mais escura. Combina com resgate, grama, ar livre &mdash;
+        o estilo fotográfico que o brandbook pede.</p>
+      </figcaption>
+    </figure>
+
+    <figure class="opcao" style="margin:0">
+      <div class="mock">
+        <div class="hero" style="background:#96B6D3;color:#2E3F4F">
+          <p class="titulo">Nós acreditamos que o amor transforma.</p>
+          <p class="sub">Do resgate, à adoção.</p>
+          <div class="btns">
+            <span class="b" style="background:#407AAE;color:#FFFFFF">Quero Adotar</span>
+            <span class="b" style="border-color:#2E3F4F;color:#2E3F4F">Quero Doar</span>
+          </div>
+        </div>
+        <div class="corpo" style="background:#F4EFE8">
+          <div class="cartao" style="background:#FFFFFF;border:1px solid #DFD5C8">
+            <p class="t" style="color:#564334">Doação Mensal</p>
+            <p class="d" style="color:#564334">Torne-se apoiador e garanta sustentabilidade ao projeto.</p>
+          </div>
+          <span class="link" style="color:#407AAE">Ser Apoiador &rarr;</span>
+        </div>
+      </div>
+      <figcaption>
+        <h3>C · Azul heterocromia</h3>
+        <p>Mantém a escolha que o site já fez, corrigida. O azul tem um porquê bonito &mdash; são os
+        olhos da Maya. O problema nunca foi o azul, foi pedir dele mais do que <code>#96B6D3</code>
+        consegue entregar.</p>
+      </figcaption>
+    </figure>
+
+  </div>
+
+  <h3>Por que a A</h3>
+  <ul class="limpa col">
+    <li>É a que o brandbook de fato descreve, inclusive na proporção.</li>
+    <li>O par principal já passa de 8:1, então a acessibilidade sai de graça em vez de virar negociação.</li>
+    <li>É a que menos inventa cor nova: só reposiciona o que já existe.</li>
+  </ul>
+  <p class="col">Um meio-termo possível: a A no site público e o azul reservado para a área do
+  doador, criando uma separação visual entre o site e o sistema.</p>
+
+  <h2>Escala derivada</h2>
+  <p class="col">As mesmas matizes do brandbook, escurecidas até passarem 4,5:1 sobre branco. Servem
+  para texto, link e ícone. Não substituem a cor da marca em área grande &mdash; o fundo continua
+  sendo o tom original.</p>
+
+  <div class="rolagem">
+  <table class="tabela">
+    <thead><tr><th>Cor da marca</th><th>Versão para texto</th><th>Como fica</th><th class="num">Contraste</th></tr></thead>
+    <tbody>
+      <tr><td>Verde <code>#B2C09D</code></td><td><code>#677C48</code></td><td><span class="amostra" style="background:#fff;color:#677C48">Ser Apoiador</span></td><td class="num">4,61</td></tr>
+      <tr><td>Azul <code>#96B6D3</code></td><td><code>#407AAE</code></td><td><span class="amostra" style="background:#fff;color:#407AAE">Ver campanhas</span></td><td class="num">4,55</td></tr>
+      <tr><td>Laranja <code>#D5934F</code></td><td><code>#A76522</code></td><td><span class="amostra" style="background:#fff;color:#A76522">Quero ajudar</span></td><td class="num">4,64</td></tr>
+      <tr><td>Areia <code>#978062</code></td><td><code>#8A7150</code></td><td><span class="amostra" style="background:#fff;color:#8A7150">Ser voluntário</span></td><td class="num">4,61</td></tr>
+      <tr><td>Rosa <code>#E99797</code></td><td><code>#D83855</code></td><td><span class="amostra" style="background:#fff;color:#D83855">Resgate urgente</span></td><td class="num">4,55</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h2>Sobre o modo claro e escuro</h2>
+  <p class="col">A recomendação é <strong>tirar o botão do site público e manter dentro do
+  painel</strong>. O modo escuro nunca foi feito para as páginas públicas: os componentes da home
+  têm zero regras de escuro, enquanto as telas de <code>/admin</code> passam de cem cada. Ele foi
+  construído para quem trabalha no sistema, e vazou para o site.</p>
+  <p class="col">Some o problema sem jogar trabalho fora, e o site público passa a ter uma aparência
+  só &mdash; que é a aparência que o brandbook descreve: luz quente, tons terrosos, fundo sólido
+  claro atrás do bicho.</p>
+
+  <footer>
+    <p><small>Cores conferidas amostrando os pixels da página 16 do Brandbook_ProjetoMaya.pdf
+    (nov. 2025, Carolina Maluly). Contrastes medidos na página em produção, em 5 de novembro de
+    2026, e remedidos depois na branch local. Duas falhas do levantamento original &mdash; a
+    legenda da foto da Maya &mdash; eram falso positivo: o script que mede contraste não enxerga
+    gradiente, e havia um escurecimento por cima da foto.</small></p>
+  </footer>
+
+</div>
+</body>
+</html>

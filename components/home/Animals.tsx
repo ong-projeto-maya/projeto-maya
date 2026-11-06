@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { useAnimals } from '@/hooks/useAnimals'
-import { ArrowRight, Heart, Dog, Cat } from 'lucide-react'
+import { ArrowRight, Heart, Dog, Cat, PawPrint } from 'lucide-react'
 import { useScrollAnimation } from '@/hooks/useScrollAnimation'
 
 export default function Animals() {
@@ -22,6 +22,21 @@ export default function Animals() {
             Conheça alguns dos nossos amiguinhos que estão esperando por uma família
           </p>
         </div>
+
+        {/* Estado vazio — enquanto nenhum animal estiver cadastrado, a seção
+            dizia apenas o título e o botão, e ficava um buraco de 400px no
+            meio da página. */}
+        {!isLoading && featuredAnimals.length === 0 && (
+          <div className="estado-vazio mb-12">
+            <PawPrint className="w-10 h-10 mx-auto mb-4 text-maya-green-dark" aria-hidden="true" />
+            <h3 className="text-xl text-maya-brown mb-2">Estamos cadastrando os bichinhos</h3>
+            <p className="text-maya-sand-dark">
+              Os animais que estão esperando por uma família aparecem aqui em breve.
+              Enquanto isso, fala com a gente no WhatsApp — a gente conta quem está
+              disponível agora.
+            </p>
+          </div>
+        )}
 
         {/* Animals Grid */}
         <div ref={gridRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
@@ -106,12 +121,12 @@ export default function Animals() {
                   <h3 className="font-display text-2xl text-maya-brown mb-1">
                     {animal.name}
                   </h3>
-                  <p className="text-maya-brown/60 text-sm flex items-center gap-1">
+                  <p className="text-maya-sand-dark text-sm flex items-center gap-1">
                     {animal.type === 'dog' ? <Dog size={16} /> : <Cat size={16} />}
                     {animal.age} • {animal.gender === 'male' ? 'Macho' : 'Fêmea'}
                   </p>
                 </div>
-                <Heart className="w-6 h-6 text-maya-green" />
+                <Heart className="w-6 h-6 text-maya-green-dark" />
               </div>
 
               {/* Temperament */}
@@ -119,7 +134,7 @@ export default function Animals() {
                 {animal.temperament.slice(0, 3).map((trait) => (
                   <span
                     key={trait}
-                    className="text-xs bg-maya-green/10 text-maya-green px-3 py-1 rounded-full"
+                    className="text-xs bg-maya-green/25 text-maya-green-dark px-3 py-1 rounded-full"
                   >
                     {trait}
                   </span>
@@ -127,14 +142,14 @@ export default function Animals() {
               </div>
 
               {/* Story Preview */}
-              <p className="text-maya-brown/70 text-sm mb-4 line-clamp-2">
+              <p className="text-maya-brown text-sm mb-4 line-clamp-2">
                 {animal.story}
               </p>
 
               {/* CTA Button */}
               <Link
                 href={`/adocao/${animal.id}`}
-                className="inline-flex items-center gap-2 text-maya-green hover:text-maya-blue font-semibold transition-colors"
+                className="inline-flex items-center gap-2 text-maya-green-dark hover:text-maya-brown font-semibold transition-colors"
               >
                 Conhecer {animal.name}
                 <ArrowRight size={18} />
