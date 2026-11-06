@@ -1053,7 +1053,7 @@ export default function ManualCuidadosPage() {
   const nextTab = currentIndex < tabs.length - 1 ? tabs[currentIndex + 1] : null
 
   return (
-    <div className="min-h-screen bg-maya-beige dark:bg-gray-900 py-12">
+    <div className="min-h-screen bg-maya-cream py-12">
       <div className="container mx-auto px-4">
         {/* Page Header */}
         <div className="text-center mb-10">

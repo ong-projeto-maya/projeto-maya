@@ -7,7 +7,8 @@ export default function Footer() {
       {/* Wave Top */}
       <div className="absolute top-0 left-0 w-full overflow-hidden leading-none">
         <svg viewBox="0 0 1440 60" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" className="w-full h-8 md:h-12">
-          <path d="M0,30 C360,60 720,0 1440,30 L1440,0 L0,0 Z" fill="currentColor" className="text-maya-beige dark:text-gray-800" />
+          {/* Casa com a faixa de campanhas, logo acima (maya-blue-dark) */}
+          <path d="M0,30 C360,60 720,0 1440,30 L1440,0 L0,0 Z" fill="currentColor" className="text-maya-blue-dark dark:text-gray-800" />
         </svg>
       </div>
 
@@ -29,7 +30,7 @@ export default function Footer() {
             Cada gesto conta. Doe, adote, seja voluntário ou simplesmente compartilhe.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Link href="/doacoes" className="inline-flex items-center gap-2 justify-center px-6 py-3 bg-maya-green text-maya-brown font-bold rounded-xl hover:bg-maya-green/90 transition-all hover:-translate-y-0.5">
+            <Link href="/doacoes" className="inline-flex items-center gap-2 justify-center px-6 py-3 bg-maya-green text-maya-brown font-bold rounded-xl hover:bg-maya-cream transition-all hover:-translate-y-0.5">
               <Heart size={18} />
               Fazer uma Doação
             </Link>
@@ -124,7 +125,7 @@ export default function Footer() {
               <li className="mt-4">
                 <Link
                   href="/reportar-resgate"
-                  className="inline-flex items-center gap-2 text-maya-orange hover:text-maya-orange/80 font-semibold transition-colors text-sm"
+                  className="inline-flex items-center gap-2 text-maya-orange-light hover:text-maya-cream font-semibold transition-colors text-sm"
                 >
                   <AlertTriangle size={14} />
                   Reportar Resgate
@@ -134,7 +135,7 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="border-t border-white/10 mt-10 pt-8 flex items-center justify-center text-white/40 text-sm">
+        <div className="border-t border-white/10 mt-10 pt-8 flex items-center justify-center text-maya-beige text-sm">
           <p>&copy; 2026 Projeto Maya. Todos os direitos reservados.</p>
         </div>
       </div>

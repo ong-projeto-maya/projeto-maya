@@ -49,7 +49,7 @@ export default function ReportarResgatePage() {
   const emailLink = `mailto:resgate@projetomaya.org?subject=${emailSubject}&body=${buildEmailBody()}`
 
   return (
-    <div className="min-h-screen bg-maya-beige dark:bg-gray-900 py-12">
+    <div className="min-h-screen bg-maya-cream py-12">
       <div className="container mx-auto px-4">
         {/* Header */}
         <div className="text-center mb-12">

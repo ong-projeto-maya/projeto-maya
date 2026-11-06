@@ -141,7 +141,7 @@ export default function QuizPage() {
 
   if (showResult && !result) {
     return (
-      <div className="min-h-screen bg-maya-beige dark:bg-gray-900 py-12">
+      <div className="min-h-screen bg-maya-cream py-12">
         <div className="container mx-auto px-4">
           <div className="max-w-2xl mx-auto text-center">
             <div className="mb-8">
@@ -170,7 +170,7 @@ export default function QuizPage() {
 
   if (showResult && result) {
     return (
-      <div className="min-h-screen bg-maya-beige dark:bg-gray-900 py-12">
+      <div className="min-h-screen bg-maya-cream py-12">
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto text-center">
             <div className="mb-8">
@@ -254,7 +254,7 @@ export default function QuizPage() {
   const Icon = question.icon
 
   return (
-    <div className="min-h-screen bg-maya-beige dark:bg-gray-900 py-12">
+    <div className="min-h-screen bg-maya-cream py-12">
       <div className="container mx-auto px-4">
         <div className="max-w-2xl mx-auto">
           {/* Header */}

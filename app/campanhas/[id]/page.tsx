@@ -90,7 +90,7 @@ export default function CampanhaDetailPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-maya-beige dark:bg-gray-900 py-12 flex items-center justify-center">
+      <div className="min-h-screen bg-maya-cream py-12 flex items-center justify-center">
         <div className="text-center">
           <div className="w-12 h-12 border-4 border-maya-green border-t-transparent rounded-full animate-spin mx-auto mb-4" />
           <p className="text-maya-brown/60 dark:text-gray-400">Carregando campanha...</p>
@@ -101,7 +101,7 @@ export default function CampanhaDetailPage() {
 
   if (!campaign) {
     return (
-      <div className="min-h-screen bg-maya-beige dark:bg-gray-900 py-12">
+      <div className="min-h-screen bg-maya-cream py-12">
         <div className="container mx-auto px-4 text-center">
           <AlertCircle className="w-16 h-16 text-maya-brown/30 dark:text-gray-600 mx-auto mb-4" />
           <h1 className="text-3xl font-display text-maya-brown dark:text-white mb-4">
@@ -169,7 +169,7 @@ export default function CampanhaDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-maya-beige dark:bg-gray-900 py-12">
+    <div className="min-h-screen bg-maya-cream py-12">
       <div className="container mx-auto px-4">
         {/* Back Button */}
         <Link

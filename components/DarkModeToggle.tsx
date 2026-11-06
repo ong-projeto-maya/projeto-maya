@@ -4,7 +4,13 @@ import { Moon, Sun } from 'lucide-react'
 import { useDarkMode } from '@/hooks/useDarkMode'
 
 export default function DarkModeToggle() {
-  const { isDark, toggleDarkMode, mounted } = useDarkMode()
+  const { isDark, toggleDarkMode, mounted, disponivel } = useDarkMode()
+
+  // O botão só existe na área logada, onde as telas têm modo escuro de
+  // verdade. No site público ele não aparece — ver hooks/useDarkMode.ts.
+  if (!disponivel) {
+    return null
+  }
 
   // Evitar problemas de hidratação
   if (!mounted) {

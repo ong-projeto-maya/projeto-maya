@@ -24,15 +24,18 @@ export default function Home() {
       <ScrollReveal direction="up">
         <About />
       </ScrollReveal>
-      <WaveDivider from="bg-white" to="#D9D3D3" />
+      {/* As ondas precisam casar com a cor das duas seções que elas separam.
+          O fundo branco saiu em favor do creme (#F4EFE8), e a faixa de
+          campanhas passou do azul-claro para o azul escurecido (#3D71A0). */}
+      <WaveDivider from="bg-maya-cream" to="#D9D3D3" />
       <ScrollReveal direction="up">
         <Animals />
       </ScrollReveal>
-      <WaveDivider from="bg-maya-beige" to="#ffffff" />
+      <WaveDivider from="bg-maya-beige" to="#F4EFE8" />
       <ScrollReveal direction="up">
         <HowToHelp />
       </ScrollReveal>
-      <WaveDivider from="bg-white" to="#96B6D3" />
+      <WaveDivider from="bg-maya-cream" to="#3D71A0" />
       <ScrollReveal direction="scale">
         <CampaignsCTA />
       </ScrollReveal>

@@ -20,7 +20,7 @@ export default function ComingSoon({
   features = [],
 }: ComingSoonProps) {
   return (
-    <div className="min-h-screen bg-maya-beige dark:bg-gray-900 flex items-center justify-center py-20 relative overflow-hidden">
+    <div className="min-h-screen bg-maya-cream flex items-center justify-center py-20 relative overflow-hidden">
       {/* Decorative paw prints */}
       <div className="absolute top-10 left-[5%] opacity-[0.06] rotate-[-20deg] pointer-events-none">
         <PawPrint size={120} className="text-maya-brown dark:text-white" />

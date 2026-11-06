@@ -7,7 +7,7 @@ export default function About() {
   const { ref: storyRef, isVisible: storyVisible } = useScrollAnimation({ threshold: 0.15 })
 
   return (
-    <section id="sobre" className="py-20 bg-white">
+    <section id="sobre" className="py-20 bg-maya-cream">
       <div className="container mx-auto px-4">
         {/* Section Header */}
         <div className="text-center mb-16">
@@ -45,7 +45,7 @@ export default function About() {
               </div>
 
               {/* Texto da História */}
-              <div className={`space-y-4 text-maya-brown/80 leading-relaxed order-1 lg:order-2 scroll-hidden scroll-right ${storyVisible ? 'scroll-visible' : ''} stagger-2`}>
+              <div className={`space-y-4 text-maya-brown leading-relaxed order-1 lg:order-2 scroll-hidden scroll-right ${storyVisible ? 'scroll-visible' : ''} stagger-2`}>
                 <p>
                   Tudo começou com ela. Uma cachorrinha adotada em 2018, que acabou virando 
                   estrelinha depois de alguns meses... mas foi tempo de sobra pra conquistar 
@@ -61,7 +61,9 @@ export default function About() {
                   e da adoção responsável, conseguimos fazer com que esses animais encontrem lares, 
                   onde serão amados e protegidos.
                 </p>
-                <p className="text-lg font-semibold text-maya-brown dark:text-white text-center mt-6 pt-4 border-t border-maya-brown/20">
+                {/* Tinha `dark:text-white` aqui. Como o card é bege, no modo
+                    escuro virava branco sobre bege claro: 1,48:1. */}
+                <p className="text-lg font-semibold text-maya-brown text-center mt-6 pt-4 border-t border-maya-brown/20">
                   Nosso trabalho não tem fins lucrativos.
                 </p>
               </div>

@@ -64,7 +64,7 @@ function DonationSuccessContent() {
   const shareUrl = typeof window !== 'undefined' ? window.location.origin : ''
 
   return (
-    <div className="min-h-screen bg-maya-beige dark:bg-gray-900 py-12">
+    <div className="min-h-screen bg-maya-cream py-12">
       <div className="container mx-auto px-4">
         <div className="max-w-2xl mx-auto text-center">
           {/* Success Icon */}
@@ -268,7 +268,7 @@ function DonationSuccessContent() {
 export default function DonationSuccessPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-maya-beige dark:bg-gray-900 flex items-center justify-center">
+      <div className="min-h-screen bg-maya-cream flex items-center justify-center">
         <Loader2 className="w-10 h-10 text-maya-green animate-spin" />
       </div>
     }>

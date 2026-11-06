@@ -12,20 +12,35 @@ export default function CampaignsCTA() {
   const { getActiveCampaigns, isLoading } = useCampaigns()
   const activeCampaigns = getActiveCampaigns().slice(0, 2)
 
+  // O azul da marca (#96B6D3) é claro demais para receber texto branco: o
+  // título "Campanhas Especiais" ficava em 2,12:1. maya-blue-dark é o mesmo
+  // azul escurecido, e com o creme por cima dá 4,51:1.
   return (
-    <section className="py-20 bg-maya-blue text-white">
+    <section className="py-20 bg-maya-blue-dark text-maya-cream">
       <div className="container mx-auto px-4">
         <div className="max-w-5xl mx-auto">
           {/* Header */}
           <div className="text-center mb-12">
-            <Target className="w-16 h-16 mx-auto mb-6" />
+            <Target className="w-16 h-16 mx-auto mb-6" aria-hidden="true" />
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-display mb-4">
               Campanhas Especiais
             </h2>
-            <p className="text-xl text-white/90 max-w-2xl mx-auto">
+            <p className="text-xl text-maya-cream max-w-2xl mx-auto">
               Contribua pra causas específicas e veja exatamente o impacto da sua doação!
             </p>
           </div>
+
+          {/* Estado vazio — sem campanha cadastrada, restavam só o título e o
+              link, com um vão no meio. */}
+          {!isLoading && activeCampaigns.length === 0 && (
+            <div className="max-w-md mx-auto text-center bg-white/10 border border-dashed border-maya-cream/40 rounded-2xl px-6 py-10 mb-10">
+              <h3 className="text-xl text-maya-cream mb-2">Nenhuma campanha aberta agora</h3>
+              <p className="text-maya-cream">
+                Quando abrirmos uma vaquinha para castração, ração ou tratamento, ela
+                aparece aqui. Até lá, qualquer doação ajuda no dia a dia do projeto.
+              </p>
+            </div>
+          )}
 
           {/* Campaign CTAs */}
           <div ref={cardsRef} className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10 max-w-3xl mx-auto">
@@ -49,12 +64,12 @@ export default function CampaignsCTA() {
                       <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
                         <Icon className="w-8 h-8" />
                       </div>
-                      <h3 className="font-display text-2xl mb-3">{campaign.title}</h3>
-                      <p className="text-white/80 mb-6">{campaign.description}</p>
+                      <h3 className="text-2xl mb-3">{campaign.title}</h3>
+                      <p className="text-maya-cream mb-6">{campaign.description}</p>
                       <div className="flex flex-col sm:flex-row gap-3 justify-center">
                         <Link
                           href={`/campanhas/${campaign.id}`}
-                          className="inline-flex items-center gap-2 bg-white text-maya-brown px-6 py-3 rounded-xl font-bold hover:shadow-lg hover:-translate-y-0.5 transition-all justify-center"
+                          className="inline-flex items-center gap-2 bg-maya-cream text-maya-brown px-6 py-3 rounded-xl font-bold hover:shadow-lg hover:-translate-y-0.5 transition-all justify-center"
                         >
                           Quero Contribuir
                           <ArrowRight size={18} />
@@ -62,7 +77,7 @@ export default function CampaignsCTA() {
                         {campaign.allowsRegistration && (
                           <Link
                             href={`/campanhas/${campaign.id}#inscricao`}
-                            className="inline-flex items-center gap-2 bg-white/15 border-2 border-white/50 text-white px-6 py-3 rounded-xl font-bold hover:bg-white/25 transition-all justify-center"
+                            className="inline-flex items-center gap-2 bg-transparent border-2 border-maya-cream/70 text-maya-cream px-6 py-3 rounded-xl font-bold hover:bg-maya-cream hover:text-maya-brown transition-all justify-center"
                           >
                             <ClipboardList size={18} />
                             Quero me Inscrever
@@ -79,7 +94,7 @@ export default function CampaignsCTA() {
           <div className="text-center">
             <Link
               href="/campanhas"
-              className="text-white/80 hover:text-white font-semibold inline-flex items-center gap-2 transition-colors"
+              className="text-maya-cream hover:text-white font-semibold inline-flex items-center gap-2 underline underline-offset-4 transition-colors"
             >
               Ver todas as campanhas
               <ArrowRight size={16} />

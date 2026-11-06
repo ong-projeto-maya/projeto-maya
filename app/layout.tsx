@@ -60,16 +60,35 @@ export default function RootLayout({
   return (
     <html lang="pt-BR">
       <head>
-        {/* Dark mode initialization script — pure JS, no user input, XSS-safe */}
+        {/*
+          Inicialização do modo escuro — JS puro, sem entrada do usuário.
+
+          O modo escuro vale apenas em /admin e /doador, onde as telas foram
+          de fato construídas para ele (mais de cem regras `dark:` por página).
+          O site público nunca teve nenhuma: ligar o escuro ali deixava o
+          cabeçalho preto e o resto claro, com texto marrom sobre fundo quase
+          preto (1,57:1). A marca também é de luz quente — tons terrosos e
+          fundo sólido claro atrás do animal.
+
+          Por isso a classe só entra nessas rotas, e nem a preferência do
+          sistema operacional a aplica no site público.
+        */}
         <script
           dangerouslySetInnerHTML={{
             __html: `
               (function() {
                 try {
-                  const stored = localStorage.getItem('maya_dark_mode');
-                  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-                  const isDark = stored !== null ? stored === 'true' : prefersDark;
-                  
+                  var p = window.location.pathname;
+                  var permite = p.indexOf('/admin') === 0 || p.indexOf('/doador') === 0;
+                  if (!permite) {
+                    document.documentElement.classList.remove('dark');
+                    return;
+                  }
+
+                  var stored = localStorage.getItem('maya_dark_mode');
+                  var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                  var isDark = stored !== null ? stored === 'true' : prefersDark;
+
                   if (isDark) {
                     document.documentElement.classList.add('dark');
                   } else {
@@ -83,7 +102,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="bg-white dark:bg-gray-900 text-maya-brown dark:text-gray-100 transition-colors duration-200">
+      <body className="bg-maya-cream dark:bg-gray-900 text-maya-brown dark:text-gray-100 transition-colors duration-200">
         <ConditionalLayout>
           {children}
         </ConditionalLayout>
