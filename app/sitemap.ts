@@ -9,7 +9,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   let animalData: { id: string }[] = []
   try {
     const supabase = createServiceClient()
-    const { data } = await supabase.from('animais').select('id')
+    // Só os animais com ficha pronta. A chave de serviço ignora o RLS, então
+    // sem este filtro o sitemap entregaria ao Google as fichas ainda vazias.
+    const { data } = await supabase.from('animais').select('id').eq('revisado', true)
     animalData = data ?? []
   } catch {
     // Env vars not configured — skip dynamic animal pages
