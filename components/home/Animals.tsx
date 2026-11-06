@@ -32,7 +32,7 @@ export default function Animals() {
             <h3 className="text-xl text-maya-brown mb-2">Estamos cadastrando os bichinhos</h3>
             <p className="text-maya-sand-dark">
               Os animais que estão esperando por uma família aparecem aqui em breve.
-              Enquanto isso, fala com a gente no WhatsApp — a gente conta quem está
+              Enquanto isso, escreva para a gente — a gente conta quem está
               disponível agora.
             </p>
           </div>

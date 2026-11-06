@@ -74,7 +74,7 @@ export default function HowToHelp() {
           </Link>
 
           {/* Voluntariado */}
-          <a href={`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? ''}?text=Ol%C3%A1!%20Gostaria%20de%20ser%20volunt%C3%A1rio%20no%20Projeto%20Maya`} target="_blank" rel="noopener noreferrer" className={`card group card-hover-lift card-hover-glow transition-all duration-500 text-center scroll-hidden scroll-up ${cardsVisible ? 'scroll-visible' : ''} stagger-4`}>
+          <Link href="/contato?assunto=voluntario" className={`card group card-hover-lift card-hover-glow transition-all duration-500 text-center scroll-hidden scroll-up ${cardsVisible ? 'scroll-visible' : ''} stagger-4`}>
             <div className="w-20 h-20 bg-maya-sand-dark rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:bg-maya-sand-dark/85 transition-colors icon-hover-bounce">
               <Users className="w-10 h-10 text-maya-cream" />
             </div>
@@ -87,7 +87,7 @@ export default function HowToHelp() {
             <span className="text-maya-sand-dark font-semibold group-hover:underline">
               Ser Voluntário →
             </span>
-          </a>
+          </Link>
         </div>
       </div>
     </section>

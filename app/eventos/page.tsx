@@ -3,6 +3,7 @@
 import { Calendar, MapPin, Clock, Users } from 'lucide-react'
 import Link from 'next/link'
 import { useEvents } from '@/hooks/useEvents'
+import { mailto } from '@/lib/contato'
 
 const typeLabels: Record<string, string> = {
   adoption: 'Adoção',
@@ -119,12 +120,13 @@ export default function EventosPage() {
                     </p>
 
                     <a
-                      href={`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? ''}?text=Ol%C3%A1!%20Gostaria%20de%20me%20inscrever%20no%20evento:%20${encodeURIComponent(event.title)}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
+                      href={mailto(
+                        `Inscrição no evento: ${event.title}`,
+                        `Olá! Gostaria de me inscrever no evento "${event.title}".\n\nMeu nome:\nTelefone:`
+                      )}
                       className="btn-primary inline-block"
                     >
-                      Inscrever-se Agora
+                      Inscrever-se por e-mail
                     </a>
                   </div>
                 </div>

@@ -1,5 +1,6 @@
 import Link from 'next/link'
-import { Heart, Instagram, Mail, Phone, PawPrint, ArrowRight, AlertTriangle } from 'lucide-react'
+import { Heart, Instagram, Mail, PawPrint, ArrowRight, AlertTriangle } from 'lucide-react'
+import { EMAIL_CONTATO } from '@/lib/contato'
 
 export default function Footer() {
   return (
@@ -100,18 +101,10 @@ export default function Footer() {
             <ul className="space-y-3">
               <li className="flex items-center space-x-3">
                 <div className="w-8 h-8 bg-white/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <Phone size={16} />
-                </div>
-                <a href={`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? ''}`} className="text-white/60 hover:text-maya-green text-sm transition-colors">
-                  WhatsApp
-                </a>
-              </li>
-              <li className="flex items-center space-x-3">
-                <div className="w-8 h-8 bg-white/10 rounded-lg flex items-center justify-center flex-shrink-0">
                   <Mail size={16} />
                 </div>
-                <a href="mailto:projetomaya@outlook.com" className="text-white/60 hover:text-maya-green text-sm transition-colors">
-                  projetomaya@outlook.com
+                <a href={`mailto:${EMAIL_CONTATO}`} className="text-white/60 hover:text-maya-green text-sm transition-colors break-all">
+                  {EMAIL_CONTATO}
                 </a>
               </li>
               <li className="flex items-center space-x-3">
