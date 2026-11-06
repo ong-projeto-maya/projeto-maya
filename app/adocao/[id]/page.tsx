@@ -26,11 +26,16 @@ function mapAnimal(row: Record<string, unknown>) {
 }
 
 export default async function AnimalDetailPage({ params }: { params: { id: string } }) {
+  // Esta página usa a chave de serviço, que ignora o RLS. O filtro
+  // revisado = true precisa ser feito aqui, à mão: sem ele, os animais que
+  // ainda não têm ficha pronta (sem foto, sem história) ficam acessíveis pela
+  // URL e aparecem na faixa "Conheça Outros Amiguinhos".
   const supabase = createServiceClient()
   const { data: row } = await supabase
     .from('animais')
     .select('*')
     .eq('id', params.id)
+    .eq('revisado', true)
     .single()
 
   if (!row) {
@@ -44,6 +49,7 @@ export default async function AnimalDetailPage({ params }: { params: { id: strin
     .select('*')
     .neq('id', params.id)
     .eq('is_adopted', false)
+    .eq('revisado', true)
     .order('sort_order', { ascending: true })
     .limit(3)
 
