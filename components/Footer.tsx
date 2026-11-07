@@ -46,10 +46,14 @@ export default function Footer() {
           {/* Logo e Missão */}
           <div className="col-span-1 sm:col-span-2">
             <div className="flex items-center mb-4">
-              <img 
-                src="/logo-2.png" 
-                alt="Projeto Maya" 
-                className="h-10 w-auto brightness-0 invert"
+              {/* Sobre fundo marrom o brandbook aplica a versão bege do
+                  logotipo (página 13), que mantém a Maya colorida. Antes
+                  era o logotipo marrom forçado a branco por filtro CSS
+                  (brightness-0 invert), o que apagava o desenho dela. */}
+              <img
+                src="/logo-bege.png"
+                alt="Projeto Maya"
+                className="h-10 w-auto"
               />
             </div>
             <p className="text-white/70 mb-6 max-w-md leading-relaxed">

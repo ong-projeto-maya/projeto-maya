@@ -87,8 +87,8 @@ function DoadorLoginForm() {
             <Image
               src="/logo.png"
               alt="Projeto Maya"
-              width={388}
-              height={141}
+              width={1200}
+              height={446}
               quality={100}
               className="h-24 w-auto drop-shadow-2xl dark:brightness-0 dark:invert"
             />
