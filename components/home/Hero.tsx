@@ -16,8 +16,8 @@ export default function Hero() {
         <Image
           src="/images/maya-hero.png"
           alt="Maya - Mascote do Projeto"
-          width={1200}
-          height={1200}
+          width={900}
+          height={1001}
           className="w-36 md:w-48 lg:w-64 h-auto object-contain"
           priority
           quality={100}

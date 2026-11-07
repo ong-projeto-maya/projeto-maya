@@ -216,8 +216,8 @@ export default function AdminDashboard() {
             <Image 
               src="/logo.png" 
               alt="Projeto Maya" 
-              width={64}
-              height={64}
+              width={1200}
+              height={446}
               className="h-16 w-auto hidden sm:block"
             />
             <div>
