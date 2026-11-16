@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pegadas do Hero</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caprasimo&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* Sem JavaScript: o visualizador de arquivos do app bloqueia script. */
+:root{
+  color-scheme: light;
+  --marrom:#564334; --creme:#F4EFE8; --linha:#DFD5C8; --areia:#978062; --verde:#B2C09D;
+  --display:'Caprasimo',Georgia,serif; --corpo:'Nunito',-apple-system,BlinkMacSystemFont,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--creme);color:var(--marrom);font-family:var(--corpo);font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1040px;margin:0 auto;padding:0 16px 80px}
+header{padding:64px 0 8px}
+h1{font-family:var(--display);font-weight:400;font-size:clamp(2rem,5vw,3rem);line-height:1.1;margin:0 0 12px;text-wrap:balance}
+h2{font-family:var(--display);font-weight:400;font-size:1.5rem;margin:3.5rem 0 .4rem}
+p{margin:.8rem 0;max-width:64ch}
+.lead{font-size:1.1rem;color:#7A6450}
+.eyebrow{font-size:.72rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--areia);margin:0 0 14px}
+hr{border:0;border-top:1px solid var(--linha);margin:2.5rem 0 0}
+small{color:#7A6450;font-size:.85rem}
+ul{padding-left:1.1rem;max-width:64ch} li{margin:.4rem 0}
+table{border-collapse:collapse;margin-top:1rem;font-size:.93rem;width:100%;max-width:620px}
+th,td{text-align:left;padding:8px 14px 8px 0;border-bottom:1px solid var(--linha)}
+th{font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--areia);font-weight:800}
+td.n{font-variant-numeric:tabular-nums;font-weight:700;text-align:right;white-space:nowrap}
+.nome{font-weight:800;font-size:.95rem;margin:2.2rem 0 0}
+
+/* ————— pegadas ————— */
+.p{position:absolute;display:block;
+  width:var(--t);height:calc(var(--t) * 1.12);
+  background-repeat:no-repeat;background-position:center;background-size:contain;
+  opacity:0;transform:rotate(var(--giro,0deg)) scaleX(var(--esp,1));
+  animation:paw 20s ease-in-out infinite both;will-change:opacity,transform}
+.pb{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 112' fill='%23F4EFE8'%3E%3Cpath d='M50.4 108c-13.8 0-24.6-6.1-27.5-15.9-2.6-8.7 1.6-17 7.6-23.6 4.7-5.2 10.6-9 19.6-9.1 9.3-.1 15.6 3.8 20.4 9.2 6 6.7 10 15 7.3 23.6C74.8 102 64.1 108 50.4 108Z'/%3E%3Cellipse cx='17.5' cy='50.5' rx='11.6' ry='14.8' transform='rotate(-26 17.5 50.5)'/%3E%3Cellipse cx='37.5' cy='25.5' rx='11.2' ry='15.4' transform='rotate(-9 37.5 25.5)'/%3E%3Cellipse cx='62.5' cy='25' rx='11.2' ry='15.4' transform='rotate(9 62.5 25)'/%3E%3Cellipse cx='82.5' cy='51.5' rx='11.6' ry='14.8' transform='rotate(26 82.5 51.5)'/%3E%3C/svg%3E")}
+.pc{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 112' fill='%23F4EFE8'%3E%3Cpath d='M50 108.5c-9.9.4-19.4-2.8-24.8-9.4-4.4-5.3-4.3-12.1-1.6-18.3 2.4-5.6 6.4-10.3 11.9-13 4.9-2.4 10.4-2.9 15.6-2.6 6 .3 12 1.9 16.6 5.9 4.9 4.2 8.2 10.2 9.3 16.6 1 5.9-.8 12-5.6 15.7-5.6 4.3-13.3 5.3-21.4 5.1Z'/%3E%3Cpath d='M18.6 65.3c-5.4.3-9.6-4.6-10.8-10.4-1.2-6 .3-12.9 4.5-17 3.9-3.8 9.8-3.4 13.2.8 3.6 4.5 4.4 11.3 2.8 17-1.5 5.4-5.1 9.3-9.7 9.6Z'/%3E%3Cpath d='M38.2 41.3c-5.3-.2-8.6-5.5-9.2-11.6-.6-6.4 1.5-13.6 6.3-17 4.4-3.1 9.9-1.4 12.5 3.5 2.7 5.2 2.3 12.2-.2 17.6-2.3 5-5.6 7.7-9.4 7.5Z'/%3E%3Cpath d='M62.4 41c-3.9.3-7.4-2.4-9.6-7.3-2.5-5.4-2.9-12.5-.1-17.6 2.7-4.8 8.2-6.3 12.5-3.1 4.7 3.5 6.7 10.7 6 17.1-.7 6-4 10.5-8.8 10.9Z'/%3E%3Cpath d='M81.8 65.6c-4.7-.2-8.4-4.1-10-9.5-1.7-5.7-.9-12.6 2.6-17.2 3.4-4.4 9.3-4.8 13.3-1 4.3 4.1 5.8 11.1 4.5 17.1-1.2 5.9-5.4 10.8-10.4 10.6Z'/%3E%3C/svg%3E")}
+
+@keyframes paw{
+  0%   {opacity:0; transform:rotate(var(--giro,0deg)) scaleX(var(--esp,1)) scale(.9)}
+  3%   {opacity:calc(var(--pico,.09) * var(--ganho,1)); transform:rotate(var(--giro,0deg)) scaleX(var(--esp,1)) scale(1.01)}
+  5.5% {opacity:calc(var(--pico,.09) * var(--ganho,1)); transform:rotate(var(--giro,0deg)) scaleX(var(--esp,1)) scale(1)}
+  20%  {opacity:calc(var(--pico,.09) * var(--ganho,1)); transform:rotate(var(--giro,0deg)) scaleX(var(--esp,1)) scale(1)}
+  30%  {opacity:0; transform:rotate(var(--giro,0deg)) scaleX(var(--esp,1)) scale(1.05)}
+  100% {opacity:0; transform:rotate(var(--giro,0deg)) scaleX(var(--esp,1)) scale(1.05)}
+}
+@media (prefers-reduced-motion: reduce){ .p{animation:none;opacity:calc(var(--pico,.09) * .6)} }
+
+.faixa{background:var(--marrom);border-radius:14px;position:relative;overflow:hidden;margin-top:12px;height:320px}
+.rotulo{position:absolute;left:18px;top:14px;color:var(--creme);opacity:.55;font-size:.7rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;z-index:3;margin:0}
+.realce{--ganho:4}
+
+/* régua de opacidade */
+.regua{display:flex;gap:0;margin-top:1rem;border-radius:12px;overflow:hidden;max-width:620px}
+.regua div{flex:1;background:var(--marrom);color:var(--creme);padding:14px 10px 12px;text-align:center;font-size:.7rem;font-weight:800;letter-spacing:.06em}
+.regua span{display:block;width:34px;height:38px;margin:0 auto 10px;background-repeat:no-repeat;background-position:center;background-size:contain;transform:rotate(90deg)}
+/* as amostras da régua estão na opacidade real de cada andar — a do passeio
+   fica quase invisível mesmo, e é esse o ponto */
+.regua .o9{opacity:.10} .regua .o13{opacity:.135} .regua .o20{opacity:.185}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <p class="eyebrow">Hero do site · versão 3 · 10 de novembro de 2026</p>
+  <h1>Dois cães, cada um no seu ritmo</h1>
+  <p class="lead">Os caminhos deixaram de ser paralelos. Cada cão tem pontos de passagem próprios, os
+  dois se cruzam no meio, a velocidade muda ao longo da caminhada — e a opacidade saiu da
+  velocidade: quem passeia mal marca o chão, quem corre crava.</p>
+</header>
+
+<hr>
+
+<h2>A marca vem da velocidade</h2>
+<p>Essa foi a parte que mudou o jeito de pensar. Em vez de escolher a opacidade no olho, ela vem do
+andar: é o mesmo motivo de uma pegada na areia ficar mais funda quando o bicho acelera.</p>
+
+<div class="regua">
+  <div><span class="pb o9"></span>passeio<br>9–11%</div>
+  <div><span class="pb o13"></span>trote<br>12–15%</div>
+  <div><span class="pb o20"></span>corrida<br>17–20%</div>
+</div>
+<p><small>As três amostras acima estão na opacidade real de cada andar. A do passeio fica quase
+invisível mesmo — é esse o ponto. A parada para farejar não deixa pegada nova: só gasta tempo, e é
+ela que tira a cadência de metrônomo do rastro.</small></p>
+
+<h2>Como ficou</h2>
+<p>Esta faixa está na <strong>opacidade real do site</strong>. Repare que as pegadas do meio da
+travessia são visivelmente mais marcadas: é o trecho em que os dois estão correndo.</p>
+
+<div class="faixa">
+  <p class="rotulo">como fica no site</p>
+  <span class="p pb" style="left:5.21%;top:90.44%;--giro:82.1deg;--esp:-1;--pico:0.097;--t:22px;animation-delay:0.89s"></span>
+  <span class="p pb" style="left:10.84%;top:80.61%;--giro:100.8deg;--esp:1;--pico:0.098;--t:23px;animation-delay:1.72s"></span>
+  <span class="p pb" style="left:16.55%;top:81.51%;--giro:87.4deg;--esp:-1;--pico:0.105;--t:24px;animation-delay:2.64s"></span>
+  <span class="p pb" style="left:25.19%;top:70.11%;--giro:95.1deg;--esp:1;--pico:0.137;--t:25px;animation-delay:3.15s"></span>
+  <span class="p pb" style="left:34.34%;top:71.06%;--giro:80.2deg;--esp:-1;--pico:0.121;--t:26px;animation-delay:3.63s"></span>
+  <span class="p pb" style="left:45.52%;top:61.51%;--giro:90.1deg;--esp:1;--pico:0.192;--t:27px;animation-delay:3.93s"></span>
+  <span class="p pb" style="left:57.67%;top:62.81%;--giro:88.3deg;--esp:-1;--pico:0.197;--t:28px;animation-delay:4.26s"></span>
+  <span class="p pb" style="left:69.87%;top:51.87%;--giro:91.7deg;--esp:1;--pico:0.183;--t:29px;animation-delay:4.54s"></span>
+  <span class="p pb" style="left:78.23%;top:54.6%;--giro:78.4deg;--esp:-1;--pico:0.146;--t:30px;animation-delay:5.03s"></span>
+  <span class="p pb" style="left:84.72%;top:48.62%;--giro:97.2deg;--esp:1;--pico:0.095;--t:31px;animation-delay:6.03s"></span>
+  <span class="p pc" style="left:11.03%;top:53.21%;--giro:79.7deg;--esp:-1;--pico:0.139;--t:16px;animation-delay:2.88s"></span>
+  <span class="p pc" style="left:19.6%;top:56.16%;--giro:96.7deg;--esp:1;--pico:0.143;--t:17px;animation-delay:3.4s"></span>
+  <span class="p pc" style="left:26.1%;top:73.27%;--giro:91.0deg;--esp:-1;--pico:0.1;--t:19px;animation-delay:6.23s"></span>
+  <span class="p pc" style="left:31.73%;top:75.67%;--giro:101.7deg;--esp:1;--pico:0.092;--t:20px;animation-delay:7.22s"></span>
+  <span class="p pc" style="left:40.28%;top:83.89%;--giro:86.1deg;--esp:-1;--pico:0.139;--t:21px;animation-delay:7.7s"></span>
+  <span class="p pc" style="left:52.74%;top:75.31%;--giro:88.4deg;--esp:1;--pico:0.178;--t:22px;animation-delay:7.96s"></span>
+  <span class="p pc" style="left:65.07%;top:73.24%;--giro:78.9deg;--esp:-1;--pico:0.19;--t:23px;animation-delay:8.26s"></span>
+  <span class="p pc" style="left:73.65%;top:62.2%;--giro:93.8deg;--esp:1;--pico:0.148;--t:24px;animation-delay:8.84s"></span>
+</div>
+
+<p class="nome">A mesma coisa realçada 4×, só para dar para ver o traço</p>
+<div class="faixa realce">
+  <p class="rotulo">realçado · não é assim no site</p>
+  <span class="p pb" style="left:5.21%;top:90.44%;--giro:82.1deg;--esp:-1;--pico:0.097;--t:22px;animation-delay:0.89s"></span>
+  <span class="p pb" style="left:10.84%;top:80.61%;--giro:100.8deg;--esp:1;--pico:0.098;--t:23px;animation-delay:1.72s"></span>
+  <span class="p pb" style="left:16.55%;top:81.51%;--giro:87.4deg;--esp:-1;--pico:0.105;--t:24px;animation-delay:2.64s"></span>
+  <span class="p pb" style="left:25.19%;top:70.11%;--giro:95.1deg;--esp:1;--pico:0.137;--t:25px;animation-delay:3.15s"></span>
+  <span class="p pb" style="left:34.34%;top:71.06%;--giro:80.2deg;--esp:-1;--pico:0.121;--t:26px;animation-delay:3.63s"></span>
+  <span class="p pb" style="left:45.52%;top:61.51%;--giro:90.1deg;--esp:1;--pico:0.192;--t:27px;animation-delay:3.93s"></span>
+  <span class="p pb" style="left:57.67%;top:62.81%;--giro:88.3deg;--esp:-1;--pico:0.197;--t:28px;animation-delay:4.26s"></span>
+  <span class="p pb" style="left:69.87%;top:51.87%;--giro:91.7deg;--esp:1;--pico:0.183;--t:29px;animation-delay:4.54s"></span>
+  <span class="p pb" style="left:78.23%;top:54.6%;--giro:78.4deg;--esp:-1;--pico:0.146;--t:30px;animation-delay:5.03s"></span>
+  <span class="p pb" style="left:84.72%;top:48.62%;--giro:97.2deg;--esp:1;--pico:0.095;--t:31px;animation-delay:6.03s"></span>
+  <span class="p pc" style="left:11.03%;top:53.21%;--giro:79.7deg;--esp:-1;--pico:0.139;--t:16px;animation-delay:2.88s"></span>
+  <span class="p pc" style="left:19.6%;top:56.16%;--giro:96.7deg;--esp:1;--pico:0.143;--t:17px;animation-delay:3.4s"></span>
+  <span class="p pc" style="left:26.1%;top:73.27%;--giro:91.0deg;--esp:-1;--pico:0.1;--t:19px;animation-delay:6.23s"></span>
+  <span class="p pc" style="left:31.73%;top:75.67%;--giro:101.7deg;--esp:1;--pico:0.092;--t:20px;animation-delay:7.22s"></span>
+  <span class="p pc" style="left:40.28%;top:83.89%;--giro:86.1deg;--esp:-1;--pico:0.139;--t:21px;animation-delay:7.7s"></span>
+  <span class="p pc" style="left:52.74%;top:75.31%;--giro:88.4deg;--esp:1;--pico:0.178;--t:22px;animation-delay:7.96s"></span>
+  <span class="p pc" style="left:65.07%;top:73.24%;--giro:78.9deg;--esp:-1;--pico:0.19;--t:23px;animation-delay:8.26s"></span>
+  <span class="p pc" style="left:73.65%;top:62.2%;--giro:93.8deg;--esp:1;--pico:0.148;--t:24px;animation-delay:8.84s"></span>
+</div>
+
+<h2>O que cada um faz</h2>
+
+<table>
+  <thead><tr><th>&nbsp;</th><th>cão de baixo (B)</th><th>cão de cima (C)</th></tr></thead>
+  <tbody>
+    <tr><td>Entra em</td><td class="n">0,9s</td><td class="n">2,9s</td></tr>
+    <tr><td>Sai em</td><td class="n">6,0s</td><td class="n">8,8s</td></tr>
+    <tr><td>Pegadas</td><td class="n">10</td><td class="n">8</td></tr>
+    <tr><td>Começa em</td><td class="n">y 90%</td><td class="n">y 53%</td></tr>
+    <tr><td>Termina em</td><td class="n">y 49%</td><td class="n">y 62%</td></tr>
+    <tr><td>Opacidade</td><td class="n">9,5–19,7%</td><td class="n">9,2–19,0%</td></tr>
+  </tbody>
+</table>
+
+<p>Eles trocam de altura no meio do caminho: o de baixo começa rente ao rodapé e sobe; o de cima
+desce até quase o rodapé e torna a subir. É no cruzamento, por volta de um terço da travessia, que
+as duas passadas se encontram. No fim, o de baixo já saiu na frente e o de cima vem atrás.</p>
+
+<h2>O sorteio é sempre o mesmo</h2>
+<p>As posições, os ângulos e as opacidades vêm de um sorteio com semente fixa. Ele muda de pegada
+para pegada, mas dá sempre o mesmo resultado — o que se quer é a <em>aparência</em> de acaso, não
+acaso de verdade. Com sorteio aberto, o rastro mudaria a cada carregamento e nunca seria possível
+reproduzir o que você viu para corrigir.</p>
+
+<h2>O que ainda dá para mexer</h2>
+<ul>
+  <li>Trocar a semente de cada cão: outro rastro, mesmo comportamento.</li>
+  <li>Mudar o roteiro de andares — mais corrida, mais parada, uma volta no meio.</li>
+  <li>Um terceiro cão, ou um indo na direção contrária.</li>
+  <li>Tirar tudo: é uma linha a menos no Hero, se a Ana preferir o hero limpo.</li>
+</ul>
+
+</div>
+</body>
+</html>
