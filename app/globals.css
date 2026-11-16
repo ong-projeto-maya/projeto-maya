@@ -386,4 +386,64 @@
   .image-reveal {
     animation: imageReveal 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
+
+  /* ===== Trilha de pegadas do hero (components/home/PawTrail.tsx) =====
+     Todas as pegadas usam esta mesma animação e esta mesma duração; o que
+     separa uma da outra é o animation-delay. Como a pegada some antes de a
+     última aparecer, lê-se como rastro: o bicho passou e as marcas vão
+     desaparecendo atrás dele. Entre 52% e 100% não há nada na tela — é a
+     pausa antes de atravessar de novo. */
+  @keyframes pawTrail {
+    0% {
+      opacity: 0;
+      transform: rotate(var(--giro, 0deg)) scaleX(var(--esp, 1)) scale(0.9);
+    }
+    /* a pata encosta — sem estalo: 0,6s para aparecer e quase nenhum exagero
+       de escala, que era o que deixava o movimento duro */
+    /* --pico vem de cada pegada: é a força da marca, e ela sai da velocidade.
+       Passeando fica em 9%; correndo chega a 20%, como pegada que crava mais
+       fundo quando o bicho acelera. */
+    3% {
+      opacity: var(--pico, 0.09);
+      transform: rotate(var(--giro, 0deg)) scaleX(var(--esp, 1)) scale(1.01);
+    }
+    5.5% {
+      opacity: var(--pico, 0.09);
+      transform: rotate(var(--giro, 0deg)) scaleX(var(--esp, 1)) scale(1);
+    }
+    /* fica visível enquanto o cão segue andando */
+    20% {
+      opacity: var(--pico, 0.09);
+      transform: rotate(var(--giro, 0deg)) scaleX(var(--esp, 1)) scale(1);
+    }
+    /* some devagar, assentando: 2s de desaparecimento */
+    30% {
+      opacity: 0;
+      transform: rotate(var(--giro, 0deg)) scaleX(var(--esp, 1)) scale(1.05);
+    }
+    100% {
+      opacity: 0;
+      transform: rotate(var(--giro, 0deg)) scaleX(var(--esp, 1)) scale(1.05);
+    }
+  }
+
+  .paw-trail__pegada {
+    opacity: 0;
+    transform: rotate(var(--giro, 0deg)) scaleX(var(--esp, 1));
+    /* 20s de ciclo. Cada pegada aparece em 0,6s, fica até os 4s e some aos 6s;
+       o resto é a pausa com a tela limpa antes de os dois atravessarem de novo.
+       `ease-in-out` em vez de `ease-out` para a pegada não brotar. */
+    animation: pawTrail 20s ease-in-out infinite both;
+    will-change: opacity, transform;
+  }
+
+  /* Quem pediu menos movimento no sistema vê as pegadas paradas e discretas,
+     mais ou menos como o hero era antes — sem nada se mexendo. */
+  @media (prefers-reduced-motion: reduce) {
+    .paw-trail__pegada {
+      animation: none;
+      opacity: 0.05;
+      transform: rotate(var(--giro, 0deg)) scaleX(var(--esp, 1));
+    }
+  }
 }
