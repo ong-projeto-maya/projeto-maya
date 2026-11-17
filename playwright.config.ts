@@ -27,6 +27,16 @@ export default defineConfig({
     {
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
+      // Os testes com login têm projeto próprio: precisam do site montado
+      // contra o Supabase de teste, não contra o placeholder.
+      testIgnore: /admin-.*\.spec\.ts/,
+    },
+    {
+      // Admin logada, contra o projeto de teste do Supabase. Rodar com
+      // `npx playwright test --project=admin`. Ver docs/dev-notes/PROJETO-DE-TESTE.md.
+      name: 'admin',
+      use: { ...devices['Desktop Chrome'] },
+      testMatch: /admin-.*\.spec\.ts/,
     },
   ],
 
