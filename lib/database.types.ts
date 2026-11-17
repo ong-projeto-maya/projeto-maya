@@ -161,6 +161,20 @@ export type Database = {
           is_rescued: boolean
           is_mixed: boolean
           sort_order: number
+          porte_label: string | null
+          status: 'disponivel' | 'em_processo' | 'em_tratamento' | 'adotado'
+          data_nascimento: string | null
+          data_entrada: string | null
+          lar_temporario: string | null
+          grupo_origem: string | null
+          vermifugado: boolean
+          vacinado: boolean
+          castrado: boolean
+          condicao_especial: string | null
+          observacoes: string | null
+          origem_registro: 'manual' | 'planilha' | 'instagram'
+          instagram_url: string | null
+          revisado: boolean
           created_at: string
           updated_at: string
         }
@@ -180,6 +194,20 @@ export type Database = {
           is_rescued?: boolean
           is_mixed?: boolean
           sort_order?: number
+          porte_label?: string | null
+          status?: 'disponivel' | 'em_processo' | 'em_tratamento' | 'adotado'
+          data_nascimento?: string | null
+          data_entrada?: string | null
+          lar_temporario?: string | null
+          grupo_origem?: string | null
+          vermifugado?: boolean
+          vacinado?: boolean
+          castrado?: boolean
+          condicao_especial?: string | null
+          observacoes?: string | null
+          origem_registro?: 'manual' | 'planilha' | 'instagram'
+          instagram_url?: string | null
+          revisado?: boolean
           created_at?: string
           updated_at?: string
         }
@@ -198,6 +226,20 @@ export type Database = {
           is_rescued?: boolean
           is_mixed?: boolean
           sort_order?: number
+          porte_label?: string | null
+          status?: 'disponivel' | 'em_processo' | 'em_tratamento' | 'adotado'
+          data_nascimento?: string | null
+          data_entrada?: string | null
+          lar_temporario?: string | null
+          grupo_origem?: string | null
+          vermifugado?: boolean
+          vacinado?: boolean
+          castrado?: boolean
+          condicao_especial?: string | null
+          observacoes?: string | null
+          origem_registro?: 'manual' | 'planilha' | 'instagram'
+          instagram_url?: string | null
+          revisado?: boolean
           updated_at?: string
         }
         Relationships: []
