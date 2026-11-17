@@ -125,3 +125,66 @@ jobs:
           name: playwright-report
           path: playwright-report/
           retention-days: 7
+
+  # ---------------------------------------------------------------------------
+  # E2E com login — o site montado contra o projeto de TESTE do Supabase
+  # (teste-funcionarios-projeto-maya). Nunca contra produção.
+  # Os segredos TESTE_* e E2E_* são só desse projeto. PR vindo de fork não
+  # recebe segredos, então o job é pulado nesse caso.
+  # Ver docs/dev-notes/PROJETO-DE-TESTE.md.
+  # ---------------------------------------------------------------------------
+  e2e-admin:
+    name: E2E com login (projeto de teste)
+    runs-on: ubuntu-24.04
+    needs: ci
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository
+
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.TESTE_SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.TESTE_SUPABASE_PUBLISHABLE_KEY }}
+      NEXT_PUBLIC_SITE_URL: http://localhost:3000
+      NEXT_PUBLIC_SENTRY_DSN: ""
+      SENTRY_DSN: ""
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright Chromium
+        run: npx playwright install chromium --with-deps
+
+      - name: Build
+        run: npm run build
+
+      - name: Start Next.js server
+        run: npm start &
+        env:
+          PORT: 3000
+
+      - name: Wait for server
+        run: npx wait-on http://localhost:3000 --timeout 120000
+
+      - name: Run E2E tests with login
+        run: npx playwright test --project=admin
+        env:
+          CI: true
+          PLAYWRIGHT_BASE_URL: http://localhost:3000
+          E2E_ADMIN_EMAIL: ${{ secrets.E2E_ADMIN_EMAIL }}
+          E2E_ADMIN_PASSWORD: ${{ secrets.E2E_ADMIN_PASSWORD }}
+
+      - name: Upload Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-admin
+          path: playwright-report/
+          retention-days: 7
