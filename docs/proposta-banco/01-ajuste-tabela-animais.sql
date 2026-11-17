@@ -1,10 +1,9 @@
--- PROPOSTA — NÃO APLICADA EM PRODUÇÃO
+-- APLICADO EM PRODUÇÃO em 06/11/2026. Registro: a estrutura está em supabase/migrations/.
 -- Ajusta public.animais para caber os dados que a ONG realmente mantém.
 -- Escrito em 2026-11-06 a partir da aba "Animais" da planilha GESTÃO PROJETO MAYA
 -- e dos posts de adoção do @projeto.maya.
 --
--- Para aplicar: mover para supabase/migrations/ com o nome
--- 20240209000000_animais_campos_reais.sql e rodar as migrations.
+-- Já virou migration: supabase/migrations/20240209000000_animais_campos_da_ficha.sql
 --
 -- Por que é preciso: a tabela de hoje tem 3 portes e um booleano is_adopted.
 -- A ONG usa 5 portes (P, P/M, M, M/G, G) e 4 estados (aguardando adoção,

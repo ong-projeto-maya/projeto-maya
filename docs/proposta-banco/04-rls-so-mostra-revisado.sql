@@ -1,4 +1,6 @@
 -- APLICADO EM PRODUÇÃO em 06/11/2026, junto com 01, 02 e 03.
+-- Conferido em 17/11/2026 por pg_policies (havia dúvida; o Eduardo rodou de novo no SQL Editor).
+-- Registro: a política está em supabase/migrations/20240210000000_animais_so_revisado_publico.sql.
 --
 -- Por que existe: a política `public_select_animais` liberava SELECT com
 -- `using (true)` — qualquer visitante lê a tabela inteira. Com os 27 animais

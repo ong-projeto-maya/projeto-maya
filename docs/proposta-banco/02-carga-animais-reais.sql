@@ -1,4 +1,4 @@
--- PROPOSTA — NÃO APLICADA EM PRODUÇÃO
+-- APLICADO EM PRODUÇÃO em 06/11/2026. Registro: NÃO rodar de novo — apaga os animais da planilha e desfaz as fichas do 05.
 -- Os 27 animais reais do Projeto Maya, extraídos da aba "Animais" da planilha
 -- GESTÃO PROJETO MAYA (cópia .xlsx de 11/07/2026, no Drive da ONG).
 --

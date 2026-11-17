@@ -1,4 +1,4 @@
--- PROPOSTA — NÃO APLICADA EM PRODUÇÃO
+-- APLICADO EM PRODUÇÃO em 06/11/2026. Registro: são dados, não entram em migration.
 -- Substitui os números inventados de supabase/seed.sql pelos números que a ONG
 -- declara no próprio Dossiê Institucional (Drive, "1 - ADMINISTRAÇÃO GERAL/
 -- DOSSIÊ INSTITUCIONAL/Dossie Institucional.docx", atualizado em 25/09/2025).
